@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement style="height: 100%; width: 100%; flex-direction: column;">
+        <ui:GroupBox>
+            <ui:TextField picking-mode="Ignore" label="Add New Gameplay Tag" value="X.Y.Z" text="X.Y.Z" name="tagTextField" style="height: auto; width: auto; margin-left: -5px; margin-right: 3px; margin-top: 3px; margin-bottom: 3px; -unity-text-align: upper-right; padding-right: 0;" />
+            <ui:TextField picking-mode="Ignore" label="Tag Comment" value="filler text" name="commentTextField" style="margin-left: -5px; padding-left: 0; -unity-text-align: upper-right;" />
+            <ui:Button text="Add New Tag" display-tooltip-when-elided="true" binding-path="addTagBtn" name="addTagButton" />
+        </ui:GroupBox>
+        <ui:GroupBox name="treebox" />
+    </ui:VisualElement>
+</ui:UXML>

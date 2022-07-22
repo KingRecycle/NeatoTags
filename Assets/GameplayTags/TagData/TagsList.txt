@@ -1,0 +1,32 @@
+- level: 0
+  count: 0
+  isRoot: true
+  isParent: false
+  isLeaf: true
+  data: Tag1
+  parent: 
+  comment: 
+- level: 0
+  count: 2
+  isRoot: true
+  isParent: true
+  isLeaf: false
+  data: Tag2
+  parent: 
+  comment: 
+- level: 0
+  count: 1
+  isRoot: true
+  isParent: true
+  isLeaf: false
+  data: Tag3
+  parent: 
+  comment: 
+- level: 0
+  count: 0
+  isRoot: true
+  isParent: false
+  isLeaf: true
+  data: Tag4
+  parent: 
+  comment: 

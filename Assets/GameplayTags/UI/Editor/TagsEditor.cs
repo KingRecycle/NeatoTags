@@ -5,6 +5,10 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.Windows;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using File = System.IO.File;
 
 namespace CharlieMadeAThing.GameplayTags.UI.Editor {
     public class TagsEditor : EditorWindow {
@@ -29,16 +33,16 @@ namespace CharlieMadeAThing.GameplayTags.UI.Editor {
             CreateTagTree( _tagStrings );
             
             
-            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/GameplayTags/UI/tageditor.uxml" );
+            
+            
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/GameplayTags/UI/Editor/tageditor.uxml" );
             visualTree.CloneTree( rootVisualElement );
 
             foreach ( var treeNode in _tags ) {
                 TraverseAndAddToElement( treeNode, rootVisualElement.Q<GroupBox>("treebox" ) );
             }
             
-            // foreach ( var foldout in _foldouts ) {
-            //     rootVisualElement.Q<GroupBox>( "LeftBox" ).Add( foldout.Value );
-            // }
+            GetNodesFromYAML();
 
         }
 
@@ -57,7 +61,7 @@ namespace CharlieMadeAThing.GameplayTags.UI.Editor {
                 if ( !node.IsRoot && node.Parent.IsRoot ) {
                     foldout.style.paddingLeft = new StyleLength( 10 );
                 }
-                Debug.Log($"{element} : {foldout}"  );
+
                 element.Add( foldout );
 
                 for ( var i = 0; i < node.Count; i++ ) {
@@ -67,10 +71,11 @@ namespace CharlieMadeAThing.GameplayTags.UI.Editor {
             } else {
                 var label = new Label();
                 label.text = node.Data;
+                
                 element.Add( label );
             }
+
             
-            //rootVisualElement.Q<GroupBox>( "LeftBox" ).Add( fo );
 
         }
 
@@ -110,16 +115,22 @@ namespace CharlieMadeAThing.GameplayTags.UI.Editor {
             treeNode = null;
             return false;
         }
-        
-        bool DoesRootNodeExist( string value ) {
-            return _tags.Any( node => node.Data == value );
+
+        void GetNodesFromYAML() {
+            var serializer = new SerializerBuilder()
+                .WithNamingConvention( CamelCaseNamingConvention.Instance )
+                .Build();
+            
+            
+            var t = AssetDatabase.LoadAssetAtPath<TextAsset>( "Assets/GameplayTags/TagData/TagsList.txt" );
+            var yaml = serializer.Serialize( _tags );
+            File.WriteAllText( "Assets/GameplayTags/TagData/TagsList.txt", yaml );
         }
         
     }
 
-    class VisualNode {
-        Foldout Foldout;
-        Label Label;
-        bool isFoldout;
+    class TagData {
+        public string Tag;
+        public string Comment;
     }
 }
