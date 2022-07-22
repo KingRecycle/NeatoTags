@@ -33,6 +33,7 @@ namespace CharlieMadeAThing.GameplayTags {
         public int Level { get { return _level; } }
         public int Count { get { return _children.Count; }}
         public bool IsRoot { get { return _parent==null; }}
+        public bool IsParent { get { return !IsLeaf; } }
         public bool IsLeaf { get { return _children.Count==0; }}
         public T Data { get { return _data; }}
         public TreeNode<T> Parent { get { return _parent; }}
