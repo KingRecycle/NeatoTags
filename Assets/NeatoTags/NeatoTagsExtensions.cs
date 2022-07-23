@@ -31,15 +31,16 @@ namespace CharlieMadeAThing.NeatoTags
         /// Returns true if the gameobject is tagged with the given tag.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="tag"></param>
+        /// <param name="tagAsset"></param>
         /// <returns>bool</returns>
-        public static bool HasTag( this GameObject gameObject, NeatoTag tag ) {
+        public static bool HasTag( this GameObject gameObject, NeatoTagAsset tagAsset ) {
             var tagger = gameObject.GetComponent<Tagger>();
             if( tagger == null || tagger.TagCollection == null ) {
                 return false;
             }
-            return tagger.TagCollection.HasTag( tag );
+            return tagger.TagCollection.HasTag( tagAsset );
         }
+        
         
         /// <summary>
         /// Returns true if the gameobject is tagged with any of the given tags.
@@ -47,7 +48,7 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
+        public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
             var tagger = gameObject.GetComponent<Tagger>();
             if( tagger == null || tagger.TagCollection == null ) {
                 return false;
@@ -61,7 +62,7 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
+        public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
             var tagger = gameObject.GetComponent<Tagger>();
             if( tagger == null || tagger.TagCollection == null ) {
                 return false;
@@ -75,12 +76,21 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
+        public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
             var tagger = gameObject.GetComponent<Tagger>();
             if( tagger == null || tagger.TagCollection == null ) {
                 return false;
             }
             return tagger.TagCollection.NoTagsMatch( tagList );
+        }
+
+        public static NeatoTagCollection.TagFilter TagFilter( this GameObject gameObject ) {
+            var tagger = gameObject.GetComponent<Tagger>();
+            if( tagger == null || tagger.TagCollection == null ) {
+                return null;
+            }
+
+            return tagger.TagCollection.Filter();
         }
     }
 }

@@ -19,13 +19,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
         void OnEnable() {
             _root = new VisualElement();
-            
             // Load in UXML template and USS styles, then apply them to the root element.
             VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/NeatoTags/Editor/Tagger.uxml");
             visualTree.CloneTree(_root);
-        }
-
-        public override VisualElement CreateInspectorGUI() {
             FindProperties();
 
             _tagViewer = _root.Q<GroupBox>("tagViewer");
@@ -33,27 +29,45 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _objectField.objectType = typeof(NeatoTagCollection);
             _objectField.value = PropertyTagCollection.objectReferenceValue;
             _objectField.RegisterValueChangedCallback( OnCollectionAdded );
-            
+            Debug.Log("Collection : " + _objectField.value);
             GetAllTagsAndCreateButtons();
+        }
+
+        public override VisualElement CreateInspectorGUI() {
+            
             
             return _root;
         }
 
+        public override void OnInspectorGUI() {
+            _objectField.value = PropertyTagCollection.objectReferenceValue;
+        }
+
         void OnCollectionAdded( ChangeEvent<Object> evt ) {
-            var collection = evt.newValue as NeatoTagCollection;
-            PropertyTagCollection.objectReferenceValue = evt.newValue;
-            Debug.Log("Collection added: " + collection.name);
+            NeatoTagCollection = evt.newValue as NeatoTagCollection;
+            PropertyTagCollection.objectReferenceValue = NeatoTagCollection;
+            PropertyTagCollection.serializedObject.ApplyModifiedProperties();
+            GetAllTagsAndCreateButtons();
+            Debug.Log("Collection added: " + NeatoTagCollection.name);
+            Debug.Log("Collection : " + _objectField.value);
         }
 
 
         //Loop through all tags in PropertyTagCollection and add a button for each one.
         void GetAllTagsAndCreateButtons() {
+            foreach ( var button in _buttons ) {
+                _tagViewer.Remove( button );
+            }
+            _buttons.Clear();
             var collectionList = NeatoTagCollection.tags;
+            Debug.Log(collectionList.Count  );
             for ( var i = 0; i < collectionList.Count; i++ ) {
                 var btn = new Button();
                 btn.text = collectionList[i].name;
                 btn.style.backgroundColor = collectionList[i].color;
                 _tagViewer.Add( btn );
+                _buttons.Add( btn );
+                
             }
 
         }

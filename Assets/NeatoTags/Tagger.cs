@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace CharlieMadeAThing
 {
+    [System.Serializable]
     public class Tagger : MonoBehaviour {
         [SerializeField] NeatoTagCollection tagCollection;
         public NeatoTagCollection TagCollection => tagCollection;

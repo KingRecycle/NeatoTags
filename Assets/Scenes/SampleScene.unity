@@ -435,7 +435,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1205850780
 MonoBehaviour:
@@ -450,6 +450,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tagCollection: {fileID: 11400000, guid: 89189269d1553f84dbdd3326d16e63f6, type: 2}
+--- !u!1 &1372085477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1372085479}
+  - component: {fileID: 1372085478}
+  m_Layer: 0
+  m_Name: Spooker (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1372085478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372085477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 501fb58898c061d469e1f038995b8024, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tagCollection: {fileID: 11400000, guid: 2f4514704af4b1545b2178a6e384ab7d, type: 2}
+--- !u!4 &1372085479
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372085477}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -9.440193, y: -0.7600708, z: 7.66125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1705574907
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,7 +527,11 @@ MonoBehaviour:
   Spooks:
   - {fileID: 11400000, guid: 861f2b04985541845be25678df98d58b, type: 2}
   - {fileID: 11400000, guid: 9192a5dbd08e6cf4188c027523e5fabe, type: 2}
+  tag1: {fileID: 11400000, guid: 861f2b04985541845be25678df98d58b, type: 2}
+  tag2: {fileID: 11400000, guid: 9192a5dbd08e6cf4188c027523e5fabe, type: 2}
+  tag3: {fileID: 11400000, guid: fd35981a71bf66b4fb37247140541deb, type: 2}
   target: {fileID: 1205850778}
+  target2: {fileID: 1372085477}
 --- !u!4 &1705574909
 Transform:
   m_ObjectHideFlags: 0
@@ -496,5 +545,5 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

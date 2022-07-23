@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Editor {
-    [CustomEditor(typeof(NeatoTag))]
+    [CustomEditor(typeof(NeatoTagAsset))]
     public class NeatoTagDrawer : UnityEditor.Editor {
         SerializedProperty PropertyColor { get; set; }
         
