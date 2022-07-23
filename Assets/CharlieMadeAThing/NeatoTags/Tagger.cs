@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CharlieMadeAThing.NeatoTags;
+using UnityEditor;
 using UnityEngine;
 using YamlDotNet.Core.Tokens;
 
@@ -13,10 +14,19 @@ namespace CharlieMadeAThing
         [SerializeField] NeatoTagCollection tagCollection;
         public NeatoTagCollection TagCollection => tagCollection;
         
+        [SerializeField] List<NeatoTagAsset> tags = new();
+        
         static Dictionary<GameObject, Tagger> _taggers = new();
+        static List<NeatoTagAsset> allTags = new();
 
         void OnEnable() {
             _taggers.Add( gameObject, this );
+            string[] guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
+            foreach ( var guid in guids ) {
+                var path = AssetDatabase.GUIDToAssetPath( guid );
+                var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( path );
+                allTags.Add( tagAsset );
+            }
         }
         
         void OnDisable() {

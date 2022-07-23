@@ -17,7 +17,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _root = new VisualElement();
             
             // Load in UXML template and USS styles, then apply them to the root element.
-            VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/NeatoTags/Editor/NeatoTag.uxml");
+            VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTag.uxml");
             visualTree.CloneTree(_root);
         }
 
@@ -29,6 +29,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             
             _button = _root.Q<Button>( "tagIcon" );
             _button.text = target.name;
+            _button.style.backgroundColor = _colorField.value;
             
             return _root;
         }
