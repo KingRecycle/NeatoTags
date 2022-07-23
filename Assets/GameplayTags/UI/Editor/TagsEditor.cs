@@ -23,13 +23,14 @@ namespace CharlieMadeAThing.GameplayTags.UI.Editor {
 
         void CreateGUI() {
             
-            _tagStrings.Add( "Tag1" );
-            _tagStrings.Add("Tag2.ChildTag1"  );
-            _tagStrings.Add("Tag2.ChildTag2"  );
-            _tagStrings.Add("Tag2.ChildTag2.ChildTag3"  );
-            _tagStrings.Add( "Tag3" );
-            _tagStrings.Add( "Tag3.Child1.Child2.Child3.Child4" );
-            _tagStrings.Add( "Tag4" );
+            _tagStrings.Add( "Vehicle" );
+            _tagStrings.Add("Vehicle.Car"  );
+            _tagStrings.Add("Vehicle.Helicopter"  );
+            _tagStrings.Add("Vehicle.Helicopter.Flying"  );
+            _tagStrings.Add( "Vehicle.Car.Drive" );
+            _tagStrings.Add( "Magic.Arcane.Child2.Child3.Child4" );
+            _tagStrings.Add( "Magic.Arcane.Neat" );
+            _tagStrings.Add( "Magic.Fire" );
             CreateTagTree( _tagStrings );
             
             

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement>
+        <uie:ColorField label="Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" name="tagColor" />
+    </ui:VisualElement>
+    <ui:VisualElement style="min-width: auto; flex-direction: row; margin-top: 12px;">
+        <ui:Button text="Button" display-tooltip-when-elided="true" name="tagIcon" style="max-width: 181px; width: auto; align-items: auto; justify-content: flex-start; left: 0; min-width: auto; flex-basis: auto;" />
+    </ui:VisualElement>
+</ui:UXML>
