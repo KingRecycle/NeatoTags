@@ -6,25 +6,12 @@ namespace CharlieMadeAThing.NeatoTags
     public static class NeatoTagsExtensions 
     {
         /// <summary>
-        /// Checks if the gameobject is able to be tagged.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>bool</returns>
-        public static bool IsTaggable(this GameObject gameObject) {
-            return gameObject.GetComponent<Tagger>() != null;
-        }
-        
-        /// <summary>
         /// Returns true if the gameobject is tagged
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>bool</returns>
         public static bool IsTagged(this GameObject gameObject) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return false;
-            }
-            return true;
+            return Tagger.IsTagged( gameObject );
         }
 
         /// <summary>
@@ -34,11 +21,7 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="tagAsset"></param>
         /// <returns>bool</returns>
         public static bool HasTag( this GameObject gameObject, NeatoTagAsset tagAsset ) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return false;
-            }
-            return tagger.TagCollection.HasTag( tagAsset );
+             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagAsset );
         }
         
         
@@ -48,12 +31,8 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return false;
-            }
-            return tagger.TagCollection.AnyTagsMatch( tagList );
+        public static bool HasAnyTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagList );
         }
         
         /// <summary>
@@ -62,12 +41,8 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return false;
-            }
-            return tagger.TagCollection.AllTagsMatch( tagList );
+        public static bool HasAllTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
         }
         
         /// <summary>
@@ -76,21 +51,12 @@ namespace CharlieMadeAThing.NeatoTags
         /// <param name="gameObject"></param>
         /// <param name="tagList"></param>
         /// <returns>bool</returns>
-        public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return false;
-            }
-            return tagger.TagCollection.NoTagsMatch( tagList );
+        public static bool HasNoTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.NoTagsMatch( tagList );
         }
 
-        public static NeatoTagCollection.TagFilter TagFilter( this GameObject gameObject ) {
-            var tagger = gameObject.GetComponent<Tagger>();
-            if( tagger == null || tagger.TagCollection == null ) {
-                return null;
-            }
-
-            return tagger.TagCollection.Filter();
+        public static Tagger.TagFilter TagFilter( this GameObject gameObject ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.Filter() : null;
         }
     }
 }
