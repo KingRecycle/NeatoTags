@@ -29,7 +29,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _objectField.objectType = typeof(NeatoTagCollection);
             _objectField.value = PropertyTagCollection.objectReferenceValue;
             _objectField.RegisterValueChangedCallback( OnCollectionAdded );
-            Debug.Log("Collection : " + _objectField.value);
             GetAllTagsAndCreateButtons();
         }
 
@@ -48,8 +47,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             PropertyTagCollection.objectReferenceValue = NeatoTagCollection;
             PropertyTagCollection.serializedObject.ApplyModifiedProperties();
             GetAllTagsAndCreateButtons();
-            Debug.Log("Collection added: " + NeatoTagCollection.name);
-            Debug.Log("Collection : " + _objectField.value);
         }
 
 
@@ -60,7 +57,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
             _buttons.Clear();
             var collectionList = NeatoTagCollection.tags;
-            Debug.Log(collectionList.Count  );
+            
             for ( var i = 0; i < collectionList.Count; i++ ) {
                 var btn = new Button();
                 btn.text = collectionList[i].name;

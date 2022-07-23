@@ -15,7 +15,7 @@ namespace CharlieMadeAThing
 
         public GameObject target;
         public GameObject target2;
-        // Start is called before the first frame update
+
         void Start()
         {
             
@@ -28,10 +28,6 @@ namespace CharlieMadeAThing
             Debug.Log( $"Chaining with TagFilter(With:{tag1.name}, Without:{tag2.name}, With:{tag3.name}): {target2.TagFilter().WithTag( tag1 ).WithoutTag(tag2).WithTag(tag3).IsMatch()}");
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
+
     }
 }
