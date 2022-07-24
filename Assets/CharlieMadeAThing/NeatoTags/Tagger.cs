@@ -33,6 +33,14 @@ namespace CharlieMadeAThing.NeatoTags
                 if( _allTags.Contains( tagAsset ) ) continue;
                 _allTags.Add( tagAsset );
             }
+            
+            var deDupe = new HashSet<NeatoTagAsset>();
+            foreach ( var neatoTag in tags ) {
+                deDupe.Add( neatoTag );
+            }
+            tags.Clear();
+            deDupe.Remove( null );
+            tags.AddRange( deDupe );
         }
         
 

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -7,8 +9,8 @@ using UnityEngine.UIElements;
 namespace CharlieMadeAThing.NeatoTags.Editor {
     [CustomEditor( typeof( Tagger ) )]
     public class TaggerDrawer : UnityEditor.Editor {
-        readonly List<Button> _activeButtons = new();
-        readonly List<Button> _unactiveButtons = new();
+        Dictionary<Button, NeatoTagAsset> buttonTagLookup = new();
+        Dictionary<NeatoTagAsset, Button> tagButtonsLookup = new();
         ObjectField _objectField;
 
         //UI
@@ -20,80 +22,115 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         SerializedProperty SelectedTags { get; set; }
 
         void OnEnable() {
+            Debug.Log( "[TaggerDrawer]: OnEnable" );
+
             _root = new VisualElement();
             // Load in UXML template and USS styles, then apply them to the root element.
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/CharlieMadeAThing/NeatoTags/Editor/Tagger.uxml" );
             visualTree.CloneTree( _root );
-            FindProperties();
-
+            
             _tagViewer = _root.Q<GroupBox>( "tagViewer" );
             _allTagViewer = _root.Q<GroupBox>( "allTagViewer" );
+            FindProperties();
             
+            NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             GetAllTagsAndCreateButtons();
         }
 
         void OnValidate() {
-            GetAllTagsAndCreateButtons();
+            
         }
 
         public override VisualElement CreateInspectorGUI() {
             return _root;
         }
 
-
         //Loop through all tags in PropertyTagCollection and add a button for each one.
         public void GetAllTagsAndCreateButtons() {
+            Debug.Log( "[TaggerDrawer]: GetAllTagsAndCreateButtons" );
             
             if ( NeatoTagAssets == null ) return;
+            Debug.Log($"{NeatoTagAssets == null} : {NeatoTagAssets.arraySize}");
+            RemoveDuplicateTags();
             for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
                 var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
-                if ( tag == null ) continue;
-                var button = new Button();
-                button.text = tag.name;
-                button.style.backgroundColor = Color.clear;
-                button.clicked += () => {
-                    Debug.Log( "Button clicked: " + tag.name );
-                    if ( TagIsSelected( tag ) ) {
-                        RemoveTag( tag );
-                        button.style.backgroundColor = Color.clear;
-                        //_tagViewer.Remove( button );
-                        _activeButtons.Remove( button );
-                        
-                        _allTagViewer.Add( button );
-                        _unactiveButtons.Add( button );
-                    } else {
-                        AddTag( tag );
-                        button.style.backgroundColor = tag.color;
-                        _tagViewer.Add( button );
-                        _activeButtons.Add( button );
-                        //_allTagViewer.Remove( button );
-                        _unactiveButtons.Remove( button );
-                    }
-                };
                 
-                if ( !TagIsSelected( tag ) ) {
-                    RemoveTag( tag );
-                    button.style.backgroundColor = Color.clear;
-                    RemoveIfContains( _tagViewer, button );
-                    _activeButtons.Remove( button );
-                    _allTagViewer.Add( button );
-                    _unactiveButtons.Add( button );
-                } else {
-                    AddTag( tag );
-                    button.style.backgroundColor = tag.color;
-                    _tagViewer.Add( button );
-                    _activeButtons.Add( button );
-                    RemoveIfContains( _allTagViewer, button );
-                    _unactiveButtons.Remove( button );
-                }
-                RemoveDuplicateTags();
-                Repaint();
+                if ( tag == null ) continue;
+                
+                CreateTagButtonToAllViewer( tag );
+                UpdateButtonTagPosition( tag );
             }
         }
 
+        void UpdateButtonTagPosition( NeatoTagAsset tag) {
+            if ( TagIsSelected( tag ) ) {
+                AddTagButtonToActiveTagViewer( tagButtonsLookup[tag] );
+            } else {
+                AddTagButtonToAllViewer( tagButtonsLookup[tag]);
+            }
+        }
+
+        void CreateTagButtonToAllViewer( NeatoTagAsset tag ) {
+            Debug.Log( "[TaggerDrawer]: CreateTagButtonToAllViewer" );
+            if ( tag == null ) return;
+            var button = new Button();
+            button.text = tag.name;
+            button.style.backgroundColor = Color.clear;
+            button.clicked += () => {
+                Debug.Log( "Button clicked: " + tag.name );
+                if ( TagIsSelected( tag ) ) {
+                    AddTagButtonToAllViewer( button );
+                } else {
+                    AddTagButtonToActiveTagViewer( button );
+                }
+            };
+            if( !tagButtonsLookup.ContainsKey( tag )) {
+                tagButtonsLookup.Add( tag, button );
+                buttonTagLookup.Add( button, tag );
+            }
+            _allTagViewer.Add( button );
+            Repaint();
+        }
+
+        void AddTagButtonToAllViewer( Button button ) {
+            Debug.Log( "[TaggerDrawer]: AddTagButtonToAllViewer" );
+            if( _allTagViewer.Contains( button ) ) return;
+            var tag = buttonTagLookup[button];
+            RemoveTag( tag );
+            button.style.backgroundColor = Color.clear;
+            _allTagViewer.Add( button );
+            Repaint();
+        }
+        
+        void AddTagButtonToActiveTagViewer( Button button ) {
+            Debug.Log( "[TaggerDrawer]: AddTagButtonToActiveTagViewer" );
+            if( _tagViewer.Contains( button ) ) return;
+            var tag = buttonTagLookup[button];
+            AddTag( tag );
+            button.style.backgroundColor = tag.color;
+            _tagViewer.Add( button );
+            Repaint();
+        }
+
+        public void UpdateAllTagViewer() {
+            Debug.Log( "[TaggerDrawer]: UpdateAllTagViewer" );
+            if ( NeatoTagAssets == null ) return;
+            RemoveDuplicateTags();
+            for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
+                var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
+                if( tag == null ) continue;
+                if ( !TagIsSelected( tag ) ) {
+                    var button = tagButtonsLookup[tag];
+                    AddTagButtonToAllViewer( button );
+                }
+            }
+            Repaint();
+        }
+
         void RemoveDuplicateTags() {
+            Debug.Log( "[TaggerDrawer]: RemoveDuplicateTags" );
             var deDupe = new HashSet<NeatoTagAsset>();
             for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
                 deDupe.Add( SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue as NeatoTagAsset );
@@ -115,6 +152,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
         
         void AddTag( NeatoTagAsset tag ) {
+            Debug.Log( "[TaggerDrawer]: AddTag" );
             var index = SelectedTags.arraySize;
             SelectedTags.InsertArrayElementAtIndex( index );
             SelectedTags.GetArrayElementAtIndex( index ).objectReferenceValue = tag;
@@ -122,6 +160,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         void RemoveTag( NeatoTagAsset tag ) {
+            Debug.Log( "[TaggerDrawer]: RemoveTag" );
             for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
                 if ( SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue == tag ) {
                     SelectedTags.DeleteArrayElementAtIndex( i );
