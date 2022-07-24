@@ -11,6 +11,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         {
             foreach ( var tagger in Object.FindObjectsOfType<Tagger>() ) {
                 tagger.OnValidate();
+                //Update TaggerDrawer
             }
         }
 
