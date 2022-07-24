@@ -26,10 +26,14 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _colorField = _root.Q<ColorField>( "tagColor" );
             _colorField.BindProperty( PropertyColor );
             _colorField.RegisterValueChangedCallback( UpdateTagIconVisual );
+            _colorField.showAlpha = false;
+            PropertyColor.colorValue = Color.black;
+            PropertyColor.colorValue = _colorField.value;
             
             _button = _root.Q<Button>( "tagIcon" );
             _button.text = target.name;
-            _button.style.backgroundColor = _colorField.value;
+            _button.style.backgroundColor = PropertyColor.colorValue;
+            
             
             return _root;
         }
@@ -37,12 +41,18 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         void FindProperties() {
             PropertyColor = serializedObject.FindProperty( "color" );
         }
-        
-        
+
+        public override void OnInspectorGUI() {
+            _button.text = target.name;
+        }
+
 
         void UpdateTagIconVisual( ChangeEvent<Color> evt ) {
-            _button.style.backgroundColor = evt.newValue;
+            Debug.Log("Color Changed"  );
             PropertyColor.colorValue = evt.newValue;
+            _button.style.backgroundColor = PropertyColor.colorValue;
+            
         }
     }
+    
 }

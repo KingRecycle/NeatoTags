@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CharlieMadeAThing.NeatoTags;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags

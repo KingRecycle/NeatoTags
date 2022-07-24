@@ -1,37 +1,51 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CharlieMadeAThing.NeatoTags;
 using UnityEditor;
 using UnityEngine;
-using YamlDotNet.Core.Tokens;
 
-namespace CharlieMadeAThing
+namespace CharlieMadeAThing.NeatoTags
 {
     [System.Serializable]
     public class Tagger : MonoBehaviour {
-        [SerializeField] NeatoTagCollection tagCollection;
-        public NeatoTagCollection TagCollection => tagCollection;
+        // [SerializeField] NeatoTagCollection tagCollection;
+        // public NeatoTagCollection TagCollection => tagCollection;
         
         [SerializeField] List<NeatoTagAsset> tags = new();
         
         static Dictionary<GameObject, Tagger> _taggers = new();
-        static List<NeatoTagAsset> allTags = new();
+        
+        [SerializeField] List<NeatoTagAsset> _allTags = new();
+        
 
-        void OnEnable() {
-            _taggers.Add( gameObject, this );
+        
+        /// <summary>
+        /// Updates the tagger's tag collection.
+        /// This should be called whenever the tag collection is changed.
+        /// Does not need to be called manually.
+        /// </summary>
+       public void OnValidate() {
+            _allTags.Clear();
             string[] guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
             foreach ( var guid in guids ) {
                 var path = AssetDatabase.GUIDToAssetPath( guid );
                 var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( path );
-                allTags.Add( tagAsset );
+                if( _allTags.Contains( tagAsset ) ) continue;
+                _allTags.Add( tagAsset );
             }
+        }
+        
+
+
+        void OnEnable() {
+            _taggers.Add( gameObject, this );
         }
         
         void OnDisable() {
             _taggers.Remove( gameObject );
         }
+        
+        
         
         public static bool IsTagged(GameObject go) => _taggers.ContainsKey( go );
         
@@ -39,8 +53,12 @@ namespace CharlieMadeAThing
             return _taggers.TryGetValue( go, out tagger );
         }
 
+        public static Dictionary<GameObject, Tagger> GetTagged() {
+            return _taggers;
+        }
+
         public bool HasTag( NeatoTagAsset tagAsset ) {
-            return tagCollection.tags.Contains( tagAsset );
+            return tags.Contains( tagAsset );
         }
         
         public bool AnyTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {

@@ -1,7 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="width: 100%; height: 100%;">
         <ui:GroupBox style="flex-grow: 1;">
-            <uie:ObjectField label="Neato Tag Collection" binding-path="tags" name="collectionField" />
             <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap;" />
         </ui:GroupBox>
     </ui:VisualElement>

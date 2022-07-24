@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
-  m_Name: MegaUltraUniversalMagicAttack
+  m_Name: Arcane
   m_EditorClassIdentifier: 
-  color: {r: 0.5176471, g: 0.29010215, b: 0.27058825, a: 1}
+  color: {r: 0.3584906, g: 0.11148135, b: 0.06933072, a: 1}

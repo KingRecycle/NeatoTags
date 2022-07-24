@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
-  m_Name: Witch
+  m_Name: Desire
   m_EditorClassIdentifier: 
-  color: {r: 0.5077062, g: 0.5176471, b: 0.27058825, a: 1}
+  color: {r: 1, g: 0.33490568, b: 0.6998092, a: 1}
