@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         VisualElement _root;
         ColorField _colorField;
         Button _button;
+        static List<TaggerDrawer> _taggerDrawers = new();
         void OnEnable() {
             _root = new VisualElement();
             
@@ -26,7 +28,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _colorField = _root.Q<ColorField>( "tagColor" );
             _colorField.BindProperty( PropertyColor );
             _colorField.RegisterValueChangedCallback( UpdateTagIconVisual );
-            _colorField.showAlpha = false;
+            _colorField.showAlpha = true;
             PropertyColor.colorValue = Color.black;
             PropertyColor.colorValue = _colorField.value;
             
@@ -48,10 +50,18 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
 
         void UpdateTagIconVisual( ChangeEvent<Color> evt ) {
-            Debug.Log("Color Changed"  );
             PropertyColor.colorValue = evt.newValue;
             _button.style.backgroundColor = PropertyColor.colorValue;
-            
+            foreach ( var taggerDrawer in _taggerDrawers ) {
+                taggerDrawer.UpdateButtonTagPosition( target as NeatoTagAsset );
+            }
+        }
+        
+        public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
+            if( _taggerDrawers.Contains( taggerDrawer ) ) {
+                return;
+            }
+            _taggerDrawers.Add(taggerDrawer);
         }
     }
     

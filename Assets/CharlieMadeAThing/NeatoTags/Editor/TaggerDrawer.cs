@@ -21,6 +21,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         SerializedProperty NeatoTagAssets { get; set; }
         SerializedProperty SelectedTags { get; set; }
 
+        HashSet<NeatoTagAsset> _selectedTagsSet = new();
+
         void OnEnable() {
             Debug.Log( "[TaggerDrawer]: OnEnable" );
 
@@ -36,6 +38,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             FindProperties();
             
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
+            NeatoTagDrawer.RegisterTaggerDrawer( this );
             GetAllTagsAndCreateButtons();
         }
 
@@ -53,7 +56,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             
             if ( NeatoTagAssets == null ) return;
             Debug.Log($"{NeatoTagAssets == null} : {NeatoTagAssets.arraySize}");
-            RemoveDuplicateTags();
             for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
                 var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
                 
@@ -64,11 +66,25 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
         }
 
-        void UpdateButtonTagPosition( NeatoTagAsset tag) {
+        public void UpdateButtonTagPosition( NeatoTagAsset tag) {
             if ( TagIsSelected( tag ) ) {
+                AddTagButtonToAllViewer( tagButtonsLookup[tag]);
                 AddTagButtonToActiveTagViewer( tagButtonsLookup[tag] );
             } else {
                 AddTagButtonToAllViewer( tagButtonsLookup[tag]);
+            }
+        }
+
+        public void RefreshAllTagButtons() {
+            var tagViewerButtons = _tagViewer.Children();
+            foreach ( var btn in tagViewerButtons ) {
+                AddTagButtonToAllViewer( (Button) btn );
+            }
+            
+            for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
+                var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
+                if ( tag == null ) continue;
+                UpdateButtonTagPosition( tag );
             }
         }
 
@@ -103,10 +119,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _allTagViewer.Add( button );
             Repaint();
         }
-        
+
         void AddTagButtonToActiveTagViewer( Button button ) {
             Debug.Log( "[TaggerDrawer]: AddTagButtonToActiveTagViewer" );
-            if( _tagViewer.Contains( button ) ) return;
+            if ( _tagViewer.Contains( button ) ) return;
             var tag = buttonTagLookup[button];
             AddTag( tag );
             button.style.backgroundColor = tag.color;
@@ -116,8 +132,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
         public void UpdateAllTagViewer() {
             Debug.Log( "[TaggerDrawer]: UpdateAllTagViewer" );
-            if ( NeatoTagAssets == null ) return;
-            RemoveDuplicateTags();
+            if ( NeatoTagAssets == null && NeatoTagAssets.arraySize == null ) return;
+            Debug.Log( NeatoTagAssets.arraySize);
             for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
                 var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
                 if( tag == null ) continue;
@@ -127,29 +143,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 }
             }
             Repaint();
+            
         }
-
-        void RemoveDuplicateTags() {
-            Debug.Log( "[TaggerDrawer]: RemoveDuplicateTags" );
-            var deDupe = new HashSet<NeatoTagAsset>();
-            for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
-                deDupe.Add( SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue as NeatoTagAsset );
-                SelectedTags.DeleteArrayElementAtIndex( i );
-            }
-
-            foreach ( var neatoTagAsset in deDupe ) {
-                SelectedTags.InsertArrayElementAtIndex( SelectedTags.arraySize );
-                SelectedTags.GetArrayElementAtIndex( SelectedTags.arraySize - 1 ).objectReferenceValue = neatoTagAsset;
-            }
-
-            SelectedTags.serializedObject.ApplyModifiedProperties();
-        }
-
-        public void RemoveIfContains( VisualElement parent, VisualElement e)
-        {
-            if (parent.Contains(e))
-                parent.Remove(e);
-        }
+        
         
         void AddTag( NeatoTagAsset tag ) {
             Debug.Log( "[TaggerDrawer]: AddTag" );
@@ -183,6 +179,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         void FindProperties() {
             NeatoTagAssets = serializedObject.FindProperty( "_allTags" );
             SelectedTags = serializedObject.FindProperty( "tags" );
+            for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
+                var t = SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue;
+                _selectedTagsSet.Add( t as NeatoTagAsset );
+            }
         }
     }
 }

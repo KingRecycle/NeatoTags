@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
   m_Name: Chaos
   m_EditorClassIdentifier: 
-  color: {r: 0.28379807, g: 0.11044855, b: 0.3207547, a: 1}
+  color: {r: 0.30491272, g: 0.15218937, b: 0.33962262, a: 1}

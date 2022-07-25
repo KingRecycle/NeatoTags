@@ -441,11 +441,11 @@ MonoBehaviour:
   _allTags:
   - {fileID: 11400000, guid: 396c0986b503ab444be0797d4cca65bc, type: 2}
   - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
+  - {fileID: 11400000, guid: fc3d248d1d9092a4692ca6d981472047, type: 2}
   - {fileID: 11400000, guid: 4228b9a65924dea46bb2b5ba9219eb12, type: 2}
   - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
   - {fileID: 11400000, guid: c44dedf8e9daa274eae3004e8f0830de, type: 2}
   - {fileID: 11400000, guid: 98a356c276c08464c9212e75baf52a43, type: 2}
-  - {fileID: 11400000, guid: 5128d221472110e46a8db2dd9ba86af4, type: 2}
   - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
 --- !u!65 &921331365
 BoxCollider:
@@ -635,15 +635,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 501fb58898c061d469e1f038995b8024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tags: []
+  tags:
+  - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
+  - {fileID: 11400000, guid: 396c0986b503ab444be0797d4cca65bc, type: 2}
+  - {fileID: 11400000, guid: 4228b9a65924dea46bb2b5ba9219eb12, type: 2}
+  - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
+  - {fileID: 11400000, guid: 98a356c276c08464c9212e75baf52a43, type: 2}
+  - {fileID: 11400000, guid: c44dedf8e9daa274eae3004e8f0830de, type: 2}
+  - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
+  - {fileID: 11400000, guid: fc3d248d1d9092a4692ca6d981472047, type: 2}
   _allTags:
   - {fileID: 11400000, guid: 396c0986b503ab444be0797d4cca65bc, type: 2}
   - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
+  - {fileID: 11400000, guid: fc3d248d1d9092a4692ca6d981472047, type: 2}
   - {fileID: 11400000, guid: 4228b9a65924dea46bb2b5ba9219eb12, type: 2}
   - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
   - {fileID: 11400000, guid: c44dedf8e9daa274eae3004e8f0830de, type: 2}
   - {fileID: 11400000, guid: 98a356c276c08464c9212e75baf52a43, type: 2}
-  - {fileID: 11400000, guid: 5128d221472110e46a8db2dd9ba86af4, type: 2}
   - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
 --- !u!1 &1705574907
 GameObject:

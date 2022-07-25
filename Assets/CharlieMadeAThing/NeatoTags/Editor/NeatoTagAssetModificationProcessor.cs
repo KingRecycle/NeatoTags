@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -18,6 +17,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             foreach ( var taggerDrawer in _taggerDrawers ) {
                 taggerDrawer.UpdateAllTagViewer();
+                taggerDrawer.RefreshAllTagButtons();
             }
         }
 
@@ -29,11 +29,15 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
             foreach ( var taggerDrawer in _taggerDrawers ) {
                 taggerDrawer.UpdateAllTagViewer();
+                taggerDrawer.RefreshAllTagButtons();
             }
             return paths;
         }
 
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
+            if( _taggerDrawers.Contains( taggerDrawer ) ) {
+                return;
+            }
             _taggerDrawers.Add(taggerDrawer);
         }
     }

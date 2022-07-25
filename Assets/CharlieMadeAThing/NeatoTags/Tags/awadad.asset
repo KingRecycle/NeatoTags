@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
-  m_Name: Lightning
+  m_Name: awadad
   m_EditorClassIdentifier: 
-  color: {r: 0.493236, g: 0.55487126, b: 0.6415094, a: 1}
+  color: {r: 1, g: 0.6839622, b: 0.6839622, a: 1}
