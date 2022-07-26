@@ -17,32 +17,20 @@ namespace CharlieMadeAThing.NeatoTags
         
         [SerializeField] List<NeatoTagAsset> _allTags = new();
         
-
         
-        /// <summary>
-        /// Updates the tagger's tag collection.
-        /// This should be called whenever the tag collection is changed.
-        /// Does not need to be called manually.
-        /// </summary>
-       public void OnValidate() {
-            _allTags.Clear();
+        public static HashSet<NeatoTagAsset> GetAllTags() {
+            var tagSet = new HashSet<NeatoTagAsset>();
             string[] guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
             foreach ( var guid in guids ) {
                 var path = AssetDatabase.GUIDToAssetPath( guid );
                 var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( path );
-                if( _allTags.Contains( tagAsset ) ) continue;
-                _allTags.Add( tagAsset );
+                tagSet.Add( tagAsset );
             }
-            
-            var deDupe = new HashSet<NeatoTagAsset>();
-            foreach ( var neatoTag in tags ) {
-                deDupe.Add( neatoTag );
-            }
-            tags.Clear();
-            deDupe.Remove( null );
-            tags.AddRange( deDupe );
+
+            return tagSet;
         }
-        
+
+        public List<NeatoTagAsset> GetTags => tags;
 
 
         void OnEnable() {

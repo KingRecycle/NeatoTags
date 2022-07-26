@@ -20,22 +20,25 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 }
             }
             
-            if( deletedAssets.Length > 0 ) {
-                foreach ( var taggerDrawer in _taggerDrawers ) {
-                    taggerDrawer.CheckAndUpdateRemovedTags();
-                }
-            }
-
-            
-            foreach ( var taggerDrawer in _taggerDrawers ) {
-                if( tagsToAdd.Count > 0 ) {
-                    foreach ( var neatoTagAsset in tagsToAdd ) {
-                        taggerDrawer.CheckAndUpdateRemovedTags();
-                        taggerDrawer.CreateTagButtonToAllViewer( neatoTagAsset );
-                    }
-                }
-                taggerDrawer.RefreshAllTagButtons();
-            }
+            //Deleted
+            // if( deletedAssets.Length > 0 ) {
+            //     foreach ( var taggerDrawer in _taggerDrawers ) {
+            //         taggerDrawer.CheckAndUpdateRemovedTags();
+            //         taggerDrawer.RefreshAllTagButtons();
+            //     }
+            //     
+            // }
+            //
+            //
+            // foreach ( var taggerDrawer in _taggerDrawers ) {
+            //     if( tagsToAdd.Count > 0 ) {
+            //         foreach ( var neatoTagAsset in tagsToAdd ) {
+            //             taggerDrawer.CheckAndUpdateRemovedTags();
+            //             taggerDrawer.CreateTagButtonToAllViewer( neatoTagAsset );
+            //         }
+            //     }
+            //     taggerDrawer.RefreshAllTagButtons();
+            // }
         }
 
 
