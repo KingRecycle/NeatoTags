@@ -52,6 +52,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         void UpdateTagIconVisual( ChangeEvent<Color> evt ) {
             PropertyColor.colorValue = evt.newValue;
             _button.style.backgroundColor = PropertyColor.colorValue;
+            
+            var L = (0.2126 * PropertyColor.colorValue.r + 0.7152 * PropertyColor.colorValue.g + 0.0722 * PropertyColor.colorValue.b) * 100f;
+            _button.style.color = L > 70 ? Color.black : Color.white;
+            
             foreach ( var taggerDrawer in _taggerDrawers ) {
                 taggerDrawer.UpdateButtonTagPosition( target as NeatoTagAsset );
             }

@@ -22,6 +22,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         SerializedProperty SelectedTags { get; set; }
 
         HashSet<NeatoTagAsset> _selectedTagsSet = new();
+        HashSet<NeatoTagAsset> _allTagsSet = new();
 
         void OnEnable() {
             Debug.Log( "[TaggerDrawer]: OnEnable" );
@@ -40,10 +41,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             GetAllTagsAndCreateButtons();
-        }
-
-        void OnValidate() {
-            
         }
 
         public override VisualElement CreateInspectorGUI() {
@@ -66,7 +63,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
         }
 
-        public void UpdateButtonTagPosition( NeatoTagAsset tag) {
+        public void UpdateButtonTagPosition( NeatoTagAsset tag ) {
+            if( tag == null && !tagButtonsLookup.ContainsKey( tag ) ) return;
             if ( TagIsSelected( tag ) ) {
                 AddTagButtonToAllViewer( tagButtonsLookup[tag]);
                 AddTagButtonToActiveTagViewer( tagButtonsLookup[tag] );
@@ -80,16 +78,15 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             foreach ( var btn in tagViewerButtons ) {
                 AddTagButtonToAllViewer( (Button) btn );
             }
-            
-            for ( var j = 0; j < NeatoTagAssets.arraySize; j++ ) {
-                var tag = NeatoTagAssets.GetArrayElementAtIndex( j ).objectReferenceValue as NeatoTagAsset;
-                if ( tag == null ) continue;
-                UpdateButtonTagPosition( tag );
+
+            foreach ( var neatoTagAsset in _allTagsSet ) {
+                UpdateButtonTagPosition( neatoTagAsset );
             }
+            
         }
 
-        void CreateTagButtonToAllViewer( NeatoTagAsset tag ) {
-            Debug.Log( "[TaggerDrawer]: CreateTagButtonToAllViewer" );
+        public void CreateTagButtonToAllViewer( NeatoTagAsset tag ) {
+            Debug.Log( $"[TaggerDrawer]: CreateTagButtonToAllViewer {tag}" );
             if ( tag == null ) return;
             var button = new Button();
             button.text = tag.name;
@@ -103,6 +100,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 }
             };
             if( !tagButtonsLookup.ContainsKey( tag )) {
+                Debug.Log( "[TaggerDrawer]: CreateTagButtonToAllViewer: Adding tag button to lookup" );
                 tagButtonsLookup.Add( tag, button );
                 buttonTagLookup.Add( button, tag );
             }
@@ -126,6 +124,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             var tag = buttonTagLookup[button];
             AddTag( tag );
             button.style.backgroundColor = tag.color;
+            var bgColor = button.style.backgroundColor;
+            var L = (0.2126 * bgColor.value.r + 0.7152 * bgColor.value.g + 0.0722 * bgColor.value.b) * 100f;
+            button.style.color = L > 70 ? Color.black : Color.white;
+            
             _tagViewer.Add( button );
             Repaint();
         }
@@ -145,6 +147,12 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             Repaint();
             
         }
+
+        public void UpdateTagViewer() {
+            foreach ( var neatoTagAsset in _allTagsSet ) {
+                
+            }
+        }
         
         
         void AddTag( NeatoTagAsset tag ) {
@@ -153,6 +161,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             SelectedTags.InsertArrayElementAtIndex( index );
             SelectedTags.GetArrayElementAtIndex( index ).objectReferenceValue = tag;
             SelectedTags.serializedObject.ApplyModifiedProperties();
+            _selectedTagsSet.Add( tag );
         }
 
         void RemoveTag( NeatoTagAsset tag ) {
@@ -160,6 +169,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
                 if ( SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue == tag ) {
                     SelectedTags.DeleteArrayElementAtIndex( i );
+                    _selectedTagsSet.Remove( tag );
                     break;
                 }
             }
@@ -168,21 +178,100 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         bool TagIsSelected( NeatoTagAsset tag ) {
-            for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
-                if ( SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue == tag ) {
-                    return true;
-                }
+
+            if ( _selectedTagsSet.Contains( tag ) ) {
+                return true;
             }
             return false;
         }
 
+        public void KillTagButton( NeatoTagAsset tag ) {
+            var button = tagButtonsLookup[tag];
+            Debug.Log( $"[TaggerDrawer]: KillTagButton {tag}. Does viewer contain button?: {_allTagViewer.Children().Contains( button )}" );
+            if ( _allTagViewer.Children().Contains( button ) ) {
+                Debug.Log( $"KILLING BUTTON VIA TAG {tag}" );
+                _allTagViewer.Remove( button );
+                buttonTagLookup.Remove( button );
+                tagButtonsLookup.Remove( tag );
+            } else if ( _tagViewer.Children().Contains( button ) ) {
+                _tagViewer.Remove( button );
+                buttonTagLookup.Remove( button );
+                tagButtonsLookup.Remove( tag );
+            }
+            Repaint();
+        }
+        
+        public void KillTagButton( Button button ) {
+            
+            Debug.Log( $"[TaggerDrawer]: KillTagButton {button}. Does viewer contain button?: {_allTagViewer.Children().Contains( button )}" );
+            if ( _allTagViewer.Children().Contains( button ) ) {
+                Debug.Log( $"KILLING BUTTON {button}" );
+                _allTagViewer.Remove( button );
+                buttonTagLookup.Remove( button );
+                tagButtonsLookup.Remove( buttonTagLookup[button] );
+            } else if ( _tagViewer.Children().Contains( button ) ) {
+                _tagViewer.Remove( button );
+                buttonTagLookup.Remove( button );
+                tagButtonsLookup.Remove( buttonTagLookup[button] );
+            }
+            Repaint();
+        }
+        
+
         void FindProperties() {
             NeatoTagAssets = serializedObject.FindProperty( "_allTags" );
+            for ( var i = 0; i < NeatoTagAssets.arraySize; i++ ) {
+                var t = NeatoTagAssets.GetArrayElementAtIndex( i ).objectReferenceValue;
+                _allTagsSet.Add( t as NeatoTagAsset );
+            }
+            
             SelectedTags = serializedObject.FindProperty( "tags" );
             for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
                 var t = SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue;
                 _selectedTagsSet.Add( t as NeatoTagAsset );
             }
+        }
+
+        void UpdateSets() {
+            _allTagsSet.Clear();
+            _selectedTagsSet.Clear();
+            for ( var i = 0; i < NeatoTagAssets.arraySize; i++ ) {
+                var t = NeatoTagAssets.GetArrayElementAtIndex( i ).objectReferenceValue;
+                _allTagsSet.Add( t as NeatoTagAsset );
+            }
+            for ( var i = 0; i < SelectedTags.arraySize; i++ ) {
+                var t = SelectedTags.GetArrayElementAtIndex( i ).objectReferenceValue;
+                _selectedTagsSet.Add( t as NeatoTagAsset );
+            }
+        }
+
+        public void CheckAndUpdateRemovedTags() {
+            Debug.Log( "[TaggerDrawer]: CheckAndUpdateRemovedTags" );
+            UpdateSets();
+            var keysToDelete = new List<NeatoTagAsset>();
+            foreach ( var tbPair in tagButtonsLookup ) {
+                if( _allTagsSet.Contains( tbPair.Key ) ) continue;
+                keysToDelete.Add( tbPair.Key );
+            }
+
+            foreach ( var neatoTagAsset in keysToDelete ) {
+                Debug.Log($"KILLING BUTTON {neatoTagAsset}");
+                KillTagButton( neatoTagAsset);
+            }
+            
+            // var buttonsToDelete = new List<Button>();
+            // foreach ( var neatoTagAsset in _allTagsSet ) {
+            //     foreach ( var btPair in buttonTagLookup ) {
+            //         if( btPair.Value.name == neatoTagAsset.name ) continue;
+            //         buttonsToDelete.Add( btPair.Key );
+            //     }
+            // }
+            //
+            // foreach ( var button in buttonsToDelete ) {
+            //     Debug.Log($"KILLING BUTTON {button.text}");
+            //     KillTagButton( button );
+            // }
+
         }
     }
 }
