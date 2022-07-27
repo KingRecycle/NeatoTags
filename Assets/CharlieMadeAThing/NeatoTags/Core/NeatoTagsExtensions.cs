@@ -1,17 +1,13 @@
-using System.Collections.Generic;
-using CharlieMadeAThing.NeatoTags;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags.Core
-{
-    public static class NeatoTagsExtensions 
-    {
+namespace CharlieMadeAThing.NeatoTags.Core {
+    public static class NeatoTagsExtensions {
         /// <summary>
         /// Returns true if the gameobject is tagged
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>bool</returns>
-        public static bool IsTagged(this GameObject gameObject) {
+        public static bool IsTagged( this GameObject gameObject ) {
             return Tagger.IsTagged( gameObject );
         }
 
@@ -22,10 +18,10 @@ namespace CharlieMadeAThing.NeatoTags.Core
         /// <param name="tagAsset"></param>
         /// <returns>bool</returns>
         public static bool HasTag( this GameObject gameObject, NeatoTagAsset tagAsset ) {
-             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagAsset );
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagAsset );
         }
-        
-        
+
+
         /// <summary>
         /// Returns true if the gameobject is tagged with any of the given tags.
         /// </summary>
@@ -35,7 +31,7 @@ namespace CharlieMadeAThing.NeatoTags.Core
         public static bool HasAnyTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagList );
         }
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with all of the given tags.
         /// </summary>
@@ -45,7 +41,7 @@ namespace CharlieMadeAThing.NeatoTags.Core
         public static bool HasAllTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
         }
-        
+
         /// <summary>
         /// Return true if the gameobject is not tagged with any of the given tags.
         /// </summary>

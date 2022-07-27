@@ -1,18 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Editor {
     [CustomEditor( typeof( Tagger ) )]
     public class TaggerDrawer : UnityEditor.Editor {
-        GroupBox _tagViewerDeselected;
-
         //UI
         VisualElement _root;
+        GroupBox _tagViewerDeselected;
         GroupBox _tagViewerSelected;
 
         void OnEnable() {
@@ -34,17 +31,20 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         public override VisualElement CreateInspectorGUI() {
             return _root;
         }
-        
+
 
         Button CreateDeselectedButton( NeatoTagAsset tag ) {
-            var button = new Button();
-            button.text = tag.name;
-            button.style.backgroundColor = Color.clear;
+            var button = new Button {
+                text = tag.name,
+                style = {
+                    backgroundColor = Color.clear
+                }
+            };
             Color.RGBToHSV( tag.Color, out var h, out var s, out var v );
             button.style.backgroundColor = Color.HSVToRGB( h, s * 0.40f, v * 0.40f );
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
-                ((Tagger) target).AddTag( tag );
+                ( (Tagger) target ).AddTag( tag );
                 PopulateButtons();
             };
 
@@ -52,35 +52,38 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         Button CreateSelectedButton( NeatoTagAsset tag ) {
-            var button = new Button();
-            button.text = tag.name;
-            button.style.backgroundColor = tag.Color;
+            var button = new Button {
+                text = tag.name,
+                style = {
+                    backgroundColor = tag.Color
+                }
+            };
             var bgColor = button.style.backgroundColor.value;
-            
+
             button.style.color = GetColorLuminosity( bgColor ) > 70 ? Color.black : Color.white;
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
-                ((Tagger) target).RemoveTag( tag );
+                ( (Tagger) target ).RemoveTag( tag );
                 PopulateButtons();
             };
             return button;
         }
 
-        public void PopulateButtons() { 
+        public void PopulateButtons() {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
             var allTags = Tagger.GetAllTags();
-            foreach ( var neatoTagAsset in allTags.Where( x => ((Tagger) target ).GetTags.Contains( x ) ) ) {
-                _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ));
+            foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
+                _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
             }
-            
-            foreach ( var neatoTagAsset in allTags.Where( x => !((Tagger) target ).GetTags.Contains( x ) ) ) {
-                _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ));
+
+            foreach ( var neatoTagAsset in allTags.Where( x => !( (Tagger) target ).GetTags.Contains( x ) ) ) {
+                _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
             }
         }
-        
+
         public static float GetColorLuminosity( Color color ) {
-            return (0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b) * 100f;
+            return ( 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b ) * 100f;
         }
     }
 }

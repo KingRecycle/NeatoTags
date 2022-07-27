@@ -4,23 +4,30 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags.Core
-{
+namespace CharlieMadeAThing.NeatoTags.Core {
     /// <summary>
     /// Holds the tags for a given gameobject.
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class Tagger : MonoBehaviour {
-        [SerializeField] List<NeatoTagAsset> tags = new();
-        
         static Dictionary<GameObject, Tagger> _taggers = new();
-        
-        [SerializeField] List<NeatoTagAsset> _allTags = new();
-        
-        
+        [SerializeField] List<NeatoTagAsset> tags = new();
+
+        public List<NeatoTagAsset> GetTags => tags;
+
+
+        void OnEnable() {
+            _taggers.Add( gameObject, this );
+        }
+
+        void OnDisable() {
+            _taggers.Remove( gameObject );
+        }
+
+
         public static HashSet<NeatoTagAsset> GetAllTags() {
             var tagSet = new HashSet<NeatoTagAsset>();
-            string[] guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
+            var guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
             foreach ( var guid in guids ) {
                 var path = AssetDatabase.GUIDToAssetPath( guid );
                 var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( path );
@@ -30,33 +37,24 @@ namespace CharlieMadeAThing.NeatoTags.Core
             return tagSet;
         }
 
-        public List<NeatoTagAsset> GetTags => tags;
 
-
-        void OnEnable() {
-            _taggers.Add( gameObject, this );
-        }
-        
-        void OnDisable() {
-            _taggers.Remove( gameObject );
-        }
-        
-        
         /// <summary>
         /// Checks if a gameobject has a Tagger component.
         /// </summary>
-        /// <param name="GameObject">Gameobject to check</param>
+        /// <param name="gameObject">Gameobject to check</param>
         /// <returns>Returns true if Gameobject has a Tagger component, false if not.</returns>
-        public static bool IsTagged(GameObject go) => _taggers.ContainsKey( go );
-        
+        public static bool IsTagged( GameObject gameObject ) {
+            return _taggers.ContainsKey( gameObject );
+        }
+
         /// <summary>
         /// Outs the Tagger component if it has one.
         /// </summary>
-        /// <param name="go">Gameobject to check</param>
+        /// <param name="gameObject">Gameobject to check</param>
         /// <param name="tagger">Gameobject's Tagger component</param>
         /// <returns>Returns true if Gameobject has a Tagger component, otherwise false.</returns>
-        public static bool TryGetTagger( GameObject go, out Tagger tagger ) {
-            return _taggers.TryGetValue( go, out tagger );
+        public static bool TryGetTagger( GameObject gameObject, out Tagger tagger ) {
+            return _taggers.TryGetValue( gameObject, out tagger );
         }
 
         /// <summary>
@@ -75,7 +73,7 @@ namespace CharlieMadeAThing.NeatoTags.Core
         public bool HasTag( NeatoTagAsset tagAsset ) {
             return tags.Contains( tagAsset );
         }
-        
+
         /// <summary>
         /// Checks if Tagger has any of the tags in the list.
         /// </summary>
@@ -84,7 +82,7 @@ namespace CharlieMadeAThing.NeatoTags.Core
         public bool AnyTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return tagList.Any( HasTag );
         }
-        
+
         /// <summary>
         /// Checks if all of the tags in the list are in the Tagger.
         /// </summary>
@@ -93,7 +91,7 @@ namespace CharlieMadeAThing.NeatoTags.Core
         public bool AllTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return tagList.All( HasTag );
         }
-        
+
         /// <summary>
         /// Checks if Tagger doesn't have any of the tags in the list.
         /// </summary>
@@ -113,45 +111,45 @@ namespace CharlieMadeAThing.NeatoTags.Core
             return new TagFilter( this );
         }
 
-
-         public class TagFilter {
-            readonly Tagger _target;
-            bool _matchesFilter = true;
-
-            public TagFilter( Tagger target ) {
-                this._target = target;
-            }
-            
-            public bool IsMatch() {
-                return _matchesFilter;
-            }
-            
-            public TagFilter WithTag( NeatoTagAsset tagAsset ) {
-                _matchesFilter &= _target.HasTag( tagAsset );
-                return this;
-            }
-            
-            public TagFilter WithoutTag( NeatoTagAsset tagAsset ) {
-                _matchesFilter &= !_target.HasTag( tagAsset );
-                return this;
-            }
-        }
-
-         /// <summary>
-         /// Add a tag to the tagger.
-         /// </summary>
-         /// <param name="neatoTagAsset">Tag to add.</param>
+        /// <summary>
+        /// Add a tag to the tagger.
+        /// </summary>
+        /// <param name="neatoTagAsset">Tag to add.</param>
         public void AddTag( NeatoTagAsset neatoTagAsset ) {
             tags.Add( neatoTagAsset );
             tags = tags.ToHashSet().ToList();
         }
 
-         /// <summary>
-         /// Remove a tag from the tagger.
-         /// </summary>
-         /// <param name="neatoTagAsset">Tag to remove.</param>
+        /// <summary>
+        /// Remove a tag from the tagger.
+        /// </summary>
+        /// <param name="neatoTagAsset">Tag to remove.</param>
         public void RemoveTag( NeatoTagAsset neatoTagAsset ) {
             tags.Remove( neatoTagAsset );
+        }
+
+
+        public class TagFilter {
+            readonly Tagger _target;
+            bool _matchesFilter = true;
+
+            public TagFilter( Tagger target ) {
+                _target = target;
+            }
+
+            public bool IsMatch() {
+                return _matchesFilter;
+            }
+
+            public TagFilter WithTag( NeatoTagAsset tagAsset ) {
+                _matchesFilter &= _target.HasTag( tagAsset );
+                return this;
+            }
+
+            public TagFilter WithoutTag( NeatoTagAsset tagAsset ) {
+                _matchesFilter &= !_target.HasTag( tagAsset );
+                return this;
+            }
         }
     }
 }

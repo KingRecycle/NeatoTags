@@ -437,7 +437,6 @@ MonoBehaviour:
   tags:
   - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
   - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
-  _allTags: []
 --- !u!4 &1356551400
 Transform:
   m_ObjectHideFlags: 0
@@ -484,7 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spookSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  tag1: {fileID: 11400000, guid: c44dedf8e9daa274eae3004e8f0830de, type: 2}
+  tag1: {fileID: 0}
   tag2: {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
   tag3: {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
   target: {fileID: 1356551398}
@@ -524,14 +523,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
   - {fileID: 11400000, guid: 396c0986b503ab444be0797d4cca65bc, type: 2}
   - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
-  _allTags:
-  - {fileID: 11400000, guid: 396c0986b503ab444be0797d4cca65bc, type: 2}
-  - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
-  - {fileID: 11400000, guid: 4228b9a65924dea46bb2b5ba9219eb12, type: 2}
-  - {fileID: 11400000, guid: a924ce14b21c8e348a5bb05e75cfa619, type: 2}
-  - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
-  - {fileID: 11400000, guid: c44dedf8e9daa274eae3004e8f0830de, type: 2}
-  - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
 --- !u!1 &2136358381
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,7 +560,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a924ce14b21c8e348a5bb05e75cfa619, type: 2}
   - {fileID: 11400000, guid: 4228b9a65924dea46bb2b5ba9219eb12, type: 2}
   - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
-  _allTags: []
 --- !u!4 &2136358383
 Transform:
   m_ObjectHideFlags: 0

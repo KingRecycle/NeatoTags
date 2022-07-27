@@ -5,8 +5,7 @@ using UnityEngine;
 namespace CharlieMadeAThing.NeatoTags.Editor {
     [CustomPropertyDrawer( typeof( NeatoTagAsset ) )]
     public class NeatoTagPropertyDrawer : PropertyDrawer {
-
-        GUIStyle _buttonStyle = new GUIStyle();
+        
         public override void OnGUI( Rect position, SerializedProperty property,
             GUIContent label ) {
             // Using BeginProperty / EndProperty on the parent property means that

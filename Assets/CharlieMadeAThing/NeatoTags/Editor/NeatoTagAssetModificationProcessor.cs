@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
-using NUnit.Framework.Constraints;
+﻿using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace CharlieMadeAThing.NeatoTags.Editor {
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
@@ -12,7 +7,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
         static void OnPostprocessAllAssets( string[] importedAssets, string[] deletedAssets, string[] movedAssets,
             string[] movedFromAssetPaths ) {
-            
             //Updates Tagger inspectors when tag assets are added or deleted.
             foreach ( var taggerDrawer in TAGGER_DRAWERS ) {
                 taggerDrawer.PopulateButtons();
@@ -21,10 +15,11 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
 
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
-            if( TAGGER_DRAWERS.Contains( taggerDrawer ) ) {
+            if ( TAGGER_DRAWERS.Contains( taggerDrawer ) ) {
                 return;
             }
-            TAGGER_DRAWERS.Add(taggerDrawer);
+
+            TAGGER_DRAWERS.Add( taggerDrawer );
         }
     }
 }
