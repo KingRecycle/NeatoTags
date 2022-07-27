@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -11,15 +12,17 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
         static void OnPostprocessAllAssets( string[] importedAssets, string[] deletedAssets, string[] movedAssets,
             string[] movedFromAssetPaths ) {
-            var tagsToAdd = new List<NeatoTagAsset>();
-            
-            foreach (string str in importedAssets) {
-                var tag = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( str );
-                if ( tag != null ) {
-                    tagsToAdd.Add( tag );
-                }
+ 
+            var selected = Selection.activeObject as GameObject;
+            if( selected != null && selected.GetComponent<Tagger>() != null ) {
+                selected.SendMessage( "OnValidate", SendMessageOptions.DontRequireReceiver);
+                
             }
-            
+
+            foreach ( var taggerDrawer in _taggerDrawers ) {
+                taggerDrawer.PopulateButtons();
+            }
+
             //Deleted
             // if( deletedAssets.Length > 0 ) {
             //     foreach ( var taggerDrawer in _taggerDrawers ) {

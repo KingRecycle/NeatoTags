@@ -95,5 +95,14 @@ namespace CharlieMadeAThing.NeatoTags
                 return this;
             }
         }
+
+        public void AddTag( NeatoTagAsset neatoTagAsset ) {
+            tags.Add( neatoTagAsset );
+            tags = tags.ToHashSet().ToList();
+        }
+
+        public void RemoveTag( NeatoTagAsset neatoTagAsset ) {
+            tags.Remove( neatoTagAsset );
+        }
     }
 }
