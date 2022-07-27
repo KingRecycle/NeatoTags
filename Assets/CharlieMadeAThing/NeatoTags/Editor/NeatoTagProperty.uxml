@@ -1,6 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <ui:VisualElement style="width: 100%; height: 6%; flex-direction: row;">
-        <uie:ObjectField label="Object Field" name="tagField" />
-        <ui:Button text="Button" display-tooltip-when-elided="true" name="tagIcon" />
-    </ui:VisualElement>
-</ui:UXML>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             var button = new Button();
             button.text = tag.name;
             button.style.backgroundColor = Color.clear;
-            Color.RGBToHSV( tag.color, out var h, out var s, out var v );
+            Color.RGBToHSV( tag.Color, out var h, out var s, out var v );
             button.style.backgroundColor = Color.HSVToRGB( h, s * 0.40f, v * 0.40f );
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
@@ -53,7 +54,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         Button CreateSelectedButton( NeatoTagAsset tag ) {
             var button = new Button();
             button.text = tag.name;
-            button.style.backgroundColor = tag.color;
+            button.style.backgroundColor = tag.Color;
             var bgColor = button.style.backgroundColor.value;
             
             button.style.color = GetColorLuminosity( bgColor ) > 70 ? Color.black : Color.white;

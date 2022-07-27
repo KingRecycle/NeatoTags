@@ -8,48 +8,23 @@ using Object = UnityEngine.Object;
 
 namespace CharlieMadeAThing.NeatoTags.Editor {
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
-        static List<TaggerDrawer> _taggerDrawers = new();
+        static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
 
         static void OnPostprocessAllAssets( string[] importedAssets, string[] deletedAssets, string[] movedAssets,
             string[] movedFromAssetPaths ) {
- 
-            var selected = Selection.activeObject as GameObject;
-            if( selected != null && selected.GetComponent<Tagger>() != null ) {
-                selected.SendMessage( "OnValidate", SendMessageOptions.DontRequireReceiver);
-                
-            }
-
-            foreach ( var taggerDrawer in _taggerDrawers ) {
+            
+            //Updates Tagger inspectors when tag assets are added or deleted.
+            foreach ( var taggerDrawer in TAGGER_DRAWERS ) {
                 taggerDrawer.PopulateButtons();
             }
-
-            //Deleted
-            // if( deletedAssets.Length > 0 ) {
-            //     foreach ( var taggerDrawer in _taggerDrawers ) {
-            //         taggerDrawer.CheckAndUpdateRemovedTags();
-            //         taggerDrawer.RefreshAllTagButtons();
-            //     }
-            //     
-            // }
-            //
-            //
-            // foreach ( var taggerDrawer in _taggerDrawers ) {
-            //     if( tagsToAdd.Count > 0 ) {
-            //         foreach ( var neatoTagAsset in tagsToAdd ) {
-            //             taggerDrawer.CheckAndUpdateRemovedTags();
-            //             taggerDrawer.CreateTagButtonToAllViewer( neatoTagAsset );
-            //         }
-            //     }
-            //     taggerDrawer.RefreshAllTagButtons();
-            // }
         }
 
 
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
-            if( _taggerDrawers.Contains( taggerDrawer ) ) {
+            if( TAGGER_DRAWERS.Contains( taggerDrawer ) ) {
                 return;
             }
-            _taggerDrawers.Add(taggerDrawer);
+            TAGGER_DRAWERS.Add(taggerDrawer);
         }
     }
 }

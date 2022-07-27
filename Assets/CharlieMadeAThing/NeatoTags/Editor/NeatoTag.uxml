@@ -5,4 +5,7 @@
     <ui:VisualElement style="min-width: auto; flex-direction: row; margin-top: 12px;">
         <ui:Button text="Button" display-tooltip-when-elided="true" name="tagIcon" style="max-width: 181px; width: auto; align-items: auto; justify-content: flex-start; left: 0; min-width: auto; flex-basis: auto;" />
     </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:TextField picking-mode="Ignore" label="Comment" name="commentField" multiline="true" style="-unity-text-align: upper-left; width: 100%; height: 100px; justify-content: flex-start; align-items: stretch; margin-left: 3px; opacity: 1; min-width: auto; min-height: auto; max-width: none; margin-top: 10px; left: auto; transform-origin: center;" />
+    </ui:VisualElement>
 </ui:UXML>

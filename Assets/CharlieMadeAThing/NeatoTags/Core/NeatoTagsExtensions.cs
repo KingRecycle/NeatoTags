@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using CharlieMadeAThing.NeatoTags;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags
+namespace CharlieMadeAThing.NeatoTags.Core
 {
     public static class NeatoTagsExtensions 
     {
@@ -57,7 +57,7 @@ namespace CharlieMadeAThing.NeatoTags
         }
 
         public static Tagger.TagFilter TagFilter( this GameObject gameObject ) {
-            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.Filter() : null;
+            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.StartFilter() : null;
         }
     }
 }
