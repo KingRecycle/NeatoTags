@@ -2,7 +2,9 @@
     <ui:VisualElement style="width: 100%; height: 100%;">
         <ui:GroupBox style="flex-grow: 1;">
             <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap; -unity-text-align: middle-left; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(106, 99, 99); border-right-color: rgb(106, 99, 99); border-top-color: rgb(106, 99, 99); border-bottom-color: rgb(106, 99, 99);" />
-            <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap;" />
+            <ui:Foldout text="Available Tags" name="foldout" style="margin-top: 16px;">
+                <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap;" />
+            </ui:Foldout>
         </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>

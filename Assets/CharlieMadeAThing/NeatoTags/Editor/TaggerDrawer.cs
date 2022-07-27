@@ -11,6 +11,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         VisualElement _root;
         GroupBox _tagViewerDeselected;
         GroupBox _tagViewerSelected;
+        Foldout _foldout;
+        static bool _isFoldoutOpen = true;
 
         void OnEnable() {
             _root = new VisualElement();
@@ -22,6 +24,12 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             _tagViewerSelected = _root.Q<GroupBox>( "tagViewer" );
             _tagViewerDeselected = _root.Q<GroupBox>( "allTagViewer" );
+            _foldout = _root.Q<Foldout>( "foldout" );
+            _foldout.value = _isFoldoutOpen;
+            _foldout.RegisterValueChangedCallback( evt => {
+                _isFoldoutOpen = evt.newValue;
+            } );
+            
 
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );

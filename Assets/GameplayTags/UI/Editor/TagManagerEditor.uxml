@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/GameplayTags/UI/Editor/TagManagerEditor.uss?fileID=7433441132597879392&amp;guid=a44f9ab5602fe7e4fae9dad2c511ac1d&amp;type=3#TagManagerEditor" />
-    <ui:VisualElement style="width: 100%; height: 100%; flex-direction: row; justify-content: space-between;">
-        <ui:ListView focusable="true" header-title="Root Tags" show-foldout-header="false" show-border="false" show-alternating-row-backgrounds="All" show-add-remove-footer="false" name="rootTagListView" style="width: 25%; height: 100%;" />
-        <ui:GroupBox style="width: 75%;" />
-    </ui:VisualElement>
-</ui:UXML>

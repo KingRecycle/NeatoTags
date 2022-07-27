@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using CharlieMadeAThing.NeatoTags.Core;
 using UnityEngine;
 
 namespace CharlieMadeAThing {
     public class SpookFinder : MonoBehaviour {
-        public Sprite spookSprite;
+        public List<NeatoTagAsset> tags;
         public NeatoTagAsset tag1;
         public NeatoTagAsset tag2;
         public NeatoTagAsset tag3;
@@ -21,6 +22,8 @@ namespace CharlieMadeAThing {
                 $"Chaining with TagFilter(With:{tag1.name}, With:{tag2.name}): {target.TagFilter().WithTag( tag1 ).WithTag( tag2 ).IsMatch()}" );
             Debug.Log(
                 $"Chaining with TagFilter[{target2}]( With:{tag1.name}, Without:{tag2.name}, With:{tag3.name} ): {target2.TagFilter().WithTag( tag1 ).WithoutTag( tag2 ).WithTag( tag3 ).IsMatch()}" );
+            
+            Debug.Log($"Chaining Extra: {target.TagFilter().WithAnyTags(tag1, tag2).IsMatch()}"  );
         }
     }
 }

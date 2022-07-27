@@ -68,7 +68,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Checks if Tagger has a specific tag.
         /// </summary>
-        /// <param name="tagAsset">The tag to check for.</param>
+        /// <param name="tagAsset">The tag to check for</param>
         /// <returns>Returns true if Tagger has the tag, otherwise false.</returns>
         public bool HasTag( NeatoTagAsset tagAsset ) {
             return tags.Contains( tagAsset );
@@ -77,7 +77,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Checks if Tagger has any of the tags in the list.
         /// </summary>
-        /// <param name="tagList">IEnumerable of tags.</param>
+        /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has any of the tags, otherwise false.</returns>
         public bool AnyTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return tagList.Any( HasTag );
@@ -86,7 +86,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Checks if all of the tags in the list are in the Tagger.
         /// </summary>
-        /// <param name="tagList">IEnumerable of tags.</param>
+        /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has all of the tags, otherwise false.</returns>
         public bool AllTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return tagList.All( HasTag );
@@ -100,13 +100,41 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool NoTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return !tagList.Any( HasTag );
         }
+        
+        /// <summary>
+        /// Returns a Hashset of GameObjects that have the tag.
+        /// </summary>
+        /// <param name="tagAsset">Tag to check for</param>
+        /// <returns>Hashset of Gameobjects</returns>
+        public HashSet<GameObject> GetTaggedGameObjectsWithTag( NeatoTagAsset tagAsset ) {
+            var taggedGameObjects = new HashSet<GameObject>();
+            foreach ( var tagger in _taggers.Values.Where( tagger => tagger.HasTag( tagAsset ) ) ) {
+                taggedGameObjects.Add( tagger.gameObject );
+            }
+
+            return taggedGameObjects;
+        }
+
+        /// <summary>
+        /// Returns a Hashset of GameObjects that don't have the tag.
+        /// </summary>
+        /// <param name="tagAsset">Tag to check for</param>
+        /// <returns>Hashset of Gameobjects</returns>
+        public HashSet<GameObject> GetTaggedGameObjectsWithoutTag( NeatoTagAsset tagAsset ) {
+            var taggedGameObjects = new HashSet<GameObject>();
+            foreach ( var tagger in _taggers.Values.Where( tagger => !tagger.HasTag( tagAsset ) ) ) {
+                taggedGameObjects.Add( tagger.gameObject );
+            }
+
+            return taggedGameObjects;
+        }
 
         /// <summary>
         /// Starts a filter for chaining filter functions.
-        /// WithTag(), WithoutTag()
+        /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
         /// To get result call .IsMatch()
         /// </summary>
-        /// <returns>Returns true if all filters match, otherwise false.</returns>
+        /// <returns></returns>
         public TagFilter StartFilter() {
             return new TagFilter( this );
         }
@@ -128,7 +156,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             tags.Remove( neatoTagAsset );
         }
 
-
+        /// <summary>
+        /// TagFilter class for chaining filter functions.
+        /// Don't use directly. Use StartFilter() instead.
+        /// </summary>
         public class TagFilter {
             readonly Tagger _target;
             bool _matchesFilter = true;
@@ -137,19 +168,106 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 _target = target;
             }
 
+            /// <summary>
+            /// Checks if the filter matches.
+            /// </summary>
+            /// <returns>Returns true if filter matches, otherwise false.</returns>
             public bool IsMatch() {
                 return _matchesFilter;
             }
 
+            /// <summary>
+            /// Checks if gameobject has tag.
+            /// </summary>
+            /// <param name="tagAsset">Tag to check for</param>
+            /// <returns></returns>
             public TagFilter WithTag( NeatoTagAsset tagAsset ) {
                 _matchesFilter &= _target.HasTag( tagAsset );
                 return this;
             }
 
+            /// <summary>
+            /// Checks if gameobject has all the tags in params.
+            /// </summary>
+            /// <param name="tags">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithTags( params NeatoTagAsset[] tags ) {
+                foreach ( var tagAsset in tags ) {
+                    _matchesFilter &= _target.HasTag( tagAsset );
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Checks if gameobject has all the tags in list.
+            /// </summary>
+            /// <param name="tagList">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithTags( IEnumerable<NeatoTagAsset> tagList ) {
+                foreach ( var tagAsset in tagList ) {
+                    _matchesFilter &= _target.HasTag( tagAsset );
+                }
+
+                return this;
+            }
+
+            /// <summary>
+            /// Checks if gameobject doesn't have tag.
+            /// </summary>
+            /// <param name="tagAsset">Tags to check for</param>
+            /// <returns></returns>
             public TagFilter WithoutTag( NeatoTagAsset tagAsset ) {
                 _matchesFilter &= !_target.HasTag( tagAsset );
                 return this;
             }
+            
+            /// <summary>
+            /// Checks if gameobject doesn't have tags in params.
+            /// </summary>
+            /// <param name="tags">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithoutTags( params NeatoTagAsset[] tags ) {
+                foreach ( var tagAsset in tags ) {
+                    _matchesFilter &= !_target.HasTag( tagAsset );
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Checks if gameobject doesn't have tags in list.
+            /// </summary>
+            /// <param name="tagList">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithoutTags( IEnumerable<NeatoTagAsset> tagList ) {
+                foreach ( var tagAsset in tagList ) {
+                    _matchesFilter &= !_target.HasTag( tagAsset );
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Checks if gameobject has any of the tags in list.
+            /// </summary>
+            /// <param name="tagList">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithAnyTags( IEnumerable<NeatoTagAsset> tagList ) {
+                _matchesFilter &= _target.AnyTagsMatch( tagList );
+                return this;
+            }
+            
+            /// <summary>
+            /// Checks if gameobject has any of the tags in params.
+            /// </summary>
+            /// <param name="tags">Tags to check for</param>
+            /// <returns></returns>
+            public TagFilter WithAnyTags( params NeatoTagAsset[] tags ) {
+                _matchesFilter &= _target.AnyTagsMatch( tags );
+                return this;
+            }
+            
         }
     }
 }
