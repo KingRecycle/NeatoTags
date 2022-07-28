@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -13,6 +14,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         GroupBox _tagViewerSelected;
         Foldout _foldout;
         static bool _isFoldoutOpen = true;
+        static Texture2D buttonTexture;
+        static VisualTreeAsset _tagButtonTemplate;
 
         void OnEnable() {
             _root = new VisualElement();
@@ -29,8 +32,13 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _foldout.RegisterValueChangedCallback( evt => {
                 _isFoldoutOpen = evt.newValue;
             } );
-            
 
+            _tagButtonTemplate =
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
+            
+            if ( !buttonTexture ) {
+                buttonTexture = AssetDatabase.LoadAssetAtPath<Texture2D>( "Assets/CharlieMadeAThing/NeatoTags/button_unitystyle.png" );
+            }
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
@@ -42,19 +50,18 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
 
         Button CreateDeselectedButton( NeatoTagAsset tag ) {
-            var button = new Button {
-                text = tag.name,
-                style = {
-                    backgroundColor = Color.clear
-                }
-            };
-            Color.RGBToHSV( tag.Color, out var h, out var s, out var v );
-            button.style.backgroundColor = Color.HSVToRGB( h, s * 0.40f, v * 0.40f );
-            button.clicked += () => {
-                Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
-                ( (Tagger) target ).AddTag( tag );
-                PopulateButtons();
-            };
+            var button = _tagButtonTemplate.Instantiate().Q<Button>();
+
+            if ( button != null ) {
+                button.text = tag.name;
+                Color.RGBToHSV( tag.Color, out var h, out var s, out var v );
+                button.style.unityBackgroundImageTintColor = Color.HSVToRGB( h, s * 0.40f, v * 0.40f );
+                button.clicked += () => {
+                    Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
+                    ( (Tagger) target ).AddTag( tag );
+                    PopulateButtons();
+                };
+            }
 
             return button;
         }

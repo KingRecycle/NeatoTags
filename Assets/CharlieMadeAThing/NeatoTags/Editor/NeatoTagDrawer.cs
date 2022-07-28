@@ -17,6 +17,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         VisualElement _root;
         SerializedProperty PropertyColor { get; set; }
         SerializedProperty PropertyComment { get; set; }
+        
 
         void OnEnable() {
             _root = new VisualElement();
@@ -37,6 +38,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             PropertyColor.colorValue = Color.black;
             PropertyColor.colorValue = _colorField.value;
 
+            
             _button = _root.Q<Button>( "tagIcon" );
             _button.text = target.name;
             _button.style.backgroundColor = PropertyColor.colorValue;

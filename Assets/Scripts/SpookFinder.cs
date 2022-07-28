@@ -12,6 +12,8 @@ namespace CharlieMadeAThing {
         public GameObject target;
         public GameObject target2;
 
+        public Sprite sprite;
+
         void Start() {
             Debug.Log( target.IsTagged() );
             Debug.Log( $"HasTag({tag1})[{target2.name}]: {target2.HasTag( tag1 )}" );
