@@ -24,7 +24,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             var buttonPlaceRect = new Rect(position.x, position.y, 150, position.height);
             var objPlaceRect = new Rect( position.x + buttonPlaceRect.width, position.y, position.width - buttonPlaceRect.width, position.height );
             if ( !buttonTexture ) {
-                buttonTexture = AssetDatabase.LoadAssetAtPath<Texture2D>( "Assets/CharlieMadeAThing/NeatoTags/button_unitystyle.png" );
+                buttonTexture = AssetDatabase.LoadAssetAtPath<Texture2D>( "Assets/CharlieMadeAThing/NeatoTags/Sprites/button_unitystyle.png" );
             }
 
             var buttonStyle = new GUIStyle( GUI.skin.button ) {

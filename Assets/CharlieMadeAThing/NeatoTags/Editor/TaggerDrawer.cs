@@ -14,7 +14,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         GroupBox _tagViewerSelected;
         Foldout _foldout;
         static bool _isFoldoutOpen = true;
-        static Texture2D buttonTexture;
         static VisualTreeAsset _tagButtonTemplate;
 
         void OnEnable() {
@@ -35,10 +34,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
-            
-            if ( !buttonTexture ) {
-                buttonTexture = AssetDatabase.LoadAssetAtPath<Texture2D>( "Assets/CharlieMadeAThing/NeatoTags/button_unitystyle.png" );
-            }
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
@@ -67,20 +62,19 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         Button CreateSelectedButton( NeatoTagAsset tag ) {
-            var button = new Button {
-                text = tag.name,
-                style = {
-                    backgroundColor = tag.Color
-                }
-            };
-            var bgColor = button.style.backgroundColor.value;
-
-            button.style.color = GetColorLuminosity( bgColor ) > 70 ? Color.black : Color.white;
-            button.clicked += () => {
-                Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
-                ( (Tagger) target ).RemoveTag( tag );
-                PopulateButtons();
-            };
+            var button = _tagButtonTemplate.Instantiate().Q<Button>();
+            if ( button != null ) {
+                button.text = tag.name;
+                Color.RGBToHSV( tag.Color, out var h, out var s, out var v );
+                button.style.unityBackgroundImageTintColor = tag.Color;
+                button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+                button.clicked += () => {
+                    Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
+                    ( (Tagger) target ).RemoveTag( tag );
+                    PopulateButtons();
+                };
+            }
+            
             return button;
         }
 
