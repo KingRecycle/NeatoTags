@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
@@ -27,6 +28,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTag.uxml" );
             visualTree.CloneTree( _root );
+            NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
         }
 
         public override VisualElement CreateInspectorGUI() {
@@ -45,10 +47,13 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             _commentField = _root.Q<TextField>( "commentField" );
             _commentField.BindProperty( PropertyComment );
+            
+            //Check when name is changed
 
 
             return _root;
         }
+        
 
         void FindProperties() {
             PropertyColor = serializedObject.FindProperty( "color" );

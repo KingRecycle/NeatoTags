@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
-  m_Name: Illusion
+  m_Name: Witch
   m_EditorClassIdentifier: 
-  color: {r: 0.8191527, g: 0.96764255, b: 0.9811321, a: 1}
-  comment: 
+  color: {r: 0.6226415, g: 0.20852618, b: 0.53117347, a: 1}
+  comment: Now that's spooky!

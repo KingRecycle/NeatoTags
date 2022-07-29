@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -26,9 +28,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Returns true if the gameobject is tagged with any of the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="tagList">params array of tags</param>
+        /// <param name="tagParams">params array of tags</param>
         /// <returns>True if any tags match, otherwise false.</returns>
-        public static bool HasAnyTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
+        public static bool HasAnyTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagParams ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagParams );
+        }
+        
+        /// <summary>
+        /// Returns true if the gameobject is tagged with any of the given tags.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tagList">IEnumerable of tags</param>
+        /// <returns>True if any tags match, otherwise false.</returns>
+        public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagList );
         }
 
@@ -36,9 +48,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Returns true if the gameobject is tagged with all of the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="tagList">params array of tags</param>
+        /// <param name="tagParams">params array of tags</param>
         /// <returns>True if all tags match, otherwise false.</returns>
-        public static bool HasAllTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
+        public static bool HasAllTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagParams ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagParams );
+        }
+        
+        /// <summary>
+        /// Returns true if the gameobject is tagged with all of the given tags.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tagList">IEnumerable of tags</param>
+        /// <returns>True if any tags match, otherwise false.</returns>
+        public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
         }
 
@@ -51,16 +73,28 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasNoTagsMatching( this GameObject gameObject, params NeatoTagAsset[] tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.NoTagsMatch( tagList );
         }
+        
+        /// <summary>
+        /// Return true if the gameobject is not tagged with any of the given tags.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tagList">IEnumerable array of tags</param>
+        /// <returns>bool</returns>
+        public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<NeatoTagAsset> tagList ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.NoTagsMatch( tagList );
+        }
 
         /// <summary>
         /// Starts a tag filter.
         /// Starts a filter for chaining filter functions.
         /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
-        /// To get result call .IsMatch()
+        /// To get result call .IsMatch() or GetMatches()
+        /// Can be null!
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <returns>Use .IsMatch() to get result</returns>
+        /// <returns>TagFilter or null</returns>
         public static Tagger.TagFilter TagFilter( this GameObject gameObject ) {
+            
             return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.StartFilter() : null;
         }
     }
