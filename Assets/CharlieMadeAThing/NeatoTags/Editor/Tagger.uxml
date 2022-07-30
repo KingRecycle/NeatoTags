@@ -1,9 +1,19 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="width: 100%; height: 100%;">
+        <ui:VisualElement>
+            <uie:Toolbar style="margin-top: 5px; height: 24px;">
+                <uie:ToolbarButton text="Add Tag" display-tooltip-when-elided="true" name="addTagButton" style="min-height: auto; -unity-text-align: middle-center;" />
+                <ui:TextField picking-mode="Ignore" text="Tag Name" name="addTagTextField" style="margin-right: 0; min-width: 30px; width: 103px; -unity-text-align: middle-left; margin-top: 2px; margin-bottom: 2px;" />
+                <uie:ToolbarSpacer />
+                <ui:Label text="Search" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+                <uie:ToolbarSpacer />
+                <uie:ToolbarSearchField focusable="true" name="taggerSearch" />
+            </uie:Toolbar>
+        </ui:VisualElement>
         <ui:GroupBox style="flex-grow: 1;">
-            <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap; -unity-text-align: middle-left; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(106, 99, 99); border-right-color: rgb(106, 99, 99); border-top-color: rgb(106, 99, 99); border-bottom-color: rgb(106, 99, 99);" />
-            <ui:Foldout text="Available Tags" name="foldout" style="margin-top: 16px;">
-                <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap;" />
+            <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap; -unity-text-align: middle-left; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(106, 99, 99); border-right-color: rgb(106, 99, 99); border-top-color: rgb(106, 99, 99); border-bottom-color: rgb(106, 99, 99); padding-left: 0; margin-left: 0; left: auto;" />
+            <ui:Foldout text="Available Tags" name="foldout" style="margin-top: 16px; margin-left: 0; left: auto;">
+                <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap; margin-left: 0; left: -30px;" />
             </ui:Foldout>
         </ui:GroupBox>
     </ui:VisualElement>

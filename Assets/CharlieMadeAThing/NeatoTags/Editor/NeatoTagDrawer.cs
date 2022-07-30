@@ -61,7 +61,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         public override void OnInspectorGUI() {
-            _button.text = target.name;
+            if ( target != null ) {
+                _button.text = target.name;
+            }
         }
 
 
