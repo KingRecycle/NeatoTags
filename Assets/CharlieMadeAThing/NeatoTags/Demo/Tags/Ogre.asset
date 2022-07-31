@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
-  m_Name: NOW THIS IS A WHAT I CALL A TAG
+  m_Name: Ogre
   m_EditorClassIdentifier: 
-  color: {r: 0.4528302, g: 0.36952654, b: 0.36952654, a: 1}
+  color: {r: 0, g: 0, b: 0, a: 1}
   comment: 

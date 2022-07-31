@@ -25,6 +25,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
 
+        /// <summary>
+        /// Gives back a Hashset of all tags in the project.
+        /// </summary>
+        /// <returns>Hashset of all tags in the project.</returns>
         public static HashSet<NeatoTagAsset> GetAllTags() {
             var tagSet = new HashSet<NeatoTagAsset>();
             var guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
@@ -60,7 +64,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// A Dictionary of all the gameobjects that have a Tagger component.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns a Dictionary where the keys are Gameobjects and Values are the respective Tagger component.</returns>
         public static Dictionary<GameObject, Tagger> GetTagged() {
             return _taggers;
         }
@@ -105,7 +109,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Returns a Hashset of GameObjects that have the tag.
         /// </summary>
         /// <param name="tagAsset">Tag to check for</param>
-        /// <returns>Hashset of Gameobjects</returns>
+        /// <returns>Hashset of Gameobjects that have the specified tag.</returns>
         public HashSet<GameObject> GetTaggedGameObjectsWithTag( NeatoTagAsset tagAsset ) {
             var taggedGameObjects = new HashSet<GameObject>();
             foreach ( var tagger in _taggers.Values.Where( tagger => tagger.HasTag( tagAsset ) ) ) {
@@ -119,7 +123,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Returns a Hashset of GameObjects that don't have the tag.
         /// </summary>
         /// <param name="tagAsset">Tag to check for</param>
-        /// <returns>Hashset of Gameobjects</returns>
+        /// <returns>Hashset of Gameobjects that don't have the specified tag.</returns>
         public HashSet<GameObject> GetTaggedGameObjectsWithoutTag( NeatoTagAsset tagAsset ) {
             var taggedGameObjects = new HashSet<GameObject>();
             foreach ( var tagger in _taggers.Values.Where( tagger => !tagger.HasTag( tagAsset ) ) ) {
@@ -134,7 +138,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
         /// To get result call .IsMatch() or .GetMatches()
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns TagFilter for chaining filter functions.</returns>
         public TagFilter StartFilter() {
             return new TagFilter( this );
         }

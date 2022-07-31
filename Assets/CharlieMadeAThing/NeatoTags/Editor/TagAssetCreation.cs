@@ -2,26 +2,44 @@
 using System.Linq;
 using System.Reflection;
 using CharlieMadeAThing.NeatoTags.Core;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Editor {
     public class TagAssetCreation : EditorWindow {
-        public static string TAG_FOLDER_PATH = string.Empty;
+        public static string TagFolderPath = string.Empty;
         
         [MenuItem( "Neato Tags/Set Tag Folder Location" )]
         static void Apply()
         {
-            string path = EditorUtility.OpenFolderPanel("Tag Folder Location", "", "");
-            TAG_FOLDER_PATH = path;
-            Debug.Log(path);
+            var path = EditorUtility.OpenFolderPanel("Tag Folder Location", "", "");
+            TagFolderPath = path;
+            var holdersGuids = AssetDatabase.FindAssets( "t:EditorDataHolder" );
+            if ( holdersGuids.Length > 1 ) {
+                Debug.LogWarning($"[TagAssetCreation]: Found more than one EditorDataHolder. This is not supported. Only the first one will be used.");
+            } else if ( holdersGuids.Length == 1 ) {
+                var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
+                var dataHolder = AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
+                dataHolder.tagFolderLocation = path;
+            } else {
+                // var newDataHolder = CreateInstance<EditorDataHolder>();
+                // AssetDatabase.CreateAsset(newDataHolder, path + "/EditorDataHolder.asset");
+                // AssetDatabase.SaveAssets();
+                // AssetDatabase.Refresh();
+                GetCharlieMadeAThingDirectory();
+            }
+        }
+        
+        static void GetCharlieMadeAThingDirectory()
+        {
             
         }
         
         [MenuItem( "Neato Tags/New Tag" )]
         static void NewTag()
         {
-            if( TAG_FOLDER_PATH == string.Empty )
+            if( TagFolderPath == string.Empty )
             {
                 if ( TryGetActiveFolderPath( out var path ) ) {
                     var newTag = CreateInstance<NeatoTagAsset>();
@@ -37,7 +55,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 }
             } else {
                 var newTag = CreateInstance<NeatoTagAsset>();
-                ProjectWindowUtil.CreateAsset(newTag, TAG_FOLDER_PATH + "/New Tag.asset");
+                ProjectWindowUtil.CreateAsset(newTag, TagFolderPath + "/New Tag.asset");
                 // AssetDatabase.SaveAssets();
                 // AssetDatabase.Refresh();
                 EditorUtility.FocusProjectWindow();
@@ -55,7 +73,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             if ( tagName == string.Empty ) {
                 tagName = "New Tag";
             }
-            if( TAG_FOLDER_PATH == string.Empty )
+            if( TagFolderPath == string.Empty )
             {
                 if ( TryGetActiveFolderPath( out var path ) ) {
                     var newTag = CreateInstance<NeatoTagAsset>();
@@ -71,7 +89,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 }
             } else {
                 var newTag = CreateInstance<NeatoTagAsset>();
-                AssetDatabase.CreateAsset(newTag, $"{TAG_FOLDER_PATH}/{tagName}.asset");
+                AssetDatabase.CreateAsset(newTag, $"{TagFolderPath}/{tagName}.asset");
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 EditorUtility.FocusProjectWindow();
@@ -79,7 +97,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
         }
         
-        static bool TryGetActiveFolderPath( out string path )
+        public static bool TryGetActiveFolderPath( out string path )
         {
             var _tryGetActiveFolderPath = typeof(ProjectWindowUtil).GetMethod( "TryGetActiveFolderPath", BindingFlags.Static | BindingFlags.NonPublic );
 

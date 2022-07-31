@@ -62,9 +62,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             return _root;   
         }
 
-        public override void OnInspectorGUI() {
-            base.OnInspectorGUI();
-        }
 
 
         Button CreateDeselectedButton( NeatoTagAsset tag ) {

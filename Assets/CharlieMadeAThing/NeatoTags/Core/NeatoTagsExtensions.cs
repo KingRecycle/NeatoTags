@@ -12,6 +12,28 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool IsTagged( this GameObject gameObject ) {
             return Tagger.IsTagged( gameObject );
         }
+        
+        /// <summary>
+        /// Adds a tag to this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tag">Tag to add</param>
+        public static void AddTag( this GameObject gameObject, NeatoTagAsset tag ) {
+            if( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                tagger.AddTag( tag );
+            }
+        }
+        
+        /// <summary>
+        /// Removes a tag from this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tag">Tag to remove</param>
+        public static void RemoveTag( this GameObject gameObject, NeatoTagAsset tag ) {
+            if( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                tagger.RemoveTag( tag );
+            }
+        }
 
         /// <summary>
         /// Returns true if the gameobject is tagged with the given tag.
