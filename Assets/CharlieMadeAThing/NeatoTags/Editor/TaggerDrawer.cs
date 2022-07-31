@@ -44,7 +44,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _addTagButton.clicked += CreateNewTag;
             _addTagTextField = _root.Q<TextField>( "addTagTextField" );
             _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
-                CreateNewTag();
+                if( evt.keyCode == KeyCode.Return )
+                    CreateNewTag();
             });
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
