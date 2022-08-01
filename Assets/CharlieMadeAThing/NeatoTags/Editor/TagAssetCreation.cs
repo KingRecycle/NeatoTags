@@ -140,5 +140,12 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             return found;
         }
+
+        public static void DeleteTag( NeatoTagAsset selectedTag ) {
+            if ( !selectedTag ) return;
+            AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
     }
 }
