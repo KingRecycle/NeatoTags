@@ -48,9 +48,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _commentField = _root.Q<TextField>( "commentField" );
             _commentField.BindProperty( PropertyComment );
             
-            //Check when name is changed
-
-
             return _root;
         }
         
