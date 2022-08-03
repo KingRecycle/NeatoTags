@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-direction: row; overflow: hidden;">
+        <ui:Button text="Button" display-tooltip-when-elided="true" name="tagButton" usage-hints="DynamicColor" style="background-image: none; border-left-color: rgb(21, 21, 21); border-right-color: rgb(21, 21, 21); border-top-color: rgb(21, 21, 21); border-bottom-color: rgb(21, 21, 21); -unity-background-image-tint-color: rgb(94, 94, 94); border-left-width: 1px; border-right-width: 3px; border-top-width: 1px; border-bottom-width: 3px; border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-top-right-radius: 0; border-bottom-right-radius: 0; overflow: hidden;" />
+        <ui:VisualElement style="left: -9px;">
+            <ui:Button display-tooltip-when-elided="true" name="removeTagButton" text="X" style="background-image: none; border-left-color: rgb(21, 21, 21); border-right-color: rgb(21, 21, 21); border-top-color: rgb(21, 21, 21); border-bottom-color: rgb(21, 21, 21); -unity-background-image-tint-color: rgb(88, 88, 88); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 3px; left: 0; -unity-text-align: middle-center; padding-left: 5px; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 8px; border-bottom-right-radius: 8px; background-color: rgb(88, 88, 88); width: 21px; height: 21px; display: flex; margin-left: 3px; margin-right: 3px; margin-top: 1px; margin-bottom: 1px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

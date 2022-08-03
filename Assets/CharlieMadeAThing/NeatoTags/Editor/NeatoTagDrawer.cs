@@ -13,6 +13,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         Button _button;
         ColorField _colorField;
         TextField _commentField;
+        NeatoTagAsset _neatoTagAsset;
 
         //UI
         VisualElement _root;
@@ -32,12 +33,13 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         public override VisualElement CreateInspectorGUI() {
+            _neatoTagAsset = target as NeatoTagAsset;
             FindProperties();
             _colorField = _root.Q<ColorField>( "tagColor" );
             _colorField.BindProperty( PropertyColor );
             _colorField.RegisterValueChangedCallback( UpdateTagIconVisual );
-            _colorField.showAlpha = true;
-            PropertyColor.colorValue = Color.black;
+            _colorField.showAlpha = false;
+            PropertyColor.colorValue = Color.gray;
             PropertyColor.colorValue = _colorField.value;
 
             
@@ -56,10 +58,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             PropertyColor = serializedObject.FindProperty( "color" );
             PropertyComment = serializedObject.FindProperty( "comment" );
         }
-
-        public override void OnInspectorGUI() {
-            if ( target != null ) {
-                _button.text = target.name;
+        
+        public void UpdateTagButtonText() {
+            if ( target != null && _button != null ) {
+                _button.text = _neatoTagAsset.name;
             }
         }
 

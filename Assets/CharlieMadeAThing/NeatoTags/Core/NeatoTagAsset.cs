@@ -5,7 +5,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [CreateAssetMenu( fileName = "New NeatoTag", menuName = "Neato Tags/New Tag", order = 0 )]
     [Serializable]
     public class NeatoTagAsset : ScriptableObject {
-        [SerializeField] Color color = Color.black;
+        [SerializeField] Color color = Color.gray;
         [SerializeField] string comment = string.Empty;
 
         public Color Color { 

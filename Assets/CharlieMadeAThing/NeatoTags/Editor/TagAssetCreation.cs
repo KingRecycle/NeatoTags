@@ -18,23 +18,44 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             if( string.IsNullOrEmpty( path ) ) {
                 return;
             }
-            var assetsPath = "Assets\\" + Path.GetRelativePath( Application.dataPath, path );
-            Debug.Log( assetsPath );
+            var selectedFolder = "Assets\\" + Path.GetRelativePath( Application.dataPath, path );
             if ( string.IsNullOrEmpty( tagPath ) ) {
-                var p = GetNeatoTagsDirectory();
+                var neatTagsDirectory = GetNeatoTagsDirectory();
                 var newDataHolder = CreateInstance<EditorDataHolder>();
-                newDataHolder.tagFolderLocation = path;
-                AssetDatabase.CreateAsset(newDataHolder, p + "/Editor/EditorDataContainer.asset");
+                newDataHolder.tagFolderLocation = selectedFolder;
+                AssetDatabase.CreateAsset(newDataHolder, neatTagsDirectory + "/Editor/EditorDataContainer.asset");
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             } else {
-                GetEditorDataContainer().tagFolderLocation = assetsPath;
+                GetEditorDataContainer().tagFolderLocation = selectedFolder;
+            }
+        }
+
+        public static void SetTagFolder() {
+            var path = EditorUtility.OpenFolderPanel("Tag Folder Location", "Assets", "");
+            var tagPath = GetTagFolderLocation();
+            //Get the path to the Assets folder
+            if( string.IsNullOrEmpty( path ) ) {
+                return;
+            }
+            var selectedFolder = "Assets\\" + Path.GetRelativePath( Application.dataPath, path );
+            Debug.Log( selectedFolder );
+            if ( string.IsNullOrEmpty( tagPath ) ) {
+                var neatTagsDirectory = GetNeatoTagsDirectory();
+                var newDataHolder = CreateInstance<EditorDataHolder>();
+                newDataHolder.tagFolderLocation = selectedFolder;
+                AssetDatabase.CreateAsset(newDataHolder, neatTagsDirectory + "\\Editor\\EditorDataContainer.asset");
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            } else {
+                GetEditorDataContainer().tagFolderLocation = selectedFolder;
             }
         }
         
         static string GetNeatoTagsDirectory() {
             var dirs = Directory.GetDirectories( $"{Application.dataPath}", "NeatoTags", SearchOption.AllDirectories );
-            if ( dirs.Length != 0 ) return dirs[0];
+            var path = "Assets\\" + Path.GetRelativePath( Application.dataPath, dirs[0] );
+            if ( dirs.Length != 0 ) return path;
             Debug.LogError("[TagAssetCreation]: Could not find NeatoTags directory.");
             return "";
         }
@@ -91,7 +112,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         //Non menu version of NewTag function
-        public static NeatoTagAsset CreateNewTag( string tagName ) {
+        public static NeatoTagAsset CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             var allTags = Tagger.GetAllTags();
             if( allTags.Any( x => x.name == tagName ) )
             {
@@ -111,8 +132,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                     AssetDatabase.CreateAsset(newTag, newPath);
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
-                    EditorUtility.FocusProjectWindow();
-                    Selection.activeObject = newTag;
+                    if ( shouldFocusInProjectWindow ) {
+                        EditorUtility.FocusProjectWindow();
+                        Selection.activeObject = newTag;
+                    }
                 }
                 else {
                     EditorUtility.DisplayDialog("Error", "Please set the tag folder location first or have a project folder selected.", "OK");
@@ -122,8 +145,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 AssetDatabase.CreateAsset(newTag, $"{dataHolder.tagFolderLocation}/{tagName}.asset");
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
-                EditorUtility.FocusProjectWindow();
-                Selection.activeObject = newTag;
+                if ( shouldFocusInProjectWindow ) {
+                    EditorUtility.FocusProjectWindow();
+                    Selection.activeObject = newTag;
+                }
             }
 
             return newTag;

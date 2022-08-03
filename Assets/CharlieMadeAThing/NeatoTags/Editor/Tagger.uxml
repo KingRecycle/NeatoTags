@@ -1,20 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="width: 100%; height: 100%;">
         <ui:VisualElement>
-            <uie:Toolbar style="margin-top: 5px; height: 24px;">
+            <uie:Toolbar style="margin-top: 0; height: 24px;">
+                <uie:ToolbarButton text="Edit Tagger" display-tooltip-when-elided="true" name="editTaggerButton" style="-unity-text-align: middle-left;" />
                 <uie:ToolbarButton text="Create Tag" display-tooltip-when-elided="true" name="addTagButton" style="min-height: auto; -unity-text-align: middle-center;" />
                 <ui:TextField picking-mode="Ignore" text="Tag Name" name="addTagTextField" style="margin-right: 0; min-width: 30px; width: 103px; -unity-text-align: middle-left; margin-top: 2px; margin-bottom: 2px;" />
                 <uie:ToolbarSpacer />
-                <ui:Label text="Search" display-tooltip-when-elided="true" style="-unity-text-align: middle-left;" />
+                <ui:Label text="Search" display-tooltip-when-elided="true" name="searchLabel" style="-unity-text-align: middle-left;" />
                 <uie:ToolbarSpacer />
-                <uie:ToolbarSearchField focusable="true" name="taggerSearch" />
+                <uie:ToolbarSearchField focusable="true" name="taggerSearch" style="width: 200px; margin-top: 0; margin-bottom: 0; height: 18px; top: 3px;" />
             </uie:Toolbar>
+            <ui:GroupBox name="tagViewer" style="flex-direction: row;" />
         </ui:VisualElement>
-        <ui:GroupBox style="flex-grow: 1;">
-            <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap; -unity-text-align: middle-left; border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(106, 99, 99); border-right-color: rgb(106, 99, 99); border-top-color: rgb(106, 99, 99); border-bottom-color: rgb(106, 99, 99); padding-left: 0; margin-left: 0; left: auto; margin-top: 0;" />
-            <ui:Foldout text="Available Tags" name="foldout" style="margin-top: 16px; margin-left: 0; left: auto; align-items: stretch; font-size: 12px; opacity: 1; -unity-text-align: upper-left;">
-                <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap; margin-left: 0; left: -30px;" />
-            </ui:Foldout>
+        <ui:GroupBox name="allTagsBox">
+            <ui:GroupBox text="Available Tags" style="flex-direction: row; padding-top: 0; align-items: stretch; padding-left: 0; padding-bottom: 0; height: 20px;">
+                <uie:ToolbarSearchField focusable="true" name="taggerSearchAvailable" style="margin-top: 0; margin-bottom: 0; align-items: center; top: -6px; height: 18px;" />
+            </ui:GroupBox>
+            <ui:GroupBox name="allTagViewer" style="flex-direction: row;" />
         </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>

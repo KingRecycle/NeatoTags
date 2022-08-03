@@ -11,19 +11,17 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [Serializable]
     public class Tagger : MonoBehaviour {
         static Dictionary<GameObject, Tagger> _taggers = new();
-        [SerializeField] List<NeatoTagAsset> tags = new();
+        [SerializeField] List<NeatoTagAsset> tags;
 
         public List<NeatoTagAsset> GetTags => tags;
 
-
-        void OnEnable() {
+        void Awake() {
             _taggers.Add( gameObject, this );
         }
 
-        void OnDisable() {
+        void OnDestroy() {
             _taggers.Remove( gameObject );
         }
-
 
         /// <summary>
         /// Gives back a Hashset of all tags in the project.
