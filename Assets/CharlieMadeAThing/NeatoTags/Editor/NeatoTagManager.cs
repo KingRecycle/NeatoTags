@@ -237,8 +237,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 _selectedTagTextField.value = _selectedTag.Comment;
                 _selectedTagTextField.RegisterValueChangedCallback( UpdateTagComment );
 
-                var tagIcon = root.Q<Button>( "tagIcon" );
-                tagIcon.parent.Remove( tagIcon );
+                // var tagIcon = root.Q<Button>( "tagIcon" );
+                // tagIcon.parent.Remove( tagIcon );
 
                 _renameToolbar.hierarchy.Insert( 2, _renameButtonDisplay );
 

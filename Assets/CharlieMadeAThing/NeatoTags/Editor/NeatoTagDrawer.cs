@@ -50,6 +50,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _button = _tagButtonTemplate.Instantiate().Q<Button>();
             _button.text = target.name;
             _button.style.backgroundColor = PropertyColor.colorValue;
+            _button.name = "tagIcon";
             _tagButtonBox.Add( _button );
 
             _commentField = _root.Q<TextField>( "commentField" );
