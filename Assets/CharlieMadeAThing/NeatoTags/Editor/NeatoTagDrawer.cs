@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
@@ -11,17 +10,17 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         Button _button;
-        VisualTreeAsset _tagButtonTemplate;
-        VisualElement _tagButtonBox;
         ColorField _colorField;
         TextField _commentField;
         NeatoTagAsset _neatoTagAsset;
 
         //UI
         VisualElement _root;
+        VisualElement _tagButtonBox;
+        VisualTreeAsset _tagButtonTemplate;
         SerializedProperty PropertyColor { get; set; }
         SerializedProperty PropertyComment { get; set; }
-        
+
 
         void OnEnable() {
             _root = new VisualElement();
@@ -33,7 +32,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             visualTree.CloneTree( _root );
             _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
             _tagButtonTemplate =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                    "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
             NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
         }
 
@@ -55,16 +55,16 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             _commentField = _root.Q<TextField>( "commentField" );
             _commentField.BindProperty( PropertyComment );
-            
+
             return _root;
         }
-        
+
 
         void FindProperties() {
             PropertyColor = serializedObject.FindProperty( "color" );
             PropertyComment = serializedObject.FindProperty( "comment" );
         }
-        
+
         public void UpdateTagButtonText() {
             if ( target != null && _button != null ) {
                 _button.text = _neatoTagAsset.name;
@@ -75,7 +75,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         void UpdateTagIconVisual( ChangeEvent<Color> evt ) {
             PropertyColor.colorValue = evt.newValue;
             _button.style.backgroundColor = PropertyColor.colorValue;
-            _button.style.color = TaggerDrawer.GetColorLuminosity( PropertyColor.colorValue ) > 70 ? Color.black : Color.white;
+            _button.style.color = TaggerDrawer.GetColorLuminosity( PropertyColor.colorValue ) > 70
+                ? Color.black
+                : Color.white;
             foreach ( var taggerDrawer in TAGGER_DRAWERS ) {
                 taggerDrawer.PopulateButtons();
             }

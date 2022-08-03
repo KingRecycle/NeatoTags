@@ -8,11 +8,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         [SerializeField] Color color = Color.gray;
         [SerializeField] string comment = string.Empty;
 
-        public Color Color { 
+        public Color Color {
             get => color;
             set => color = value;
         }
-        public string Comment { 
+
+        public string Comment {
             get => comment;
             set => comment = value;
         }

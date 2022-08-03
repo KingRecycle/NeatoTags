@@ -1,22 +1,24 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="width: auto; height: auto; min-height: 100%;">
-        <ui:GroupBox style="flex-direction: row; justify-content: flex-start; padding-left: 0; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0; height: 100%; align-items: stretch;">
-            <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-top: 0; -unity-text-outline-width: 0; -unity-text-outline-color: rgb(45, 45, 45); border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; width: 25%; height: 100%; padding-bottom: 0; min-width: 25%; align-items: flex-start; max-width: 25%;">
-                <uie:Toolbar style="width: auto; max-width: none;">
-                    <uie:ToolbarButton text="+" display-tooltip-when-elided="true" name="addTagButton" style="min-width: 32px; -unity-text-align: upper-center; font-size: 14px; width: auto;" />
-                    <uie:ToolbarSearchField focusable="true" style="max-width: none; width: 60%; justify-content: flex-start; align-items: center; flex-direction: row; min-width: 25%;" />
+        <ui:GroupBox style="flex-direction: column; justify-content: flex-start; padding-left: 0; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0; height: 100%; align-items: stretch;">
+            <ui:GroupBox name="tagInfoBox" style="width: 100%; border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; margin-top: 0; margin-bottom: 0; margin-right: 0; margin-left: 0; padding-left: 0; padding-top: 0; padding-bottom: 0; align-items: stretch;">
+                <uie:Toolbar name="renameToolbar" style="justify-content: flex-start; flex-direction: row; width: 100%; margin-left: 0; border-bottom-width: 1px; align-items: stretch; border-left-width: 0;">
+                    <uie:ToolbarButton text="-" display-tooltip-when-elided="true" name="deleteTagButton" style="align-items: auto; width: auto; -unity-text-align: middle-center; left: auto; flex-direction: column; justify-content: flex-end; flex-basis: auto; position: relative; min-width: 32px; height: auto; padding-left: 0; padding-right: 0; padding-top: 0; font-size: 14px; margin-left: -1px;" />
+                    <uie:ToolbarSpacer />
+                    <ui:TextField picking-mode="Ignore" name="renameField" style="margin-left: 1px; margin-right: 0; margin-top: 1px; margin-bottom: 0; width: 25%; height: 16px; flex-wrap: nowrap; justify-content: flex-start; min-width: 35%; position: relative; top: auto; left: auto; min-height: 16px; align-items: stretch; padding-top: 2px;" />
+                    <ui:Button text="Rename" display-tooltip-when-elided="true" name="renameButton" style="max-width: none; position: relative; top: auto; left: auto; height: 18px;" />
+                </uie:Toolbar>
+            </ui:GroupBox>
+            <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-top: 0; -unity-text-outline-width: 0; -unity-text-outline-color: rgb(45, 45, 45); border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; width: 100%; height: auto; padding-bottom: 0; min-width: 25%; align-items: flex-start; max-width: 100%; margin-bottom: 30px;">
+                <uie:Toolbar style="width: 100%; max-width: none; border-bottom-width: 1px;">
+                    <uie:ToolbarButton text="+" display-tooltip-when-elided="true" name="addTagButton" style="min-width: 32px; -unity-text-align: upper-center; font-size: 14px; width: auto; padding-left: 0; padding-right: 0; padding-top: 0; margin-left: 0;" />
+                    <uie:ToolbarSpacer />
+                    <uie:ToolbarSearchField focusable="true" name="tagSearchField" style="max-width: none; width: 60%; justify-content: flex-start; align-items: center; flex-direction: row; min-width: 25%; margin-left: 0;" />
+                    <ui:Button text="Set Default Tag Folder" display-tooltip-when-elided="true" name="setTagFolderButton" />
                 </uie:Toolbar>
                 <ui:ScrollView style="height: 100%;">
                     <ui:GroupBox name="allTagsBox" style="width: auto; flex-direction: row; flex-wrap: wrap;" />
                 </ui:ScrollView>
-            </ui:GroupBox>
-            <ui:GroupBox name="tagInfoBox" style="width: 75%; border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; margin-top: 0; margin-bottom: 0; margin-right: 0; margin-left: 0; padding-left: 0; padding-top: 0; padding-bottom: 0; align-items: stretch;">
-                <uie:Toolbar name="renameToolbar" style="justify-content: flex-end; flex-direction: row;">
-                    <uie:ToolbarSpacer />
-                    <ui:TextField picking-mode="Ignore" name="renameField" style="margin-left: 0; margin-right: 0; margin-top: 1px; margin-bottom: 0; width: auto; height: 18px; flex-wrap: nowrap; justify-content: flex-start; min-width: 35%; position: relative; top: auto; left: auto;" />
-                    <ui:Button text="Rename" display-tooltip-when-elided="true" name="renameButton" style="max-width: none; position: relative; top: auto; left: auto; height: 18px;" />
-                    <uie:ToolbarButton text="-" display-tooltip-when-elided="true" name="deleteTagButton" style="align-items: auto; width: 26px; -unity-text-align: upper-center; left: auto; flex-direction: column; justify-content: flex-end; flex-basis: auto; position: relative; min-width: 26px; height: 20px;" />
-                </uie:Toolbar>
             </ui:GroupBox>
         </ui:GroupBox>
     </ui:VisualElement>
