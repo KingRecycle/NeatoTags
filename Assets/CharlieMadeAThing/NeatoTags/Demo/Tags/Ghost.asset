@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
   m_Name: Ghost
   m_EditorClassIdentifier: 
-  color: {r: 0.34834465, g: 0.70254755, b: 0.7169812, a: 1}
+  color: {r: 0.25013348, g: 0.7061479, b: 0.7264151, a: 1}
   comment: Careful! It's a gobby!

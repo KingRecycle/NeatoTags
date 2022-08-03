@@ -11,6 +11,8 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         Button _button;
+        VisualTreeAsset _tagButtonTemplate;
+        VisualElement _tagButtonBox;
         ColorField _colorField;
         TextField _commentField;
         NeatoTagAsset _neatoTagAsset;
@@ -29,6 +31,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
                     "Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTag.uxml" );
             visualTree.CloneTree( _root );
+            _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
+            _tagButtonTemplate =
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
             NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
         }
 
@@ -42,10 +47,10 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             PropertyColor.colorValue = Color.gray;
             PropertyColor.colorValue = _colorField.value;
 
-            
-            _button = _root.Q<Button>( "tagIcon" );
+            _button = _tagButtonTemplate.Instantiate().Q<Button>();
             _button.text = target.name;
             _button.style.backgroundColor = PropertyColor.colorValue;
+            _tagButtonBox.Add( _button );
 
             _commentField = _root.Q<TextField>( "commentField" );
             _commentField.BindProperty( PropertyComment );
