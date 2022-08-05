@@ -15,12 +15,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return;
             }
 
-            var selectedFolder = "Assets\\" + Path.GetRelativePath( Application.dataPath, path );
+            var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
             if ( string.IsNullOrEmpty( tagPath ) ) {
                 var neatTagsDirectory = GetNeatoTagsDirectory();
                 var newDataHolder = CreateInstance<EditorDataHolder>();
                 newDataHolder.tagFolderLocation = selectedFolder;
-                AssetDatabase.CreateAsset( newDataHolder, neatTagsDirectory + "/Editor/EditorDataContainer.asset" );
+                var newPath = Path.Join( GetNeatoTagsEditorDirectory(), "EditorDataContainer.asset" );
+                AssetDatabase.CreateAsset( newDataHolder, newPath );
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             } else {
@@ -36,13 +37,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return;
             }
 
-            var selectedFolder = "Assets\\" + Path.GetRelativePath( Application.dataPath, path );
+            var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
             Debug.Log( selectedFolder );
             if ( string.IsNullOrEmpty( tagPath ) ) {
                 var neatTagsDirectory = GetNeatoTagsDirectory();
                 var newDataHolder = CreateInstance<EditorDataHolder>();
                 newDataHolder.tagFolderLocation = selectedFolder;
-                AssetDatabase.CreateAsset( newDataHolder, neatTagsDirectory + "\\Editor\\EditorDataContainer.asset" );
+                var newPath = Path.Join( GetNeatoTagsEditorDirectory(), "EditorDataContainer.asset" );
+                AssetDatabase.CreateAsset( newDataHolder, newPath );
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             } else {
@@ -53,7 +55,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static string GetNeatoTagsDirectory() {
             var dirs = Directory.GetDirectories( $"{Application.dataPath}", "NeatoTags", SearchOption.AllDirectories );
-            var path = "Assets\\" + Path.GetRelativePath( Application.dataPath, dirs[0] );
+            var path = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
             if ( dirs.Length != 0 ) return path;
             Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags directory." );
             return "";
@@ -61,11 +63,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static string GetNeatoTagsEditorDirectory() {
             var neatTagsDirectory = GetNeatoTagsDirectory();
-            var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "EditorDataContainer",
+            var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "Editor",
                 SearchOption.AllDirectories );
-            var path = "Assets\\" + Path.GetRelativePath( Application.dataPath, dirs[0] );
+            var path = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
             if ( dirs.Length != 0 ) return path;
             Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags Editor directory." );
+            return "";
+        }
+
+        public static string GetUxmlDirectory() {
+            var neatTagsDirectory = GetNeatoTagsDirectory();
+            var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "UXML",
+                SearchOption.AllDirectories );
+            var path = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
+            if ( dirs.Length != 0 ) return path;
+            Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags UXML directory." );
             return "";
         }
 

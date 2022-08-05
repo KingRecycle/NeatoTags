@@ -26,6 +26,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         GroupBox _tagViewerSelected;
 
         void OnEnable() {
+            TagAssetCreation.GetUxmlDirectory();
             _root = new VisualElement();
             // Load in UXML template and USS styles, then apply them to the root element.
             var visualTree =
