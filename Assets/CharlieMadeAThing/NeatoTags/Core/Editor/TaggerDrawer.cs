@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     [CustomEditor( typeof( Tagger ) )]
     public class TaggerDrawer : UnityEditor.Editor {
         static VisualTreeAsset _tagButtonTemplate;
@@ -30,17 +29,14 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _root = new VisualElement();
             // Load in UXML template and USS styles, then apply them to the root element.
             var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/Tagger.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.TaggerUxml );
             visualTree.CloneTree( _root );
 
             _tagButtonTemplate =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
 
             _tagButtonWithXTemplate =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTagWithX.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagWithXUxml );
 
 
             _tagViewerSelected = _root.Q<GroupBox>( "tagViewer" );
@@ -67,25 +63,25 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             _editTaggerButton = _root.Q<ToolbarButton>( "editTaggerButton" );
 
-            _searchField.style.visibility = Visibility.Hidden;
-            _addTagButton.style.visibility = Visibility.Hidden;
-            _addTagTextField.style.visibility = Visibility.Hidden;
-            _searchLabel.style.visibility = Visibility.Hidden;
+            _searchField.style.display = DisplayStyle.None;
+            _addTagButton.style.display = DisplayStyle.None;
+            _addTagTextField.style.display = DisplayStyle.None;
+            _searchLabel.style.display = DisplayStyle.None;
             _allTagsBox.style.display = DisplayStyle.None;
             _editTaggerButton.clicked += () => {
                 _isEditTaggerMode = !_isEditTaggerMode;
                 if ( _isEditTaggerMode ) {
-                    _searchField.style.visibility = Visibility.Visible;
-                    _addTagButton.style.visibility = Visibility.Visible;
-                    _addTagTextField.style.visibility = Visibility.Visible;
-                    _searchLabel.style.visibility = Visibility.Visible;
+                    _searchField.style.display = DisplayStyle.Flex;
+                    _addTagButton.style.display = DisplayStyle.Flex;
+                    _addTagTextField.style.display = DisplayStyle.Flex;
+                    _searchLabel.style.display = DisplayStyle.Flex;
                     _allTagsBox.style.display = DisplayStyle.Flex;
                     PopulateButtons();
                 } else {
-                    _searchField.style.visibility = Visibility.Hidden;
-                    _addTagButton.style.visibility = Visibility.Hidden;
-                    _addTagTextField.style.visibility = Visibility.Hidden;
-                    _searchLabel.style.visibility = Visibility.Hidden;
+                    _searchField.style.display = DisplayStyle.None;
+                    _addTagButton.style.display = DisplayStyle.None;
+                    _addTagTextField.style.display = DisplayStyle.None;
+                    _searchLabel.style.display = DisplayStyle.None;
                     _allTagsBox.style.display = DisplayStyle.None;
                     PopulateButtons();
                 }
@@ -128,7 +124,9 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         }
 
         VisualElement CreateSelectedButton( NeatoTagAsset tag ) {
-            var tagButton = _isEditTaggerMode ? _tagButtonWithXTemplate.Instantiate().Q<VisualElement>() : _tagButtonTemplate.Instantiate().Q<Button>();
+            var tagButton = _isEditTaggerMode
+                ? _tagButtonWithXTemplate.Instantiate().Q<VisualElement>()
+                : _tagButtonTemplate.Instantiate().Q<Button>();
 
             if ( tag.Comment != string.Empty ) {
                 tagButton.tooltip = tag.Comment;

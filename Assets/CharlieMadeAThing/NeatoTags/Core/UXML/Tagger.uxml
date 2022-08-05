@@ -1,9 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <ui:VisualElement style="width: 100%; height: 100%;">
         <ui:VisualElement>
-            <uie:Toolbar style="margin-top: 0; height: 24px;">
-                <uie:ToolbarButton text="Edit Tagger" display-tooltip-when-elided="true" name="editTaggerButton" style="-unity-text-align: middle-left;" />
-                <uie:ToolbarButton text="Create Tag" display-tooltip-when-elided="true" name="addTagButton" style="min-height: auto; -unity-text-align: middle-center;" />
+            <uie:Toolbar style="margin-top: 0; height: 24px; flex-shrink: 1;">
+                <uie:ToolbarButton text="Edit Tagger" display-tooltip-when-elided="true" name="editTaggerButton" style="-unity-text-align: middle-left; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" />
+                <uie:ToolbarButton text="Create Tag" display-tooltip-when-elided="true" name="addTagButton" style="min-height: auto; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis;" />
                 <ui:TextField picking-mode="Ignore" text="Tag Name" name="addTagTextField" style="margin-right: 0; min-width: 30px; width: 103px; -unity-text-align: middle-left; margin-top: 2px; margin-bottom: 2px;" />
                 <uie:ToolbarSpacer />
                 <ui:Label text="Search" display-tooltip-when-elided="true" name="searchLabel" style="-unity-text-align: middle-left;" />
@@ -16,7 +16,7 @@
             <ui:GroupBox text="Available Tags" style="flex-direction: row; padding-top: 0; align-items: stretch; padding-left: 0; padding-bottom: 0; height: 20px;">
                 <uie:ToolbarSearchField focusable="true" name="taggerSearchAvailable" style="margin-top: 0; margin-bottom: 0; align-items: center; top: -6px; height: 18px;" />
             </ui:GroupBox>
-            <ui:GroupBox name="allTagViewer" style="flex-direction: row;" />
+            <ui:GroupBox name="allTagViewer" style="flex-direction: row; flex-wrap: wrap;" />
         </ui:GroupBox>
     </ui:VisualElement>
 </ui:UXML>

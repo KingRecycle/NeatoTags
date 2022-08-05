@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Reflection;
-using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class TagAssetCreation : EditorWindow {
         [MenuItem( "Tools/Neato Tags/Set Tag Folder Location" )]
         static void SetTagFolderLocation() {
@@ -51,7 +50,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             }
         }
 
-        
+
         static string GetNeatoTagsDirectory() {
             var dirs = Directory.GetDirectories( $"{Application.dataPath}", "NeatoTags", SearchOption.AllDirectories );
             var path = "Assets\\" + Path.GetRelativePath( Application.dataPath, dirs[0] );
@@ -60,7 +59,17 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             return "";
         }
 
-        static string GetTagFolderLocation() {
+        static string GetNeatoTagsEditorDirectory() {
+            var neatTagsDirectory = GetNeatoTagsDirectory();
+            var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "EditorDataContainer",
+                SearchOption.AllDirectories );
+            var path = "Assets\\" + Path.GetRelativePath( Application.dataPath, dirs[0] );
+            if ( dirs.Length != 0 ) return path;
+            Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags Editor directory." );
+            return "";
+        }
+
+        public static string GetTagFolderLocation() {
             var dataHolder = GetEditorDataContainer();
             return dataHolder == null ? "" : dataHolder.tagFolderLocation;
         }

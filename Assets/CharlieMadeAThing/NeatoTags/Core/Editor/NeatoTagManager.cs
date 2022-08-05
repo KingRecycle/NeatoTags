@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class NeatoTagManager : EditorWindow {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualElement _root;
@@ -25,6 +24,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         static GroupBox _tagInfoBox;
         static Button _deleteTagButton;
         static Button _setTagFolderButton;
+        static Label _tagDirectoryLabel;
 
         //Selected Data
         static NeatoTagAsset _selectedTag;
@@ -43,14 +43,12 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             // Import UXML
             var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTagManager.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatTagManagerUxml );
             visualTree.CloneTree( _root );
 
 
             _tagButtonTemplate =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
 
             _allTagsBox = _root.Q<GroupBox>( "allTagsBox" );
             _tagInfoBox = _root.Q<GroupBox>( "tagInfoBox" );
@@ -76,7 +74,13 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             };
 
             _setTagFolderButton = _root.Q<Button>( "setTagFolderButton" );
-            _setTagFolderButton.clicked += TagAssetCreation.SetTagFolder;
+            _setTagFolderButton.clicked += () => {
+                TagAssetCreation.SetTagFolder();
+                UpdatePathLabel();
+            };
+
+            _tagDirectoryLabel = _root.Q<Label>( "tagDirectoryLabel" );
+            UpdatePathLabel();
 
 
             _deleteTagButton = _root.Q<Button>( "deleteTagButton" );
@@ -102,6 +106,12 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             DisplayTag();
         }
 
+        void UpdatePathLabel() {
+            var tagFolderLocation = TagAssetCreation.GetTagFolderLocation();
+            var tagPath = tagFolderLocation == string.Empty ? "Not Assigned" : tagFolderLocation;
+            _tagDirectoryLabel.text = $"Default Tag Folder Location: {tagPath}";
+        }
+        
         void PopulateButtonsWithSearch( string evtNewValue ) {
             if ( evtNewValue == string.Empty ) {
                 PopulateAllTagsBox();
@@ -192,7 +202,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
         static void DisplayTag() {
             var visualTree = AssetDatabase
-                .LoadAssetAtPath<VisualTreeAsset>( "Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTag.uxml" )
+                .LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml )
                 .Instantiate();
             var tagVisualElement = visualTree.Q<VisualElement>( "topVisualElement" );
 
@@ -238,7 +248,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 _selectedTagTextField.value = _selectedTag.Comment;
                 _selectedTagTextField.RegisterValueChangedCallback( UpdateTagComment );
             }
-            
+
 
             _renameToolbar.hierarchy.Insert( 2, _renameButtonDisplay );
 
@@ -264,6 +274,14 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
             _renameButtonDisplay.style.backgroundColor = _selectedTag.Color;
             _renameButtonDisplay.style.color =
                 TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
+            foreach ( var element in _allTagsBox.Children() ) {
+                if ( element is Button tagButton && tagButton.text == _selectedTag.name ) {
+                    tagButton.style.backgroundColor = _selectedTag.Color;
+                    tagButton.style.color =
+                        TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
+                }
+            }
+
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
 

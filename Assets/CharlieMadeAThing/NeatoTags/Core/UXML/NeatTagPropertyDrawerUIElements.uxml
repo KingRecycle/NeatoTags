@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/CharlieMadeAThing/NeatoTags/Editor/NeatTagPropertyDrawerStyle.uss?fileID=7433441132597879392&amp;guid=d19c62b44656a9942989c88c6675729b&amp;type=3#NeatTagPropertyDrawerStyle" />
+    <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; height: 32px;">
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" style="align-self: flex-start;" />
+        <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" style="align-self: flex-start; align-items: flex-start; left: auto;" />
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; justify-content: flex-end;">
+            <uie:ObjectField style="align-self: flex-start; width: 20px; height: auto; justify-content: flex-start; align-items: stretch;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

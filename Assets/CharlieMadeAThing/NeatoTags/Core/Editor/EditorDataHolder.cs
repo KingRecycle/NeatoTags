@@ -1,13 +1,12 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class EditorDataHolder : ScriptableObject {
         [ReadOnly] public string tagFolderLocation;
     }
 
-    
-    
+
     public class ReadOnlyAttribute : PropertyAttribute {
     }
 

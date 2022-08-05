@@ -1,0 +1,21 @@
+.unity-object-field {
+    display: flex;
+}
+
+.unity-object-field-display {
+    display: none;
+}
+
+.unity-base-field__input {
+    display: flex;
+    visibility: visible;
+}
+
+.unity-object-field__selector {
+    display: flex;
+    align-self: auto;
+    align-items: auto;
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}

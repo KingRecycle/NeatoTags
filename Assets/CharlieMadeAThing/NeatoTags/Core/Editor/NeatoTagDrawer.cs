@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using CharlieMadeAThing.NeatoTags.Core;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     [CustomEditor( typeof( NeatoTagAsset ) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
@@ -27,13 +26,11 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             // Load in UXML template and USS styles, then apply them to the root element.
             var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/NeatoTag.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml );
             visualTree.CloneTree( _root );
             _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
             _tagButtonTemplate =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
-                    "Assets/CharlieMadeAThing/NeatoTags/Editor/buttonTag.uxml" );
+                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
             NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
         }
 
@@ -90,5 +87,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             TAGGER_DRAWERS.Add( taggerDrawer );
         }
+        
     }
 }

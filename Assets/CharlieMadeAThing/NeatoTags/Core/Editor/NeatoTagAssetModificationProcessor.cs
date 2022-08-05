@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 
-namespace CharlieMadeAThing.NeatoTags.Editor {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         static readonly List<NeatoTagDrawer> NEATO_TAG_DRAWERS = new();
@@ -11,7 +11,6 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
         //This shouldn't be too slow since it's only called once even if there are multiple assets being modified.
         static void OnPostprocessAllAssets( string[] importedAssets, string[] deletedAssets, string[] movedAssets,
             string[] movedFromAssetPaths ) {
-            
             UpdateTaggers();
         }
 
@@ -26,8 +25,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
                 neatoTagDrawer.UpdateTagButtonText();
             }
         }
-        
-        
+
 
         //Grabs the TaggerDrawer. Doesn't work if not a list for some reason...
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
@@ -37,6 +35,7 @@ namespace CharlieMadeAThing.NeatoTags.Editor {
 
             TAGGER_DRAWERS.Add( taggerDrawer );
         }
+
         //Grabs the NeatoTagDrawer. Doesn't work if not a list for some reason...
         public static void RegisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
             if ( NEATO_TAG_DRAWERS.Contains( neatoTagDrawer ) ) {

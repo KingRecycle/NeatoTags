@@ -17,5 +17,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             get => comment;
             set => comment = value;
         }
+        
+        
     }
 }

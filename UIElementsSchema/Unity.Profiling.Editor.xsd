@@ -92,7 +92,6 @@
         <xs:attribute default="-1" name="max-length" type="xs:int" use="optional" />
         <xs:attribute default="false" name="password" type="xs:boolean" use="optional" />
         <xs:attribute default="*" name="mask-character" type="xs:string" use="optional" />
-        <xs:attribute default="" name="text" type="xs:string" use="optional" />
         <xs:attribute default="false" name="readonly" type="xs:boolean" use="optional" />
         <xs:attribute default="false" name="is-delayed" type="xs:boolean" use="optional" />
         <xs:attribute default="false" name="multiline" type="xs:boolean" use="optional" />

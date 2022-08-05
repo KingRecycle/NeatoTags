@@ -8,8 +8,8 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
     public class SpookFinder : MonoBehaviour {
         public List<NeatoTagAsset> spookerTags;
 
-        public NeatoTagAsset human;
-        public NeatoTagAsset ghost;
+        public NeatoTagAsset humanTag;
+        public NeatoTagAsset ghostTag;
         public NeatoTagAsset goblin;
         public NeatoTagAsset witch;
         [SerializeField] List<GameObject> spooksGotFromFilter = new();
@@ -54,11 +54,11 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
                 _spooksInRange.Add( other.gameObject );
             }
             //Start a filter and chain functions to it.
-            if ( other.gameObject.TagFilter().WithTag( human ).WithoutTags( spookerTags ).IsMatch() ) {
+            if ( other.gameObject.TagFilter().WithTag( humanTag ).WithoutTags( spookerTags ).IsMatch() ) {
                 Debug.Log( "Found human" );
             }
             //If you have a small list of tags to search then instead of passing a list just add each tag to the function seperated by commas.
-            var filter = other.gameObject.TagFilter().WithAnyTags( ghost, goblin, witch );
+            var filter = other.gameObject.TagFilter().WithAnyTags( ghostTag, goblin, witch );
             if ( filter != null && filter.IsMatch() ) {
                 var spookies = filter.GetMatches(); // GetMatches returns a list of GameObjects that match the filter
 
