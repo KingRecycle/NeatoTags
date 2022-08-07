@@ -2185,11 +2185,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
   - {fileID: 11400000, guid: 2b1f38d553bc5cc4888f5ce09a860d1a, type: 2}
   - {fileID: 11400000, guid: 829bec202422edd408d728fc00c5e39d, type: 2}
-  humanTag: {fileID: 11400000, guid: 84a6f3f2392888f4793ef08e9e9bd76f, type: 2}
+  humanTag: {fileID: 11400000, guid: 51eb8b725bb3fbb45b7585f16f844939, type: 2}
   ghostTag: {fileID: 11400000, guid: 2b1f38d553bc5cc4888f5ce09a860d1a, type: 2}
-  goblin: {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
-  witch: {fileID: 11400000, guid: 829bec202422edd408d728fc00c5e39d, type: 2}
-  spooksGotFromFilter: []
+  goblinTag: {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
+  witchTag: {fileID: 11400000, guid: 829bec202422edd408d728fc00c5e39d, type: 2}
+  spookyGameObjects:
+  - {fileID: 1356551398}
+  - {fileID: 1725705717}
+  - {fileID: 2136358381}
   tmpText: {fileID: 131841783}
 --- !u!4 &1705574909
 Transform:
