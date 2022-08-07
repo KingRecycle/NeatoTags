@@ -11,7 +11,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [Serializable]
     public class Tagger : MonoBehaviour {
         static Dictionary<GameObject, Tagger> _taggers = new();
-        [SerializeField] List<NeatoTagAsset> tags;
+        [SerializeField] List<NeatoTagAsset> tags = new();
 
         public List<NeatoTagAsset> GetTags => tags;
 
@@ -38,7 +38,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             return tagSet;
         }
-
 
         /// <summary>
         /// Checks if a gameobject has a Tagger component.
@@ -102,45 +101,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool NoTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
             return !tagList.Any( HasTag );
         }
-
-        /// <summary>
-        /// Returns a Hashset of GameObjects that have the tag.
-        /// </summary>
-        /// <param name="tagAsset">Tag to check for</param>
-        /// <returns>Hashset of Gameobjects that have the specified tag.</returns>
-        public HashSet<GameObject> GetTaggedGameObjectsWithTag( NeatoTagAsset tagAsset ) {
-            var taggedGameObjects = new HashSet<GameObject>();
-            foreach ( var tagger in _taggers.Values.Where( tagger => tagger.HasTag( tagAsset ) ) ) {
-                taggedGameObjects.Add( tagger.gameObject );
-            }
-
-            return taggedGameObjects;
-        }
-
-        /// <summary>
-        /// Returns a Hashset of GameObjects that don't have the tag.
-        /// </summary>
-        /// <param name="tagAsset">Tag to check for</param>
-        /// <returns>Hashset of Gameobjects that don't have the specified tag.</returns>
-        public HashSet<GameObject> GetTaggedGameObjectsWithoutTag( NeatoTagAsset tagAsset ) {
-            var taggedGameObjects = new HashSet<GameObject>();
-            foreach ( var tagger in _taggers.Values.Where( tagger => !tagger.HasTag( tagAsset ) ) ) {
-                taggedGameObjects.Add( tagger.gameObject );
-            }
-
-            return taggedGameObjects;
-        }
-
-        /// <summary>
-        /// Starts a filter for chaining filter functions.
-        /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
-        /// To get result call .IsMatch() or .GetMatches()
-        /// </summary>
-        /// <returns>Returns TagFilter for chaining filter functions.</returns>
-        public TagFilter StartFilter() {
-            return new TagFilter( this );
-        }
-
+        
+        
         /// <summary>
         /// Add a tag to the tagger.
         /// </summary>
@@ -159,17 +121,291 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
+        /// Starts a filter for tags on a GameObject.
+        /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
+        /// To get result call .IsMatch() or .GetMatches()
+        /// </summary>
+        /// <returns>Returns TagFilter for chaining filter functions.</returns>
+        public TagFilter StartFilter() {
+            return new TagFilter( this );
+        }
+        
+        /// <summary>
+        /// Starts a filter for tagged GameObjects.
+        /// If nothing is passed in, it will check against ALL tagged GameObjects.
+        /// </summary>
+        /// <param name="gameObjectsToCheckAgainst">Optional list of GameObjects</param>
+        /// <returns>Returns TagFilter for chaining filter functions</returns>
+        public static GameObjectFilter StartGameObjectFilter( IEnumerable<GameObject> gameObjectsToCheckAgainst = null ) {
+            var gameObjects = gameObjectsToCheckAgainst ?? _taggers.Keys;
+            return new GameObjectFilter( gameObjects );
+        }
+
+
+        /// <summary>
+        /// GameObjectFilter class for chaining filter functions.
+        /// Don't use directly. Use StartGameObjectFilter() instead.
+        /// </summary>
+        public class GameObjectFilter {
+            readonly IEnumerable<GameObject> _gameObjects;
+            readonly HashSet<GameObject> _matches = new();
+            bool _isFirstFilterDone;
+            public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
+                this._gameObjects = gameObjects;
+            }
+            
+            /// <summary>
+            /// Returns the result of the filter.
+            /// </summary>
+            /// <returns>HashSet of GameObjects</returns>
+            public HashSet<GameObject> GetMatches() {
+                return _matches;
+            }
+            
+            /// <summary>
+            /// Filters for GameObjects that have the tag.
+            /// </summary>
+            /// <param name="tag">Tag to check for.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithTag( NeatoTagAsset tag ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasTag( tag ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasTag( tag ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Filters for GameObjects that have all of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithTags( IEnumerable<NeatoTagAsset> tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasAllTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasAllTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+                
+                
+                return this;
+            }
+            
+            /// <summary>
+            /// Filters for GameObjects that have all of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithTags( params NeatoTagAsset[] tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasAllTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasAllTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Filter for GameObjects that don't have the tag.
+            /// </summary>
+            /// <param name="tag">Tag to check for.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithoutTag( NeatoTagAsset tag ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( !gameObject.HasTag( tag ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( !gameObject.HasTag( tag ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+
+                return this;
+            }
+            
+            /// <summary>
+            /// Filters for GameObjects that have none of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithoutTags( IEnumerable<NeatoTagAsset> tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasNoTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasNoTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+                
+                return this;
+            }
+            
+            /// <summary>
+            /// Filters for GameObjects that have none of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <returns></returns>
+            public GameObjectFilter WithoutTags( params NeatoTagAsset[] tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasNoTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasNoTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+                
+                return this;
+            }
+            
+            /// <summary>
+            /// Filter for GameObjects that have any of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatTagAsset</param>
+            /// <returns></returns>
+            public GameObjectFilter WithAnyTags( IEnumerable<NeatoTagAsset> tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasAnyTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasAnyTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    } 
+                    _isFirstFilterDone = true;
+                }
+                
+                return this;
+            }
+            
+            /// <summary>
+            /// Filter for GameObjects that have any of the tags.
+            /// </summary>
+            /// <param name="tags">IEnumerable of NeatTagAsset</param>
+            /// <returns></returns>
+            public GameObjectFilter WithAnyTags( params NeatoTagAsset[] tags ) {
+                if ( _isFirstFilterDone ) {
+                    var tempMatches = _matches.ToHashSet();
+                    foreach ( var gameObject in tempMatches ) {
+                        if ( gameObject.HasAnyTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                } else {
+                    foreach ( var gameObject in _gameObjects ) {
+                        if ( gameObject.HasAnyTagsMatching( tags ) ) {
+                            _matches.Add( gameObject );
+                        } else {
+                            _matches.Remove( gameObject );
+                        }
+                    }
+                    _isFirstFilterDone = true;
+                }
+               
+                return this;
+            }
+        }
+
+        /// <summary>
         /// TagFilter class for chaining filter functions.
         /// Don't use directly. Use StartFilter() instead.
         /// </summary>
         public class TagFilter {
-            readonly HashSet<GameObject> _taggedGameObjects;
             readonly Tagger _target;
             bool _matchesFilter = true;
 
             public TagFilter( Tagger target ) {
                 _target = target;
-                _taggedGameObjects = new HashSet<GameObject>();
             }
 
             /// <summary>
@@ -179,14 +415,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public bool IsMatch() {
                 return _matchesFilter;
             }
-
-            /// <summary>
-            /// Returns a Hashset of GameObjects that have matched the filter.
-            /// </summary>
-            /// <returns>Hashset of GameObjects</returns>
-            public HashSet<GameObject> GetMatches() {
-                return _taggedGameObjects;
-            }
+            
 
             /// <summary>
             /// Checks if gameobject has tag.
@@ -195,12 +424,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <returns></returns>
             public TagFilter WithTag( NeatoTagAsset tagAsset ) {
                 _matchesFilter &= _target.HasTag( tagAsset );
-                if ( _target.HasTag( tagAsset ) ) {
-                    _taggedGameObjects.Add( _target.gameObject );
-                } else {
-                    _taggedGameObjects.Remove( _target.gameObject );
-                }
-
                 return this;
             }
 
@@ -212,11 +435,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public TagFilter WithTags( params NeatoTagAsset[] tags ) {
                 foreach ( var tagAsset in tags ) {
                     _matchesFilter &= _target.HasTag( tagAsset );
-                    if ( _target.HasTag( tagAsset ) ) {
-                        _taggedGameObjects.Add( _target.gameObject );
-                    } else {
-                        _taggedGameObjects.Remove( _target.gameObject );
-                    }
                 }
 
                 return this;
@@ -230,11 +448,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public TagFilter WithTags( IEnumerable<NeatoTagAsset> tagList ) {
                 foreach ( var tagAsset in tagList ) {
                     _matchesFilter &= _target.HasTag( tagAsset );
-                    if ( _target.HasTag( tagAsset ) ) {
-                        _taggedGameObjects.Add( _target.gameObject );
-                    } else {
-                        _taggedGameObjects.Remove( _target.gameObject );
-                    }
                 }
 
                 return this;
@@ -247,11 +460,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <returns></returns>
             public TagFilter WithoutTag( NeatoTagAsset tagAsset ) {
                 _matchesFilter &= !_target.HasTag( tagAsset );
-                if ( !_target.HasTag( tagAsset ) ) {
-                    _taggedGameObjects.Add( _target.gameObject );
-                } else {
-                    _taggedGameObjects.Remove( _target.gameObject );
-                }
 
                 return this;
             }
@@ -264,11 +472,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public TagFilter WithoutTags( params NeatoTagAsset[] tags ) {
                 foreach ( var tagAsset in tags ) {
                     _matchesFilter &= !_target.HasTag( tagAsset );
-                    if ( !_target.HasTag( tagAsset ) ) {
-                        _taggedGameObjects.Add( _target.gameObject );
-                    } else {
-                        _taggedGameObjects.Remove( _target.gameObject );
-                    }
                 }
 
                 return this;
@@ -282,11 +485,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public TagFilter WithoutTags( IEnumerable<NeatoTagAsset> tagList ) {
                 foreach ( var tagAsset in tagList ) {
                     _matchesFilter &= !_target.HasTag( tagAsset );
-                    if ( !_target.HasTag( tagAsset ) ) {
-                        _taggedGameObjects.Add( _target.gameObject );
-                    } else {
-                        _taggedGameObjects.Remove( _target.gameObject );
-                    }
                 }
 
                 return this;
@@ -300,11 +498,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public TagFilter WithAnyTags( IEnumerable<NeatoTagAsset> tagList ) {
                 var neatoTagAssets = tagList as NeatoTagAsset[] ?? tagList.ToArray();
                 _matchesFilter &= _target.AnyTagsMatch( neatoTagAssets );
-                if ( _target.AnyTagsMatch( neatoTagAssets ) ) {
-                    _taggedGameObjects.Add( _target.gameObject );
-                } else {
-                    _taggedGameObjects.Remove( _target.gameObject );
-                }
 
                 return this;
             }
@@ -316,9 +509,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <returns></returns>
             public TagFilter WithAnyTags( params NeatoTagAsset[] tags ) {
                 _matchesFilter &= _target.AnyTagsMatch( tags );
-                if ( _target.AnyTagsMatch( tags ) ) {
-                    _taggedGameObjects.Add( _target.gameObject );
-                }
 
                 return this;
             }

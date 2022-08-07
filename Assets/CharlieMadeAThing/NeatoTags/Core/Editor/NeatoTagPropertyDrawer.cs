@@ -28,7 +28,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _labelButtonContainer = new VisualElement();
             _labelButtonContainer.style.flexDirection = FlexDirection.Row;
             _labelButtonContainer.style.overflow = Overflow.Hidden;
-            
+            _labelButtonContainer.style.justifyContent = Justify.SpaceBetween;
+
 
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
@@ -72,12 +73,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 _tagButton.style.backgroundColor = tag.Color;
                 _tagButton.style.marginBottom = 0;
                 _tagButton.style.marginTop = 0;
-                _tagButton.style.alignSelf = Align.FlexStart;
                 _labelButtonContainer.Add( _tagButton );
-                //_root.hierarchy.Insert( 1, _tagButton );
+                _tagButton.style.textOverflow = TextOverflow.Ellipsis;
+                _tagButton.style.maxWidth = 200;
                 _tagButton.style.display = DisplayStyle.Flex;
-                _propertyField.style.maxWidth = 200;
-                
+                _propertyField.style.maxWidth = 250;
+                _tagButton.style.color = TaggerDrawer.GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
 
                 if ( _label.text.Contains( "Element" ) ) {
                     _label.style.display = DisplayStyle.None;
@@ -89,8 +90,56 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         
 #else
     public override void OnGUI( Rect position, SerializedProperty property, GUIContent label ) {
-            EditorGUILayout.HelpBox( "Neato Tags requires Unity 2022.2+ to show NeatTag properties correctly.", MessageType.Warning );
-            base.OnGUI( position, property, label );
+            
+            // Using BeginProperty / EndProperty on the parent property means that
+            // prefab override logic works on the entire property.
+            EditorGUI.BeginProperty( position, label, property );
+
+            // Draw label
+            position = EditorGUI.PrefixLabel( position, GUIUtility.GetControlID( FocusType.Passive ), label );
+
+            // Don't make child fields be indented
+            var indent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = 0;
+
+            // Calculate rects
+            var buttonPlaceRect = new Rect( position.x, position.y, 150, position.height );
+            var objPlaceRect = new Rect( position.x + buttonPlaceRect.width, position.y,
+                position.width - buttonPlaceRect.width, position.height );
+            if ( !_buttonTexture ) {
+                _buttonTexture =
+                    AssetDatabase.LoadAssetAtPath<Texture2D>(
+                        "Assets/CharlieMadeAThing/NeatoTags/Core/Sprites/button_unitystyle.png" );
+            }
+
+            var buttonStyle = new GUIStyle( GUI.skin.button ) {
+                border = new RectOffset( 4, 4, 4, 4 ),
+                normal = {
+                    background = _buttonTexture
+                }
+            };
+
+
+            // Draw fields - pass GUIContent.none to each so they are drawn without labels
+
+            //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTagAsset), false );
+            var obj = EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
+
+            var oldColor = GUI.backgroundColor;
+            var p = property.objectReferenceValue as NeatoTagAsset;
+            if ( p ) {
+                var lum = TaggerDrawer.GetColorLuminosity( p.Color ) > 70 ? Color.black : Color.white;
+                buttonStyle.normal.textColor = lum;
+                GUI.backgroundColor = p.Color;
+                var btn = GUI.Button( buttonPlaceRect, p.name, buttonStyle );
+                GUI.backgroundColor = oldColor;
+            }
+
+
+            // Set indent back to what it was
+            EditorGUI.indentLevel = indent;
+
+            EditorGUI.EndProperty();
         }
 #endif
     }

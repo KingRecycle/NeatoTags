@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Cube
+  - Cylinder
+  - Sphere
+  - Capsule
+  - TagRef
+  - Plane
   layers:
   - Default
   - TransparentFX

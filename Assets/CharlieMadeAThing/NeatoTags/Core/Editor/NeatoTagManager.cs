@@ -93,7 +93,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             PopulateAllTagsBox();
         }
 
-        [MenuItem( "Tools/Neato Tags/Neato Tag Manager" )]
+        [MenuItem( "Window/Neato Tag Manager" )]
         public static void ShowWindow() {
             var wnd = GetWindow<NeatoTagManager>();
             wnd.titleContent = new GUIContent( "Neato Tag Manager" );
