@@ -18,7 +18,7 @@ namespace CharlieMadeAThing
         void Start() {
             for ( var i = 0; i < count; i++ ) {
                 var go = Instantiate(prefab, Vector3.right + new Vector3(i, 0, 0 ),  Quaternion.identity);
-                go.AddTag( tags[Random.Range(0, tags.Count)] );
+                //go.AddTag( tags[Random.Range(0, tags.Count)] );
             }
         }
 

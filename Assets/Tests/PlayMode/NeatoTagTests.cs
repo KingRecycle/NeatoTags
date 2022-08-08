@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using CharlieMadeAThing.NeatoTags;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
@@ -13,6 +14,7 @@ namespace CharlieMadeAThing {
         public GameObject cylinder;
         public GameObject plane; //Plane has no tagger so it will always be treated as it has no tags at all when querying for tags.
         public GameObject sphere;
+        public GameObject quad;
         public GameObject[] shapes;
 
         
@@ -33,7 +35,8 @@ namespace CharlieMadeAThing {
             sphere = GameObject.FindWithTag( "Sphere" );
             capsule = GameObject.FindWithTag( "Capsule" );
             plane = GameObject.FindWithTag( "Plane" );
-            shapes = new[] { cube, cylinder, sphere, capsule, plane };
+            quad = GameObject.FindWithTag( "Quad" );
+            shapes = new[] { cube, cylinder, sphere, capsule, plane, quad };
         }
 
         #region IsTagged
@@ -179,7 +182,6 @@ namespace CharlieMadeAThing {
         
         #endregion
         
-
         #region StartTagFilter Tests
 
         [UnityTest]
@@ -331,9 +333,9 @@ namespace CharlieMadeAThing {
         public IEnumerator StartGameObjectFilter_WithoutTagCube_ReturnsFourShapesNoCube() {
             var filteredShapes = Tagger.StartGameObjectFilter( shapes ).WithoutTag( tagRefsForTests.cubeTag )
                 .GetMatches();
-            Assert.AreEqual( 4, filteredShapes.Count );
+            Assert.AreEqual( 4, filteredShapes.Count, $"Cube should not be in the list of shapes. {string.Join( ", ", filteredShapes.Select( x=> x.name ) )  }" );
             if ( filteredShapes.Contains( cube ) ) {
-                Assert.Fail( "Cube should not be in the list of shapes" );
+                Assert.Fail( $"Cube should not be in the list of shapes. {string.Join( ", ", filteredShapes.Select( x=> x.name ) )  }" );
             } else {
                 Assert.Pass();
             }

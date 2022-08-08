@@ -10,6 +10,7 @@ TagManager:
   - Capsule
   - TagRef
   - Plane
+  - Quad
   layers:
   - Default
   - TransparentFX
