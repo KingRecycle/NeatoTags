@@ -13,6 +13,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         static Dictionary<GameObject, Tagger> _taggers = new();
         [SerializeField] List<NeatoTagAsset> tags = new();
 
+        
         public List<NeatoTagAsset> GetTags => tags;
 
         void Awake() {

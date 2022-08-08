@@ -25,10 +25,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 }
             };
 
-            _labelButtonContainer = new VisualElement();
-            _labelButtonContainer.style.flexDirection = FlexDirection.Row;
-            _labelButtonContainer.style.overflow = Overflow.Hidden;
-            _labelButtonContainer.style.justifyContent = Justify.SpaceBetween;
+            _labelButtonContainer = new VisualElement {
+                style = {
+                    flexDirection = FlexDirection.Row,
+                    overflow = Overflow.Hidden,
+                    justifyContent = Justify.SpaceBetween
+                }
+            };
 
 
             _tagButtonTemplate =
@@ -43,7 +46,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 }
             };
             _propertyField.RegisterValueChangeCallback( UpdateTagDisplay );
-
+            
 
             _label = new Label( property.displayName ) {
                 style = {
@@ -63,17 +66,20 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void UpdateTagDisplay( SerializedPropertyChangeEvent evt ) {
             var tag = evt.changedProperty.objectReferenceValue as NeatoTagAsset;
-            _tagButton ??= _tagButtonTemplate.Instantiate().Q<Button>();
+            if( _labelButtonContainer.Contains( _tagButton ) ) {
+                _labelButtonContainer.Remove( _tagButton );
+            }
+            _tagButton = _tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag == null ) {
                 _tagButton.style.display = DisplayStyle.None;
                 _label.style.display = DisplayStyle.Flex;
             } else {
+                _labelButtonContainer.Add( _tagButton );
                 _tagButton.tooltip = tag.Comment;
                 _tagButton.text = tag.name;
                 _tagButton.style.backgroundColor = tag.Color;
                 _tagButton.style.marginBottom = 0;
                 _tagButton.style.marginTop = 0;
-                _labelButtonContainer.Add( _tagButton );
                 _tagButton.style.textOverflow = TextOverflow.Ellipsis;
                 _tagButton.style.maxWidth = 200;
                 _tagButton.style.display = DisplayStyle.Flex;

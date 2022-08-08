@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -29,7 +28,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void OnEnable() {
             TagAssetCreation.GetUxmlDirectory();
             _root = new VisualElement();
-            
+
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.TaggerUxml );
             visualTree.CloneTree( _root );
@@ -45,13 +44,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerDeselected = _root.Q<GroupBox>( "allTagViewer" );
 
             _searchField = _root.Q<ToolbarSearchField>( "taggerSearch" );
-            _searchField.RegisterValueChangedCallback( evt => { PopulateButtonsWithSearch(); } );
+            _searchField.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
             _searchLabel = _root.Q<Label>( "searchLabel" );
 
             _taggerSearchAvailable = _root.Q<ToolbarSearchField>( "taggerSearchAvailable" );
-            _taggerSearchAvailable.RegisterValueChangedCallback( evt => {
-                PopulateButtonsWithSearch();
-            } );
+            _taggerSearchAvailable.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
 
             _addTagButton = _root.Q<Button>( "addTagButton" );
             _addTagButton.clicked += CreateNewTag;
@@ -117,7 +114,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
                 ( (Tagger) target ).AddTag( tag );
-                if( _taggerSearchAvailable.value != string.Empty ) {
+                if ( _taggerSearchAvailable.value != string.Empty ) {
                     PopulateButtonsWithSearch();
                 } else {
                     PopulateButtons();
@@ -145,13 +142,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 var button = tagButton.Q<Button>( "tagButton" );
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
                 StyleButton( button, tag );
-                
+
                 removeButton.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
                 removeButton.clicked += () => {
                     if ( !_isEditTaggerMode ) return;
                     Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
                     ( (Tagger) target ).RemoveTag( tag );
-                    if( _searchField.value != string.Empty ) {
+                    if ( _searchField.value != string.Empty ) {
                         PopulateButtonsWithSearch();
                     } else {
                         PopulateButtons();
@@ -174,7 +171,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var allTags = Tagger.GetAllTags();
 
             if ( ( (Tagger) target ).GetTags != null ) {
-
                 foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
                     _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
                 }
@@ -187,16 +183,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                 }
             }
-
         }
 
-        
 
         void PopulateButtonsWithSearch() {
- 
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
-            
+
             var allTags = Tagger.GetAllTags();
             //Selected Tags
             foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
@@ -211,7 +204,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             //Available Tags
             foreach ( var neatoTagAsset in allTags.Where( x => !( (Tagger) target ).GetTags.Contains( x ) ) ) {
-                if ( !string.IsNullOrEmpty( _taggerSearchAvailable.value ) && !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
+                if ( !string.IsNullOrEmpty( _taggerSearchAvailable.value ) &&
+                     !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
                     if ( Regex.IsMatch( neatoTagAsset.name, _taggerSearchAvailable.value, RegexOptions.IgnoreCase ) ) {
                         _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                     }

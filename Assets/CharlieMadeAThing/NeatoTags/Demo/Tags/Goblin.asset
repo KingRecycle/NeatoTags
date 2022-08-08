@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
   m_Name: Goblin
   m_EditorClassIdentifier: 
-  color: {r: 0.12775898, g: 0.2735849, b: 0.16371606, a: 1}
+  color: {r: 0.14070842, g: 0.3207547, b: 0.18225755, a: 1}
   comment: 

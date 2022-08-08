@@ -18,7 +18,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
             Debug.Log( selectedFolder );
             if ( string.IsNullOrEmpty( tagPath ) ) {
-                var neatTagsDirectory = GetNeatoTagsDirectory();
                 var newDataHolder = CreateInstance<EditorDataHolder>();
                 newDataHolder.tagFolderLocation = selectedFolder;
                 var newPath = Path.Join( GetNeatoTagsEditorDirectory(), "EditorDataContainer.asset" );

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using CharlieMadeAThing.NeatoTags.Core;
@@ -25,7 +24,8 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //To filter out a list of Gameobjects, we can use the static function Tagger.StartGameObjectFilter()
             //We can pass in our own list of GameObjects to filter or leave it empty to filter all GameObjects that have a tagger in the scene.
             var allSpooks = Tagger.StartGameObjectFilter().WithTags( spookerTags ).GetMatches();
-            var humans = Tagger.StartGameObjectFilter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag ).GetMatches();
+            var humans = Tagger.StartGameObjectFilter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag )
+                .GetMatches();
             var ghosts = Tagger.StartGameObjectFilter( spookyGameObjects ).WithTag( ghostTag ).GetMatches();
         }
 
@@ -61,19 +61,20 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //and won't show up in the list of tagged objects.
             //So if you want to be sure you are only checking tagged objects, you can use IsTagged()
             if ( !potentialSpook.IsTagged() ) return;
-            
+
             //HasTag only cares about the specified tag.
             //In this example the Witch gameobject which has the Witch and Human tag will also return true.
-            if( potentialSpook.HasTag( humanTag ) ) {
+            if ( potentialSpook.HasTag( humanTag ) ) {
                 Debug.Log( "Human spotted...maybe?" );
             }
-            
+
             //Pass a list of tags to check against
             //When checking for any tags it does not have to be all tags but any GameObject with one of the tags will be returned as true.
             //use HasAllTagsMatching() to check for if ALL the tags are present.
             if ( potentialSpook.HasAnyTagsMatching( spookerTags ) ) {
                 _spooksInRange.Add( potentialSpook );
             }
+
             //Start a filter and chain functions to it.
             //IsMatch() returns true if filter is true, otherwise false.
             //StartTagFilter().WithTag( humanTag ).WithoutTags( spookerTags ).IsMatch() is the same as checking 
@@ -81,12 +82,12 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             if ( potentialSpook.StartTagFilter().WithTag( humanTag ).WithoutTags( spookerTags ).IsMatch() ) {
                 Debug.Log( "Found human, truly!" );
             }
+
             //If you have a small list of tags to search then instead of passing a list just add each tag to the function seperated by commas.
             var filter = potentialSpook.StartTagFilter().WithAnyTags( ghostTag, goblinTag, witchTag );
             if ( filter.IsMatch() ) {
                 Debug.Log( "Found a Spook!" );
             }
-
         }
 
         void OnTriggerExit( Collider other ) {
