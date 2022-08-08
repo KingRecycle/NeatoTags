@@ -12,10 +12,11 @@ namespace CharlieMadeAThing {
         public GameObject capsule;
         public GameObject cube;
         public GameObject cylinder;
-        public GameObject plane; //Plane has no tagger so it will always be treated as it has no tags at all when querying for tags.
+        public GameObject plane; 
         public GameObject sphere;
         public GameObject quad;
         public GameObject[] shapes;
+        public GameObject[] unintializedList;
 
         
 
@@ -58,6 +59,13 @@ namespace CharlieMadeAThing {
         #region HasTag Tests
 
         [UnityTest]
+        public IEnumerator HasTag_AddTagWithNull_CheckForNull_ReturnsFalse() {
+            cube.AddTag( null );
+            Assert.AreEqual( false, cube.HasTag( null ) );
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator HasTag_CubeHasCubeTag_ReturnsTrue() {
             Assert.AreEqual( true, cube.HasTag( tagRefsForTests.cubeTag ) );
             yield return null;
@@ -92,6 +100,13 @@ namespace CharlieMadeAThing {
         #region AddRemoveTag Tests
 
         [UnityTest]
+        public IEnumerator AddTag_PassInNull_ReturnFalse() {
+            cube.AddTag( null );
+            Assert.AreEqual( false, cube.HasTag( null ) );
+            yield return null;
+        }
+        
+        [UnityTest]
         public IEnumerator AddTag_AddPlaneTagToCube_CheckHasTagPlane_ReturnTrue() {
             cube.AddTag( tagRefsForTests.planeTag );
             Assert.AreEqual( true, cube.HasTag( tagRefsForTests.planeTag ) );
@@ -104,7 +119,7 @@ namespace CharlieMadeAThing {
             Assert.AreEqual( false, cube.HasTag( tagRefsForTests.planeTag ) );
             yield return null;
         }
-        //Planes have no tagger so they will always be treated as they have no tags at all when querying for tags.
+        
         [UnityTest]
         public IEnumerator AddTag_AddPlaneTagToPlane_PlaneHasNoTagger_ReturnFalse() {
             plane.AddTag( tagRefsForTests.planeTag );
@@ -123,6 +138,15 @@ namespace CharlieMadeAThing {
 
         #region HasAnyTagsMatching Tests
 
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_AddTagAsNull_CheckForAnyNulls_ReturnsFalse() {
+            cube.AddTag( null );
+            Assert.AreEqual( false,
+                cube.HasAnyTagsMatching( null, null,
+                    null ) );
+            yield return null;
+        }
+        
         [UnityTest]
         public IEnumerator HasAnyTagsMatching_DoesCubeHaveAnyListedTags_CubeSpherePlane_ReturnTrue() {
             Assert.AreEqual( true,
@@ -269,6 +293,14 @@ namespace CharlieMadeAThing {
         #endregion
 
         #region StartGameObjectFilter Tests
+        
+        [UnityTest]
+        public IEnumerator StartGameObjectFilter_PassInUninitializedList_ReturnsNothing() {
+            var filteredShapes =
+                Tagger.StartGameObjectFilter( unintializedList ).WithTag( tagRefsForTests.planeTag ).GetMatches();
+            Assert.AreEqual( 0, filteredShapes.Count );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_GetMatchesNoFilter_ReturnsNoShapes() {

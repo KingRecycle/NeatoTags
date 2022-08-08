@@ -104,7 +104,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
 
-        Button CreateDeselectedButton( NeatoTagAsset tag ) {
+        Button CreateDeselectedButton( NeatoTag tag ) {
             var button = _tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag.Comment != string.Empty ) {
                 button.tooltip = tag.Comment;
@@ -124,7 +124,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return button;
         }
 
-        VisualElement CreateSelectedButton( NeatoTagAsset tag ) {
+        VisualElement CreateSelectedButton( NeatoTag tag ) {
             var tagButton = _isEditTaggerMode
                 ? _tagButtonWithXTemplate.Instantiate().Q<VisualElement>()
                 : _tagButtonTemplate.Instantiate().Q<Button>();
@@ -159,7 +159,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return tagButton;
         }
 
-        static void StyleButton( Button button, NeatoTagAsset tag ) {
+        static void StyleButton( Button button, NeatoTag tag ) {
             button.text = tag.name;
             button.style.backgroundColor = tag.Color;
             button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;

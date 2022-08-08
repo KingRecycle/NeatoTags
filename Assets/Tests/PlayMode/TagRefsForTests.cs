@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags {
     public class TagRefsForTests : MonoBehaviour {
-        public NeatoTagAsset cubeTag;
-        public NeatoTagAsset sphereTag;
-        public NeatoTagAsset cylinderTag;
-        public NeatoTagAsset capsuleTag;
-        public NeatoTagAsset planeTag;
-        public NeatoTagAsset platonicTag;
-        public NeatoTagAsset cornerlessTag;
+        public NeatoTag cubeTag;
+        public NeatoTag sphereTag;
+        public NeatoTag cylinderTag;
+        public NeatoTag capsuleTag;
+        public NeatoTag planeTag;
+        public NeatoTag platonicTag;
+        public NeatoTag cornerlessTag;
     }
 }

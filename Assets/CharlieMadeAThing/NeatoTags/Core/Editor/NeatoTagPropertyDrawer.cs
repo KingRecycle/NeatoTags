@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomPropertyDrawer( typeof( NeatoTagAsset ) )]
+    [CustomPropertyDrawer( typeof( NeatoTag ) )]
     public class NeatoTagPropertyDrawer : PropertyDrawer {
         static Texture2D _buttonTexture;
         Label _label;
@@ -65,7 +65,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void UpdateTagDisplay( SerializedPropertyChangeEvent evt ) {
-            var tag = evt.changedProperty.objectReferenceValue as NeatoTagAsset;
+            var tag = evt.changedProperty.objectReferenceValue as NeatoTag;
             if( _labelButtonContainer.Contains( _tagButton ) ) {
                 _labelButtonContainer.Remove( _tagButton );
             }
@@ -128,11 +128,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             // Draw fields - pass GUIContent.none to each so they are drawn without labels
 
-            //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTagAsset), false );
+            //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTag), false );
             var obj = EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
 
             var oldColor = GUI.backgroundColor;
-            var p = property.objectReferenceValue as NeatoTagAsset;
+            var p = property.objectReferenceValue as NeatoTag;
             if ( p ) {
                 var lum = TaggerDrawer.GetColorLuminosity( p.Color ) > 70 ? Color.black : Color.white;
                 buttonStyle.normal.textColor = lum;

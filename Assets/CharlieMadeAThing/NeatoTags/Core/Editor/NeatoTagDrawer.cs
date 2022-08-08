@@ -5,13 +5,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomEditor( typeof( NeatoTagAsset ) )]
+    [CustomEditor( typeof( NeatoTag ) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         Button _button;
         ColorField _colorField;
         TextField _commentField;
-        NeatoTagAsset _neatoTagAsset;
+        NeatoTag _neatoTag;
 
         //UI
         VisualElement _root;
@@ -35,7 +35,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public override VisualElement CreateInspectorGUI() {
-            _neatoTagAsset = target as NeatoTagAsset;
+            _neatoTag = target as NeatoTag;
             FindProperties();
             _colorField = _root.Q<ColorField>( "tagColor" );
             _colorField.BindProperty( PropertyColor );
@@ -64,7 +64,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         public void UpdateTagButtonText() {
             if ( target != null && _button != null ) {
-                _button.text = _neatoTagAsset.name;
+                _button.text = _neatoTag.name;
             }
         }
 

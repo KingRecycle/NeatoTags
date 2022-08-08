@@ -11,11 +11,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [Serializable]
     public class Tagger : MonoBehaviour {
         static Dictionary<GameObject, Tagger> _taggers = new();
-        [SerializeField] List<NeatoTagAsset> tags = new();
-
-        static Dictionary<NeatoTagAsset, HashSet<GameObject>> _taggedObjects = new();
+        static Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new();
         static HashSet<GameObject> _nonTaggedObjects = new();
-        public List<NeatoTagAsset> GetTags => tags;
+        
+        //This Tagger's tags.
+        [SerializeField] List<NeatoTag> tags = new();
+        public List<NeatoTag> GetTags => tags;
 
         void Awake() {
             _taggers.Add( gameObject, this );
@@ -41,12 +42,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Gives back a Hashset of all tags in the project.
         /// </summary>
         /// <returns>Hashset of all tags in the project.</returns>
-        public static HashSet<NeatoTagAsset> GetAllTags() {
-            var tagSet = new HashSet<NeatoTagAsset>();
-            var guids = AssetDatabase.FindAssets( "t:NeatoTagAsset" );
+        public static HashSet<NeatoTag> GetAllTags() {
+            var tagSet = new HashSet<NeatoTag>();
+            var guids = AssetDatabase.FindAssets( "t:NeatoTag" );
             foreach ( var guid in guids ) {
                 var path = AssetDatabase.GUIDToAssetPath( guid );
-                var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTagAsset>( path );
+                var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>( path );
                 tagSet.Add( tagAsset );
             }
 
@@ -83,10 +84,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Checks if Tagger has a specific tag.
         /// </summary>
-        /// <param name="tagAsset">The tag to check for</param>
+        /// <param name="tag">The tag to check for</param>
         /// <returns>Returns true if Tagger has the tag, otherwise false.</returns>
-        public bool HasTag( NeatoTagAsset tagAsset ) {
-            return tags.Contains( tagAsset );
+        public bool HasTag( NeatoTag tag ) {
+            return tags.Contains( tag );
         }
 
         /// <summary>
@@ -94,7 +95,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has any of the tags, otherwise false.</returns>
-        public bool AnyTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
+        public bool AnyTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return tagList.Any( HasTag );
         }
 
@@ -103,7 +104,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has all of the tags, otherwise false.</returns>
-        public bool AllTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
+        public bool AllTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return tagList.All( HasTag );
         }
 
@@ -112,7 +113,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has none of the tags in the list, otherwise false.</returns>
-        public bool NoTagsMatch( IEnumerable<NeatoTagAsset> tagList ) {
+        public bool NoTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return !tagList.Any( HasTag );
         }
         
@@ -120,22 +121,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Add a tag to the tagger.
         /// </summary>
-        /// <param name="neatoTagAsset">Tag to add.</param>
-        public void AddTag( NeatoTagAsset neatoTagAsset ) {
-            tags.Add( neatoTagAsset );
+        /// <param name="neatoTag">Tag to add.</param>
+        public void AddTag( NeatoTag neatoTag ) {
+            tags.Add( neatoTag );
             tags = tags.ToHashSet().ToList();
-            _taggedObjects.TryAdd( neatoTagAsset, new HashSet<GameObject>() );
-            _taggedObjects[neatoTagAsset].Add( gameObject );
+            _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
+            _taggedObjects[neatoTag].Add( gameObject );
             _nonTaggedObjects.Remove( gameObject );
         }
 
         /// <summary>
         /// Remove a tag from the tagger.
         /// </summary>
-        /// <param name="neatoTagAsset">Tag to remove.</param>
-        public void RemoveTag( NeatoTagAsset neatoTagAsset ) {
-            tags.Remove( neatoTagAsset );
-            _taggedObjects[neatoTagAsset].Remove( gameObject );
+        /// <param name="neatoTag">Tag to remove.</param>
+        public void RemoveTag( NeatoTag neatoTag ) {
+            tags.Remove( neatoTag );
+            _taggedObjects[neatoTag].Remove( gameObject );
             if( tags.Count == 0 ) {
                 _nonTaggedObjects.Add( gameObject );
             }
@@ -189,7 +190,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
-            public GameObjectFilter WithTag( NeatoTagAsset tag ) {
+            public GameObjectFilter WithTag( NeatoTag tag ) {
                 _taggedObjects.TryGetValue( tag, out var tempMatches );
                 tempMatches ??= new HashSet<GameObject>();
                 
@@ -200,18 +201,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <summary>
             /// Filters for GameObjects that have all of the tags.
             /// </summary>
-            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
-            public GameObjectFilter WithTags( IEnumerable<NeatoTagAsset> tags ) {
+            public GameObjectFilter WithTags( IEnumerable<NeatoTag> tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
             }
             
             /// <summary>
             /// Filters for GameObjects that have all of the tags.
             /// </summary>
-            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
-            public GameObjectFilter WithTags( params NeatoTagAsset[] tags ) {
+            public GameObjectFilter WithTags( params NeatoTag[] tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
             }
             
@@ -220,7 +221,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
-            public GameObjectFilter WithoutTag( NeatoTagAsset tag ) {
+            public GameObjectFilter WithoutTag( NeatoTag tag ) {
                 _matches.RemoveWhere( taggedObject => taggedObject.HasTag( tag ) );
                 return this;
             }
@@ -228,18 +229,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <summary>
             /// Filters for GameObjects that have none of the tags.
             /// </summary>
-            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
-            public GameObjectFilter WithoutTags( IEnumerable<NeatoTagAsset> tags ) {
+            public GameObjectFilter WithoutTags( IEnumerable<NeatoTag> tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithoutTag( neatoTag ) );
             }
             
             /// <summary>
             /// Filters for GameObjects that have none of the tags.
             /// </summary>
-            /// <param name="tags">IEnumerable of NeatoTagAsset.</param>
+            /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
-            public GameObjectFilter WithoutTags( params NeatoTagAsset[] tags ) {
+            public GameObjectFilter WithoutTags( params NeatoTag[] tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithoutTag( neatoTag ) );
             }
             
@@ -248,7 +249,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
-            public GameObjectFilter WithAnyTags( IEnumerable<NeatoTagAsset> tags ) {
+            public GameObjectFilter WithAnyTags( IEnumerable<NeatoTag> tags ) {
                 foreach ( var taggedObject in _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
                     _matches.IntersectWith(taggedObject.Value);
                 }
@@ -260,7 +261,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
-            public GameObjectFilter WithAnyTags( params NeatoTagAsset[] tags ) {
+            public GameObjectFilter WithAnyTags( params NeatoTag[] tags ) {
                 var tempMatches = new HashSet<GameObject>();
                 foreach ( var taggedObject in _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
                     tempMatches.UnionWith( taggedObject.Value );
@@ -294,10 +295,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <summary>
             /// Checks if gameobject has tag.
             /// </summary>
-            /// <param name="tagAsset">Tag to check for</param>
+            /// <param name="tag">Tag to check for</param>
             /// <returns></returns>
-            public TagFilter WithTag( NeatoTagAsset tagAsset ) {
-                _matchesFilter &= _target.HasTag( tagAsset );
+            public TagFilter WithTag( NeatoTag tag ) {
+                _matchesFilter &= _target.HasTag( tag );
                 return this;
             }
 
@@ -306,7 +307,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithTags( params NeatoTagAsset[] tags ) {
+            public TagFilter WithTags( params NeatoTag[] tags ) {
                 foreach ( var tagAsset in tags ) {
                     _matchesFilter &= _target.HasTag( tagAsset );
                 }
@@ -319,7 +320,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithTags( IEnumerable<NeatoTagAsset> tagList ) {
+            public TagFilter WithTags( IEnumerable<NeatoTag> tagList ) {
                 foreach ( var tagAsset in tagList ) {
                     _matchesFilter &= _target.HasTag( tagAsset );
                 }
@@ -330,10 +331,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <summary>
             /// Checks if gameobject doesn't have tag.
             /// </summary>
-            /// <param name="tagAsset">Tags to check for</param>
+            /// <param name="tag">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithoutTag( NeatoTagAsset tagAsset ) {
-                _matchesFilter &= !_target.HasTag( tagAsset );
+            public TagFilter WithoutTag( NeatoTag tag ) {
+                _matchesFilter &= !_target.HasTag( tag );
 
                 return this;
             }
@@ -343,7 +344,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithoutTags( params NeatoTagAsset[] tags ) {
+            public TagFilter WithoutTags( params NeatoTag[] tags ) {
                 foreach ( var tagAsset in tags ) {
                     _matchesFilter &= !_target.HasTag( tagAsset );
                 }
@@ -356,7 +357,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithoutTags( IEnumerable<NeatoTagAsset> tagList ) {
+            public TagFilter WithoutTags( IEnumerable<NeatoTag> tagList ) {
                 foreach ( var tagAsset in tagList ) {
                     _matchesFilter &= !_target.HasTag( tagAsset );
                 }
@@ -369,8 +370,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithAnyTags( IEnumerable<NeatoTagAsset> tagList ) {
-                var neatoTagAssets = tagList as NeatoTagAsset[] ?? tagList.ToArray();
+            public TagFilter WithAnyTags( IEnumerable<NeatoTag> tagList ) {
+                var neatoTagAssets = tagList as NeatoTag[] ?? tagList.ToArray();
                 _matchesFilter &= _target.AnyTagsMatch( neatoTagAssets );
 
                 return this;
@@ -381,7 +382,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
-            public TagFilter WithAnyTags( params NeatoTagAsset[] tags ) {
+            public TagFilter WithAnyTags( params NeatoTag[] tags ) {
                 _matchesFilter &= _target.AnyTagsMatch( tags );
 
                 return this;

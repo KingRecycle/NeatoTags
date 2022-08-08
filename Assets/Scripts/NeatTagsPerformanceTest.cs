@@ -12,8 +12,8 @@ namespace CharlieMadeAThing
     public class NeatTagsPerformanceTest : MonoBehaviour {
         public GameObject prefab;
         public int count = 1000;
-        public NeatoTagAsset humanTag;
-        public List<NeatoTagAsset> tags;
+        public NeatoTag humanTag;
+        public List<NeatoTag> tags;
         Stopwatch timer = new();
         void Start() {
             for ( var i = 0; i < count; i++ ) {

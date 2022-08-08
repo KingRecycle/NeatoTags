@@ -82,7 +82,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         //Non menu version of NewTag function
-        public static NeatoTagAsset CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
+        public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             var allTags = Tagger.GetAllTags();
             if ( allTags.Any( x => x.name == tagName ) ) {
                 tagName = tagName + " " + allTags.Count( x => x.name == tagName );
@@ -92,11 +92,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 tagName = "New Tag";
             }
 
-            NeatoTagAsset newTag = null;
+            NeatoTag newTag = null;
             var dataHolder = GetEditorDataContainer();
             if ( dataHolder == null || string.IsNullOrEmpty( dataHolder.tagFolderLocation ) ) {
                 if ( TryGetActiveFolderPath( out var path ) ) {
-                    newTag = CreateInstance<NeatoTagAsset>();
+                    newTag = CreateInstance<NeatoTag>();
                     var newPath = AssetDatabase.GenerateUniqueAssetPath( $"{path}/{tagName}.asset" );
                     AssetDatabase.CreateAsset( newTag, newPath );
                     AssetDatabase.SaveAssets();
@@ -110,7 +110,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                         "Please set the tag folder location first or have a project folder selected.", "OK" );
                 }
             } else {
-                newTag = CreateInstance<NeatoTagAsset>();
+                newTag = CreateInstance<NeatoTag>();
                 AssetDatabase.CreateAsset( newTag, $"{dataHolder.tagFolderLocation}/{tagName}.asset" );
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -135,7 +135,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return found;
         }
 
-        public static void DeleteTag( NeatoTagAsset selectedTag ) {
+        public static void DeleteTag( NeatoTag selectedTag ) {
             if ( !selectedTag ) return;
             AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
             AssetDatabase.SaveAssets();

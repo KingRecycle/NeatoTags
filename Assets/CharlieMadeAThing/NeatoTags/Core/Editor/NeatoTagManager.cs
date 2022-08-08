@@ -27,7 +27,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static Label _tagDirectoryLabel;
 
         //Selected Data
-        static NeatoTagAsset _selectedTag;
+        static NeatoTag _selectedTag;
         static TextField _selectedTagTextField;
         static ColorField _selectedTagColorField;
 
@@ -99,7 +99,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             wnd.titleContent = new GUIContent( "Neato Tag Manager" );
         }
 
-        public static void ShowWindow( NeatoTagAsset tag ) {
+        public static void ShowWindow( NeatoTag tag ) {
             var wnd = GetWindow<NeatoTagManager>();
             wnd.titleContent = new GUIContent( "Neato Tag Manager" );
             _selectedTag = tag;
@@ -148,7 +148,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
 
-        static Button CreateTagButton( NeatoTagAsset tag ) {
+        static Button CreateTagButton( NeatoTag tag ) {
             var button = _tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag.Comment != string.Empty ) {
                 button.tooltip = tag.Comment;

@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Demo {
     public class SpookFinder : MonoBehaviour {
-        public List<NeatoTagAsset> spookerTags;
+        public List<NeatoTag> spookerTags;
 
-        public NeatoTagAsset humanTag;
-        public NeatoTagAsset ghostTag;
-        public NeatoTagAsset goblinTag;
-        public NeatoTagAsset witchTag;
+        public NeatoTag humanTag;
+        public NeatoTag ghostTag;
+        public NeatoTag goblinTag;
+        public NeatoTag witchTag;
         [SerializeField] List<GameObject> spookyGameObjects;
 
         //UI
