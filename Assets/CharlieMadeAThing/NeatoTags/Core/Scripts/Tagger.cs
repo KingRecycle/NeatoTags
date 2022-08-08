@@ -160,7 +160,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <returns>Returns TagFilter for chaining filter functions</returns>
         public static GameObjectFilter StartGameObjectFilter( IEnumerable<GameObject> gameObjectsToCheckAgainst = null ) {
             var gameObjects = gameObjectsToCheckAgainst ?? _taggers.Keys;
-            return new GameObjectFilter( gameObjects );
+            return new GameObjectFilter( gameObjectsToCheckAgainst );
         }
 
 
@@ -173,8 +173,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             readonly HashSet<GameObject> _matches = new();
             
             public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
-                this._gameObjects = gameObjects.Where( x => x.IsTagged() );
-                _matches.UnionWith( _gameObjects);
+                if ( gameObjects == null ) {
+                    _gameObjects = _taggers.Keys;
+                } else {
+                    this._gameObjects = gameObjects.Where( x => x.IsTagged() );
+                }
+                _matches.UnionWith( _gameObjects );
             }
             
             /// <summary>

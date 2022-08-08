@@ -64,6 +64,12 @@ namespace CharlieMadeAThing {
             Assert.AreEqual( false, cube.HasTag( null ) );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator HasTag_QuadHaveCubeTag_QuadHasTaggerButNoTags_ReturnsFalse() {
+            Assert.AreEqual( false, quad.HasTag( tagRefsForTests.cubeTag ) );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator HasTag_CubeHasCubeTag_ReturnsTrue() {
@@ -289,6 +295,33 @@ namespace CharlieMadeAThing {
             yield return null;
         }
         
+        [UnityTest]
+        public IEnumerator StartTagFilter_Sphere_WithTagCornerless_WithoutTagCapsule_ReturnFalse() {
+            Assert.AreEqual( false,
+                sphere.StartTagFilter().WithTag( tagRefsForTests.cornerlessTag ).WithTag( tagRefsForTests.capsuleTag ).IsMatch() );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator StartTagFilter_Cube_WithoutTagsCornerlessAndSphere_ReturnFalse() {
+            Assert.AreEqual( true,
+                cube.StartTagFilter().WithoutTags( tagRefsForTests.cornerlessTag, tagRefsForTests.sphereTag ).IsMatch() );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator StartTagFilter_Cube_WithoutTagsCapsuleAndSphere_ReturnTrue() {
+            Assert.AreEqual( true,
+                cube.StartTagFilter().WithoutTags( tagRefsForTests.capsuleTag, tagRefsForTests.sphereTag ).IsMatch() );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator StartTagFilter_Cube_WithAnyTagsPlatonicPlaneSphere_ReturnTrue() {
+            Assert.AreEqual( true,
+                cube.StartTagFilter().WithAnyTags( tagRefsForTests.platonicTag, tagRefsForTests.planeTag, tagRefsForTests.sphereTag ).IsMatch() );
+            yield return null;
+        }
 
         #endregion
 

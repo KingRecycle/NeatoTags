@@ -254,7 +254,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _renameField.style.visibility = Visibility.Visible;
             _renameButtonDisplay.style.visibility = Visibility.Visible;
-
+            _renameButtonDisplay.tooltip = $"Click to show {_selectedTag.name} in the project view.";
             _renameButtonDisplay.style.backgroundColor = _selectedTag.Color;
             _renameButtonDisplay.style.color =
                 TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;

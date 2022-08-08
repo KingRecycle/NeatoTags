@@ -14,11 +14,13 @@ namespace CharlieMadeAThing
         public int count = 1000;
         public NeatoTag humanTag;
         public List<NeatoTag> tags;
+        public int goCount;
         Stopwatch timer = new();
         void Start() {
             for ( var i = 0; i < count; i++ ) {
                 var go = Instantiate(prefab, Vector3.right + new Vector3(i, 0, 0 ),  Quaternion.identity);
                 //go.AddTag( tags[Random.Range(0, tags.Count)] );
+                go.AddTag( humanTag );
             }
         }
 
@@ -28,13 +30,13 @@ namespace CharlieMadeAThing
                 timer.Start();
                 GetAllGameObjectsWithHumanTag();
                 timer.Stop();
-                Debug.Log( $"Elapsed: {timer.Elapsed} -- ms: {timer.ElapsedMilliseconds}" );
+                Debug.Log( $"{goCount} GameObjects returned with the tag {humanTag.name} out of {count}. Time it took: Elapsed: {timer.Elapsed} -- ms: {timer.ElapsedMilliseconds}" );
             }
         }
 
         void GetAllGameObjectsWithHumanTag() {
             var go = Tagger.StartGameObjectFilter().WithTag( humanTag ).GetMatches();
-            Debug.Log( go.Count);
+            goCount = go.Count;
         }
     }
 }

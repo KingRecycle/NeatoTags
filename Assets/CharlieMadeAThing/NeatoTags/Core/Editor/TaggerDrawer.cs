@@ -45,12 +45,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _searchField = _root.Q<ToolbarSearchField>( "taggerSearch" );
             _searchField.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
+            _searchField.tooltip = $"Search through tags currently tagged to {target.name}";
             _searchLabel = _root.Q<Label>( "searchLabel" );
 
             _taggerSearchAvailable = _root.Q<ToolbarSearchField>( "taggerSearchAvailable" );
             _taggerSearchAvailable.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
+            _taggerSearchAvailable.tooltip = $"Search through tags currently available to add to {target.name}";
 
             _addTagButton = _root.Q<Button>( "addTagButton" );
+            _addTagButton.tooltip = $"Create a new tag and add it to {target.name}";
             _addTagButton.clicked += CreateNewTag;
             _addTagTextField = _root.Q<TextField>( "addTagTextField" );
             _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
@@ -61,6 +64,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _allTagsBox = _root.Q<GroupBox>( "allTagsBox" );
 
             _editTaggerButton = _root.Q<ToolbarButton>( "editTaggerButton" );
+            _editTaggerButton.tooltip = $"Edit Tags for {target.name}";
 
             _searchField.style.display = DisplayStyle.None;
             _addTagButton.style.display = DisplayStyle.None;
@@ -141,6 +145,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             } else {
                 var button = tagButton.Q<Button>( "tagButton" );
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
+                removeButton.tooltip = $"Remove {tag.name} tag from {target.name}";
                 StyleButton( button, tag );
 
                 removeButton.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
