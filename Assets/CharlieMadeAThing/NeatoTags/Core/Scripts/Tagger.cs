@@ -169,20 +169,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Don't use directly. Use StartGameObjectFilter() instead.
         /// </summary>
         public class GameObjectFilter {
-            readonly IEnumerable<GameObject> _gameObjects;
-            readonly HashSet<GameObject> _matches = new();
+
+            readonly HashSet<GameObject> _matches;
             
             public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
-                if ( gameObjects == null ) {
-                    _gameObjects = _taggers.Keys;
-                } else {
-                    this._gameObjects = gameObjects.Where( x => x.IsTagged() );
-                }
-                _matches.UnionWith( _gameObjects );
+                _matches = new HashSet<GameObject>();
+                var gameObjectsToFilter = gameObjects == null ? _taggers.Keys : gameObjects.Where( x => x.IsTagged() );
+                _matches.UnionWith( gameObjectsToFilter );
             }
             
             /// <summary>
             /// Returns the result of the filter.
+            /// Will not return duplicate GameObjects.
             /// </summary>
             /// <returns>HashSet of GameObjects</returns>
             public HashSet<GameObject> GetMatches() {
