@@ -119,7 +119,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             _allTagsBox.Clear();
-            var allTags = Tagger.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags();
             foreach ( var neatoTagAsset in allTags ) {
                 if ( Regex.IsMatch( neatoTagAsset.name, evtNewValue, RegexOptions.IgnoreCase ) ) {
                     _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );
@@ -140,7 +140,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _allTagsBox.Clear();
             BUTTON_ACTION_MAP.Clear();
 
-            var allTags = Tagger.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags();
 
             foreach ( var neatoTagAsset in allTags ) {
                 _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );

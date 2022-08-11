@@ -38,21 +38,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _nonTaggedObjects.Remove( gameObject );
         }
 
-        /// <summary>
-        /// Gives back a Hashset of all tags in the project.
-        /// </summary>
-        /// <returns>Hashset of all tags in the project.</returns>
-        public static HashSet<NeatoTag> GetAllTags() {
-            var tagSet = new HashSet<NeatoTag>();
-            var guids = AssetDatabase.FindAssets( "t:NeatoTag" );
-            foreach ( var guid in guids ) {
-                var path = AssetDatabase.GUIDToAssetPath( guid );
-                var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>( path );
-                tagSet.Add( tagAsset );
-            }
-
-            return tagSet;
-        }
+        
 
         /// <summary>
         /// Checks if a gameobject has a Tagger component.

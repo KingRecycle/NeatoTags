@@ -173,7 +173,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public void PopulateButtons() {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
-            var allTags = Tagger.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags();
 
             if ( ( (Tagger) target ).GetTags != null ) {
                 foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
@@ -195,7 +195,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
 
-            var allTags = Tagger.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags();
             //Selected Tags
             foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
                 if ( !string.IsNullOrEmpty( _searchField.value ) && !string.IsNullOrWhiteSpace( _searchField.value ) ) {

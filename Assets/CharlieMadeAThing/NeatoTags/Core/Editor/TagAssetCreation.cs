@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -83,7 +84,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Non menu version of NewTag function
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
-            var allTags = Tagger.GetAllTags();
+            var allTags = GetAllTags();
             if ( allTags.Any( x => x.name == tagName ) ) {
                 tagName = tagName + " " + allTags.Count( x => x.name == tagName );
             }
@@ -140,6 +141,22 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+        
+        /// <summary>
+        /// Gives back a Hashset of all tags in the project.
+        /// </summary>
+        /// <returns>Hashset of all tags in the project.</returns>
+        public static HashSet<NeatoTag> GetAllTags() {
+            var tagSet = new HashSet<NeatoTag>();
+            var guids = AssetDatabase.FindAssets( "t:NeatoTag" );
+            foreach ( var guid in guids ) {
+                var path = AssetDatabase.GUIDToAssetPath( guid );
+                var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>( path );
+                tagSet.Add( tagAsset );
+            }
+
+            return tagSet;
         }
     }
 }
