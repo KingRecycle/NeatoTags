@@ -10,7 +10,7 @@
                 </uie:Toolbar>
             </ui:GroupBox>
             <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-top: 0; -unity-text-outline-width: 0; -unity-text-outline-color: rgb(45, 45, 45); border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; width: 100%; height: auto; padding-bottom: 0; min-width: 25%; align-items: flex-start; max-width: 100%; margin-bottom: 30px;">
-                <uie:Toolbar style="width: 100%; max-width: none; border-bottom-width: 1px;">
+                <uie:Toolbar style="width: 100%; max-width: none; border-bottom-width: 1px; margin-bottom: 0;">
                     <uie:ToolbarButton text="+" display-tooltip-when-elided="true" name="addTagButton" tooltip="Create a New Tag" style="min-width: 32px; -unity-text-align: upper-center; font-size: 14px; width: auto; padding-left: 0; padding-right: 0; padding-top: 0; margin-left: 0;" />
                     <uie:ToolbarSpacer />
                     <uie:ToolbarSearchField focusable="true" name="tagSearchField" tooltip="Search through all tags" style="max-width: none; width: 60%; justify-content: flex-start; align-items: center; flex-direction: row; min-width: 25%; margin-left: 0;" />

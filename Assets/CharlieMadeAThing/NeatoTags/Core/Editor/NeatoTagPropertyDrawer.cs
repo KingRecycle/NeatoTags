@@ -20,7 +20,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public override VisualElement CreatePropertyGUI( SerializedProperty property ) {
             _root = new VisualElement {
                 style = {
-                    flexDirection = FlexDirection.RowReverse,
+                    flexDirection = FlexDirection.Row,
                     justifyContent = Justify.SpaceBetween
                 }
             };
@@ -29,7 +29,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 style = {
                     flexDirection = FlexDirection.Row,
                     overflow = Overflow.Hidden,
-                    justifyContent = Justify.SpaceBetween
+                    flexGrow = 1,
+                    maxWidth = Length.Percent( 50 )
                 }
             };
 
@@ -42,7 +43,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 label = string.Empty,
                 style = {
                     flexGrow = 1,
-                    alignSelf = Align.FlexEnd
+                    alignSelf = Align.FlexStart,
+                    alignContent = Align.Auto,
                 }
             };
             _propertyField.RegisterValueChangeCallback( UpdateTagDisplay );
@@ -52,14 +54,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 style = {
                     paddingBottom = 0,
                     paddingTop = 0,
-                    justifyContent = Justify.FlexEnd
+                    marginRight = 20,
+                    justifyContent = Justify.FlexEnd,
+                    flexGrow = 0,
+                    maxWidth = Length.Percent( 50 )
                 }
             };
 
             
-            _root.Add( _propertyField );
+            _root.Add( _label );
             
-            _labelButtonContainer.Add( _label );
+            _labelButtonContainer.Add( _propertyField );
             _root.Add(_labelButtonContainer);
             return _root;
         }
@@ -74,7 +79,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 _tagButton.style.display = DisplayStyle.None;
                 _label.style.display = DisplayStyle.Flex;
             } else {
-                _labelButtonContainer.Add( _tagButton );
+                //_labelButtonContainer.Add( _tagButton );
+                _labelButtonContainer.Insert(0, _tagButton);
                 _tagButton.tooltip = tag.Comment;
                 _tagButton.text = tag.name;
                 _tagButton.style.backgroundColor = tag.Color;
@@ -83,12 +89,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 _tagButton.style.textOverflow = TextOverflow.Ellipsis;
                 _tagButton.style.maxWidth = 200;
                 _tagButton.style.display = DisplayStyle.Flex;
-                _propertyField.style.maxWidth = 250;
+                _labelButtonContainer.style.maxWidth = 650;
                 _tagButton.style.color = TaggerDrawer.GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
 
-                if ( _label.text.Contains( "Element" ) ) {
-                    _label.style.display = DisplayStyle.None;
-                }
+                // if ( _label.text.Contains( "Element" ) ) {
+                //     _label.style.display = DisplayStyle.None;
+                // }
             }
 
             evt.changedProperty.serializedObject.ApplyModifiedProperties();
