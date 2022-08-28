@@ -1419,6 +1419,7 @@ GameObject:
   - component: {fileID: 874803347}
   - component: {fileID: 874803351}
   - component: {fileID: 874803352}
+  - component: {fileID: 874803353}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -1554,6 +1555,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags:
   - {fileID: 11400000, guid: bff2f4b6132d7794a8d4e99b95bf1b4d, type: 2}
+--- !u!114 &874803353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874803346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cefb4f64f9a88ca47ba5cee787606416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 1454756441841554239, guid: 722d970d14036404daeac9bfc4facd43, type: 3}
+  count: 100
+  humanTag: {fileID: 11400000, guid: 51eb8b725bb3fbb45b7585f16f844939, type: 2}
+  tags:
+  - {fileID: 11400000, guid: 51eb8b725bb3fbb45b7585f16f844939, type: 2}
+  - {fileID: 11400000, guid: aec7d8d781e8b9b4390d59d9f9a02119, type: 2}
+  goCount: 0
 --- !u!1 &1287977200
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,7 +1677,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 69cb8b89a329a7147a0a18a4816d6118, type: 2}
   - {fileID: 11400000, guid: 100bdff3917e91a47a1291f9b5e6ee5c, type: 2}
   - {fileID: 11400000, guid: e018959735b957c44a4dfe304b059f8a, type: 2}
-  - {fileID: 11400000, guid: 2b1f38d553bc5cc4888f5ce09a860d1a, type: 2}
 --- !u!4 &1356551400
 Transform:
   m_ObjectHideFlags: 0
@@ -2461,7 +2480,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: aec6616fd0d831e469452923b84b59ea, type: 2}
   - {fileID: 11400000, guid: e018959735b957c44a4dfe304b059f8a, type: 2}
   - {fileID: 11400000, guid: e621670e400d228498cecb2301a39595, type: 2}
-  - {fileID: 11400000, guid: 45f10f2113fc0c34eb558fdf41d500b7, type: 2}
   - {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
 --- !u!4 &2136358383
 Transform:

@@ -11,16 +11,20 @@ namespace CharlieMadeAThing
 {
     public class NeatTagsPerformanceTest : MonoBehaviour {
         public GameObject prefab;
-        public int count = 1000;
+        public int count = 100000;
         public NeatoTag humanTag;
         public List<NeatoTag> tags;
         public int goCount;
         Stopwatch timer = new();
+        HashSet<GameObject> results = new HashSet<GameObject>(100000);
         void Start() {
             for ( var i = 0; i < count; i++ ) {
                 var go = Instantiate(prefab, Vector3.right + new Vector3(i, 0, 0 ),  Quaternion.identity);
-                go.AddTag( tags[Random.Range(0, tags.Count)] );
-                //go.AddTag( humanTag );
+                //go.AddTag( tags[Random.Range(0, tags.Count)] );
+                go.AddTag( humanTag );
+                // if( i == count - 1 ) {
+                //     go.AddTag( humanTag );
+                // }
             }
         }
 
@@ -35,8 +39,9 @@ namespace CharlieMadeAThing
         }
 
         void GetAllGameObjectsWithHumanTag() {
-            var go = Tagger.StartGameObjectFilter().WithTag( humanTag ).GetMatches();
-            goCount = go.Count;
+            results.Clear();
+            results = Tagger.StartGameObjectFilter().WithTag( humanTag ).GetMatches();
+            goCount = results.Count;
         }
     }
 }

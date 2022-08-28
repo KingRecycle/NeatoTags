@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomEditor( typeof( Tagger ) )]
+    [CustomEditor( typeof( Tagger ) )][CanEditMultipleObjects]
     public class TaggerDrawer : UnityEditor.Editor {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualTreeAsset _tagButtonWithXTemplate;
@@ -28,7 +28,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void OnEnable() {
             TagAssetCreation.GetUxmlDirectory();
             _root = new VisualElement();
-
+            
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.TaggerUxml );
             visualTree.CloneTree( _root );
@@ -117,7 +117,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             StyleButton( button, tag );
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
-                ( (Tagger) target ).AddTag( tag );
+                if( serializedObject.isEditingMultipleObjects ) {
+                    foreach( var obj in serializedObject.targetObjects ) {
+                        ( (Tagger) obj ).AddTag( tag );
+                    }
+                } else {
+                    ( (Tagger) target ).AddTag( tag );
+                }
+                
                 if ( _taggerSearchAvailable.value != string.Empty ) {
                     PopulateButtonsWithSearch();
                 } else {
@@ -152,7 +159,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 removeButton.clicked += () => {
                     if ( !_isEditTaggerMode ) return;
                     Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
-                    ( (Tagger) target ).RemoveTag( tag );
+                    
+                    if( serializedObject.isEditingMultipleObjects ) {
+                        foreach( var obj in serializedObject.targetObjects ) {
+                            ( (Tagger) obj ).RemoveTag( tag );
+                        }
+                    } else {
+                        ( (Tagger) target ).RemoveTag( tag );
+                    }
+                    
+                    
                     if ( _searchField.value != string.Empty ) {
                         PopulateButtonsWithSearch();
                     } else {

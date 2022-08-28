@@ -122,6 +122,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="neatoTag">Tag to remove.</param>
         public void RemoveTag( NeatoTag neatoTag ) {
             tags.Remove( neatoTag );
+            if ( !_taggedObjects.ContainsKey( neatoTag ) ) return;
             _taggedObjects[neatoTag].Remove( gameObject );
             if( tags.Count == 0 ) {
                 _nonTaggedObjects.Add( gameObject );
