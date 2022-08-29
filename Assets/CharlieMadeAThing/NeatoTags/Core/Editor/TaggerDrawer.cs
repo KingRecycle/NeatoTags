@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomEditor( typeof( Tagger ) )][CanEditMultipleObjects]
+    [CustomEditor( typeof( Tagger ) )]
+    [CanEditMultipleObjects]
     public class TaggerDrawer : UnityEditor.Editor {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualTreeAsset _tagButtonWithXTemplate;
@@ -28,7 +29,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void OnEnable() {
             TagAssetCreation.GetUxmlDirectory();
             _root = new VisualElement();
-            
+
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.TaggerUxml );
             visualTree.CloneTree( _root );
@@ -114,17 +115,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 button.tooltip = tag.Comment;
             }
 
-            StyleButton( button, tag );
+            StyleButtonAvailable( button, tag );
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
-                if( serializedObject.isEditingMultipleObjects ) {
-                    foreach( var obj in serializedObject.targetObjects ) {
+                if ( serializedObject.isEditingMultipleObjects ) {
+                    foreach ( var obj in serializedObject.targetObjects ) {
                         ( (Tagger) obj ).AddTag( tag );
                     }
                 } else {
                     ( (Tagger) target ).AddTag( tag );
                 }
-                
+
                 if ( _taggerSearchAvailable.value != string.Empty ) {
                     PopulateButtonsWithSearch();
                 } else {
@@ -154,21 +155,30 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
                 removeButton.tooltip = $"Remove {tag.name} tag from {target.name}";
                 StyleButton( button, tag );
+                button.clicked += () => {
+                    if ( serializedObject.isEditingMultipleObjects ) {
+                        GiveAllSelectedTag( tag );
+                        if ( _searchField.value != string.Empty ) {
+                            PopulateButtonsWithSearch();
+                        } else {
+                            PopulateButtons();
+                        }
+                    }
+                };
 
-                removeButton.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
                 removeButton.clicked += () => {
                     if ( !_isEditTaggerMode ) return;
                     Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
-                    
-                    if( serializedObject.isEditingMultipleObjects ) {
-                        foreach( var obj in serializedObject.targetObjects ) {
+
+                    if ( serializedObject.isEditingMultipleObjects ) {
+                        foreach ( var obj in serializedObject.targetObjects ) {
                             ( (Tagger) obj ).RemoveTag( tag );
                         }
                     } else {
                         ( (Tagger) target ).RemoveTag( tag );
                     }
-                    
-                    
+
+
                     if ( _searchField.value != string.Empty ) {
                         PopulateButtonsWithSearch();
                     } else {
@@ -180,10 +190,68 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return tagButton;
         }
 
-        static void StyleButton( Button button, NeatoTag tag ) {
-            button.text = tag.name;
-            button.style.backgroundColor = tag.Color;
-            button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+        void GiveAllSelectedTag( NeatoTag tag ) {
+            foreach ( var obj in serializedObject.targetObjects ) {
+                var tagger = (Tagger) obj;
+                tagger.AddTag( tag );
+            }
+        }
+
+        void StyleButton( Button button, NeatoTag tag ) {
+            if ( serializedObject.isEditingMultipleObjects ) {
+                var occurrences = 0;
+                var targetTagger = (Tagger) target;
+                foreach ( var tagger in serializedObject.targetObjects ) {
+                    var otherTagger = (Tagger) tagger;
+                    if ( otherTagger.HasTag( tag ) ) {
+                        occurrences++;
+                    }
+                }
+
+                if ( occurrences == serializedObject.targetObjects.Length ) {
+                    button.text = tag.name;
+                    button.style.backgroundColor = tag.Color;
+                    button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+
+                } else {
+                    button.style.backgroundColor = tag.Color;
+                    button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+                    button.style.unityFontStyleAndWeight = FontStyle.Italic;
+                    button.text = tag.name + $"({occurrences})";
+                }
+            } else {
+                button.text = tag.name;
+                button.style.backgroundColor = tag.Color;
+                button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+            }
+        }
+
+        void StyleButtonAvailable( Button button, NeatoTag tag ) {
+            if ( serializedObject.isEditingMultipleObjects ) {
+                var occurrences = 0;
+                var targetTagger = (Tagger) target;
+                foreach ( var tagger in serializedObject.targetObjects ) {
+                    var otherTagger = (Tagger) tagger;
+                    if ( otherTagger.HasTag( tag ) ) {
+                        occurrences++;
+                    }
+                }
+
+                if ( occurrences > 0 && occurrences < serializedObject.targetObjects.Length ) {
+                    button.style.unityFontStyleAndWeight = FontStyle.Italic;
+                    button.style.backgroundColor = tag.Color;
+                    button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+                    button.text = tag.name + $"({occurrences})";
+                } else {
+                    button.text = tag.name;
+                    button.style.backgroundColor = tag.Color;
+                    button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+                }
+            } else {
+                button.text = tag.name;
+                button.style.backgroundColor = tag.Color;
+                button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
+            }
         }
 
         public void PopulateButtons() {

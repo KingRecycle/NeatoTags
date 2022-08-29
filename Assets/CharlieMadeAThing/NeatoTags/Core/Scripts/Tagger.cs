@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -102,6 +101,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool NoTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return !tagList.Any( HasTag );
         }
+        
         
         
         /// <summary>
