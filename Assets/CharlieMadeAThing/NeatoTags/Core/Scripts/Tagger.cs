@@ -16,7 +16,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         //This Tagger's tags.
         [SerializeField] List<NeatoTag> tags = new();
         public List<NeatoTag> GetTags => tags;
-
+        
         void Awake() {
             _taggers.Add( gameObject, this );
             _nonTaggedObjects.Add( gameObject );

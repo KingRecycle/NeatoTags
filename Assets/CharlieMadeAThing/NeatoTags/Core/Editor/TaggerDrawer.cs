@@ -66,6 +66,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _editTaggerButton = _root.Q<ToolbarButton>( "editTaggerButton" );
             _editTaggerButton.tooltip = $"Edit Tags for {target.name}";
+            
 
             _searchField.style.display = DisplayStyle.None;
             _addTagButton.style.display = DisplayStyle.None;
@@ -99,7 +100,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void CreateNewTag() {
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
-            ( (Tagger) target ).AddTag( tag );
+            if ( serializedObject.isEditingMultipleObjects ) {
+                foreach ( var targetObject in serializedObject.targetObjects ) {
+                    var tagger = targetObject as Tagger;
+                    if ( tagger != null ) tagger.AddTag( tag );
+                }
+            } else {
+                ( (Tagger) target ).AddTag( tag );
+            }
+            
             PopulateButtons();
         }
 
@@ -154,6 +163,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 var button = tagButton.Q<Button>( "tagButton" );
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
                 removeButton.tooltip = $"Remove {tag.name} tag from {target.name}";
+                if ( serializedObject.isEditingMultipleObjects ) {
+                    tagButton.tooltip = $"Click to add {tag.name} tag to all selected gameobjects.";
+                } else {
+                    if ( tag.Comment != string.Empty ) {
+                        tagButton.tooltip = tag.Comment;
+                    }
+                }
+
                 StyleButton( button, tag );
                 button.clicked += () => {
                     if ( serializedObject.isEditingMultipleObjects ) {
@@ -198,7 +215,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void StyleButton( Button button, NeatoTag tag ) {
-            if ( serializedObject.isEditingMultipleObjects ) {
+            if ( serializedObject.targetObject && serializedObject.isEditingMultipleObjects ) {
                 var occurrences = 0;
                 var targetTagger = (Tagger) target;
                 foreach ( var tagger in serializedObject.targetObjects ) {
