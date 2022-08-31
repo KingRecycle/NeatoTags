@@ -27,7 +27,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         GroupBox _tagViewerSelected;
 
         void OnEnable() {
-            TagAssetCreation.GetUxmlDirectory();
             _root = new VisualElement();
 
             var visualTree =
@@ -97,6 +96,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
         }
+        
 
         void CreateNewTag() {
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
@@ -215,9 +215,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void StyleButton( Button button, NeatoTag tag ) {
-            if ( serializedObject.targetObject && serializedObject.isEditingMultipleObjects ) {
+            if ( serializedObject.isEditingMultipleObjects ) {
                 var occurrences = 0;
-                var targetTagger = (Tagger) target;
                 foreach ( var tagger in serializedObject.targetObjects ) {
                     var otherTagger = (Tagger) tagger;
                     if ( otherTagger.HasTag( tag ) ) {
@@ -246,7 +245,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void StyleButtonAvailable( Button button, NeatoTag tag ) {
             if ( serializedObject.isEditingMultipleObjects ) {
                 var occurrences = 0;
-                var targetTagger = (Tagger) target;
                 foreach ( var tagger in serializedObject.targetObjects ) {
                     var otherTagger = (Tagger) tagger;
                     if ( otherTagger.HasTag( tag ) ) {

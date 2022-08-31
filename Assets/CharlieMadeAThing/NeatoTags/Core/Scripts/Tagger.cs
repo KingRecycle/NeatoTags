@@ -69,10 +69,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Checks if Tagger has a specific tag.
         /// </summary>
-        /// <param name="tag">The tag to check for</param>
+        /// <param name="neatoTag">The tag to check for</param>
         /// <returns>Returns true if Tagger has the tag, otherwise false.</returns>
-        public bool HasTag( NeatoTag tag ) {
-            return tags.Contains( tag );
+        public bool HasTag( NeatoTag neatoTag ) {
+            return tags.Contains( neatoTag );
+        }
+        
+        /// <summary>
+        /// Checks if Tagger has a specific tag by tag name.
+        /// </summary>
+        /// <param name="neatoTag">The tag name to check for</param>
+        /// <returns>Returns true if Tagger has the tag, otherwise false.</returns>
+        public bool HasTag( string neatoTag ) {
+            return tags.Any( t => t.name == neatoTag );
         }
 
         /// <summary>
@@ -81,6 +90,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has any of the tags, otherwise false.</returns>
         public bool AnyTagsMatch( IEnumerable<NeatoTag> tagList ) {
+            return tagList.Any( HasTag );
+        }
+        
+        /// <summary>
+        /// Checks if Tagger has any of the tags in the list by name.
+        /// </summary>
+        /// <param name="tagList">IEnumerable of tag names</param>
+        /// <returns>Returns true if Tagger has any of the tags, otherwise false.</returns>
+        public bool AnyTagsMatch( IEnumerable<string> tagList ) {
             return tagList.Any( HasTag );
         }
 
@@ -92,6 +110,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool AllTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return tagList.All( HasTag );
         }
+        
+        /// <summary>
+        /// Checks if all of the tags in the list are in the Tagger by name.
+        /// </summary>
+        /// <param name="tagList">IEnumerable of tag names</param>
+        /// <returns>Returns true if Tagger has all of the tags, otherwise false.</returns>
+        public bool AllTagsMatch( IEnumerable<string> tagList ) {
+            return tagList.All( HasTag );
+        }
 
         /// <summary>
         /// Checks if Tagger doesn't have any of the tags in the list.
@@ -99,6 +126,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>Returns true if Tagger has none of the tags in the list, otherwise false.</returns>
         public bool NoTagsMatch( IEnumerable<NeatoTag> tagList ) {
+            return !tagList.Any( HasTag );
+        }
+        
+        /// <summary>
+        /// Checks if Tagger doesn't have any of the tags in the list by name.
+        /// </summary>
+        /// <param name="tagList">IEnumerable of tag names</param>
+        /// <returns>Returns true if Tagger has none of the tags in the list, otherwise false.</returns>
+        public bool NoTagsMatch( IEnumerable<string> tagList ) {
             return !tagList.Any( HasTag );
         }
         

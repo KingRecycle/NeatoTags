@@ -1134,3 +1134,11 @@ MonoBehaviour:
   planeTag: {fileID: 11400000, guid: 7348c49f8ba378b409bd37e40024b99a, type: 2}
   platonicTag: {fileID: 11400000, guid: a29bcba0c9b67244e821f0ff8bd74341, type: 2}
   cornerlessTag: {fileID: 11400000, guid: 08661c9d61077774089a7fe851235b86, type: 2}
+  testTags:
+  - {fileID: 11400000, guid: e4d4f3b1e2339b442bf8b58c51c4e82d, type: 2}
+  - {fileID: 11400000, guid: 669ed11665b95c64c9f985e2b48baffd, type: 2}
+  - {fileID: 11400000, guid: 7348c49f8ba378b409bd37e40024b99a, type: 2}
+  testTagsStrings:
+  - Cube
+  - Sphere
+  - Plane

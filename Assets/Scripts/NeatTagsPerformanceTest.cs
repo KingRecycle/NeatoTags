@@ -13,6 +13,7 @@ namespace CharlieMadeAThing
         public GameObject prefab;
         public int count = 100000;
         public NeatoTag humanTag;
+        public NeatoTag ghostTag;
         public List<NeatoTag> tags;
         public int goCount;
         Stopwatch timer = new();
@@ -22,6 +23,7 @@ namespace CharlieMadeAThing
                 var go = Instantiate(prefab, Vector3.right + new Vector3(i, 0, 0 ),  Quaternion.identity);
                 //go.AddTag( tags[Random.Range(0, tags.Count)] );
                 go.AddTag( humanTag );
+                go.AddTag( ghostTag );
                 // if( i == count - 1 ) {
                 //     go.AddTag( humanTag );
                 // }
@@ -40,7 +42,7 @@ namespace CharlieMadeAThing
 
         void GetAllGameObjectsWithHumanTag() {
             results.Clear();
-            results = Tagger.StartGameObjectFilter().WithTag( humanTag ).GetMatches();
+            results = Tagger.StartGameObjectFilter().WithTags( humanTag, ghostTag  ).GetMatches();
             goCount = results.Count;
         }
     }

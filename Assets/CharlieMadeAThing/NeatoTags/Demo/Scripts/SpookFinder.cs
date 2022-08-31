@@ -24,8 +24,6 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //To filter out a list of Gameobjects, we can use the static function Tagger.StartGameObjectFilter()
             //We can pass in our own list of GameObjects to filter or leave it empty to filter all GameObjects that have a tagger in the scene.
             //Any GameObjects that do not have a Tagger Component will be ignored.
-            //Try to be reasonable with the amount of GameObjects you pass in. About 10,000 gameobjects will take just a couple milliseconds to filter.
-            //But higher you can start to see a RELATIVE performance hit. Searching 100,000 gameobjects is usually above 15 milliseconds.
             var allSpooks = Tagger.StartGameObjectFilter().WithTags( spookerTags ).GetMatches();
             var humans = Tagger.StartGameObjectFilter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag )
                 .GetMatches();

@@ -61,7 +61,7 @@ namespace CharlieMadeAThing {
         [UnityTest]
         public IEnumerator HasTag_AddTagWithNull_CheckForNull_ReturnsFalse() {
             cube.AddTag( null );
-            Assert.AreEqual( false, cube.HasTag( null ) );
+            Assert.AreEqual( false, cube.HasTag( (NeatoTag)null ) );
             yield return null;
         }
         
@@ -76,10 +76,22 @@ namespace CharlieMadeAThing {
             Assert.AreEqual( true, cube.HasTag( tagRefsForTests.cubeTag ) );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator HasTag_ByString_CubeHasCubeTag_ReturnsTrue() {
+            Assert.AreEqual( true, cube.HasTag( "Cube" ) );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator HasTag_CubeHasSphereTag_ReturnsFalse() {
             Assert.AreEqual( false, cube.HasTag( tagRefsForTests.sphereTag ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasTag_ByString_CubeHasSphereTag_ReturnsFalse() {
+            Assert.AreEqual( false, cube.HasTag( "Sphere" ) );
             yield return null;
         }
 
@@ -108,7 +120,7 @@ namespace CharlieMadeAThing {
         [UnityTest]
         public IEnumerator AddTag_PassInNull_ReturnFalse() {
             cube.AddTag( null );
-            Assert.AreEqual( false, cube.HasTag( null ) );
+            Assert.AreEqual( false, cube.HasTag( (NeatoTag)null ) );
             yield return null;
         }
         
@@ -148,7 +160,16 @@ namespace CharlieMadeAThing {
         public IEnumerator HasAnyTagsMatching_AddTagAsNull_CheckForAnyNulls_ReturnsFalse() {
             cube.AddTag( null );
             Assert.AreEqual( false,
-                cube.HasAnyTagsMatching( null, null,
+                cube.HasAnyTagsMatching( (NeatoTag)null, null,
+                    null ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_ByString_AddTagAsNull_CheckForAnyNulls_ReturnsFalse() {
+            cube.AddTag( null );
+            Assert.AreEqual( false,
+                cube.HasAnyTagsMatching( (string)null, null,
                     null ) );
             yield return null;
         }
@@ -160,12 +181,42 @@ namespace CharlieMadeAThing {
                     tagRefsForTests.planeTag ) );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_ByString_DoesCubeHaveAnyListedTags_CubeSpherePlane_ReturnTrue() {
+            Assert.AreEqual( true,
+                cube.HasAnyTagsMatching( "Cube", "Sphere",
+                    "Plane" ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_IEnumerable_DoesCubeHaveAnyListedTags_CubeSpherePlane_ReturnTrue() {
+            Assert.AreEqual( true,
+                cube.HasAnyTagsMatching( tagRefsForTests.testTags ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_ByString_IEnumerable_DoesCubeHaveAnyListedTags_CubeSpherePlane_ReturnTrue() {
+            Assert.AreEqual( true,
+                cube.HasAnyTagsMatching( tagRefsForTests.testTagsStrings ) );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator HasAnyTagsMatching_DoesCubeHaveAnyListedTags_CapsuleSpherePlane_ReturnFalse() {
             Assert.AreEqual( false,
                 cube.HasAnyTagsMatching( tagRefsForTests.capsuleTag, tagRefsForTests.sphereTag,
                     tagRefsForTests.planeTag ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_ByString_DoesCubeHaveAnyListedTags_CapsuleSpherePlane_ReturnFalse() {
+            Assert.AreEqual( false,
+                cube.HasAnyTagsMatching( "Capsule", "Sphere",
+                    "Plane" ) );
             yield return null;
         }
 
@@ -178,12 +229,32 @@ namespace CharlieMadeAThing {
             Assert.AreEqual( true, cube.HasAllTagsMatching( tagRefsForTests.cubeTag, tagRefsForTests.platonicTag ) );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator HasAllTagsMatching_ByString_DoesCubeHaveAllListedTags_CubePlatonic_ReturnTrue() {
+            Assert.AreEqual( true, cube.HasAllTagsMatching( "Cube", "Platonic Solid" ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAllTagsMatching_ByString_IEnumerable_DoesCubeHaveAllListedTags_CubePlatonic_ReturnTrue() {
+            Assert.AreEqual( true, cube.HasAllTagsMatching( new string[2]{ "Cube", "Platonic Solid"} ) );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator HasAllTagsMatching_DoesCubeHaveAllListedTags_CubePlatonicSphere_ReturnFalse() {
             Assert.AreEqual( false,
                 cube.HasAllTagsMatching( tagRefsForTests.cubeTag, tagRefsForTests.platonicTag,
                     tagRefsForTests.sphereTag ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasAllTagsMatching_ByString_DoesCubeHaveAllListedTags_CubePlatonicSphere_ReturnFalse() {
+            Assert.AreEqual( false,
+                cube.HasAllTagsMatching( "Cube", "Platonic Solid",
+                    "Sphere" ) );
             yield return null;
         }
         #endregion
@@ -196,8 +267,26 @@ namespace CharlieMadeAThing {
         }
         
         [UnityTest]
+        public IEnumerator HasNoTagsMatching_ByString_DoesCubeNotHaveListedTags_CubePlatonic_ReturnFalse() {
+            Assert.AreEqual( false, cube.HasNoTagsMatching( "Cube", "Platonic Solid" ) );
+            yield return null;
+        }
+        
+        [UnityTest]
         public IEnumerator HasNoTagsMatching_DoesPlaneNotHaveListedTags_CubePlatonic_ReturnTrue() {
             Assert.AreEqual( true, plane.HasNoTagsMatching( tagRefsForTests.cubeTag, tagRefsForTests.platonicTag ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasNoTagsMatching_ByString_DoesPlaneNotHaveListedTags_CubePlatonic_ReturnTrue() {
+            Assert.AreEqual( true, plane.HasNoTagsMatching( "Cube", "Platonic Solid" ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator HasNoTagsMatching_ByString_IEnumerable_DoesPlaneNotHaveListedTags_CubePlatonic_ReturnTrue() {
+            Assert.AreEqual( true, plane.HasNoTagsMatching( new string[2] {"Cube", "Platonic Solid"} ) );
             yield return null;
         }
 

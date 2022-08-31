@@ -10,5 +10,9 @@ namespace CharlieMadeAThing.NeatoTags {
         public NeatoTag planeTag;
         public NeatoTag platonicTag;
         public NeatoTag cornerlessTag;
+
+        public NeatoTag[] testTags;
+
+        public string[] testTagsStrings;
     }
 }

@@ -7,17 +7,15 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class TagAssetCreation : EditorWindow {
-        
         public static void SetTagFolder() {
             var path = EditorUtility.OpenFolderPanel( "Tag Folder Location", "Assets", "" );
             var tagPath = GetTagFolderLocation();
-            //Get the path to the Assets folder
+
             if ( string.IsNullOrEmpty( path ) ) {
                 return;
             }
 
             var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
-            Debug.Log( selectedFolder );
             if ( string.IsNullOrEmpty( tagPath ) ) {
                 var newDataHolder = CreateInstance<EditorDataHolder>();
                 newDataHolder.tagFolderLocation = selectedFolder;
@@ -67,19 +65,20 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static EditorDataHolder GetEditorDataContainer() {
             var holdersGuids = AssetDatabase.FindAssets( "EditorDataContainer" );
 
-            if ( holdersGuids.Length > 1 ) {
-                Debug.LogWarning(
-                    "[TagAssetCreation]: Found more than one EditorDataHolder. This is not supported. Only the first one will be used." );
-                var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
-                return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
+            switch ( holdersGuids.Length ) {
+                case > 1: {
+                    Debug.LogWarning(
+                        "[TagAssetCreation]: Found more than one EditorDataHolder. This is not supported. Only the first one will be used." );
+                    var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
+                    return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
+                }
+                case 1: {
+                    var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
+                    return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
+                }
+                default:
+                    return null;
             }
-
-            if ( holdersGuids.Length == 1 ) {
-                var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
-                return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
-            }
-
-            return null;
         }
 
         //Non menu version of NewTag function
@@ -142,7 +141,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
-        
+
         /// <summary>
         /// Gives back a Hashset of all tags in the project.
         /// </summary>
