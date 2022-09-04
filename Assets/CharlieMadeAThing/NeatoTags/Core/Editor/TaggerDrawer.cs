@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -97,11 +98,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             PopulateButtons();
         }
         
-
         void CreateNewTag() {
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
-            if ( serializedObject.isEditingMultipleObjects ) {
-                foreach ( var targetObject in serializedObject.targetObjects ) {
+            if ( targets.Length > 1 ) {
+                foreach ( var targetObject in targets ) {
                     var tagger = targetObject as Tagger;
                     if ( tagger != null ) tagger.AddTag( tag );
                 }
@@ -127,8 +127,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             StyleButtonAvailable( button, tag );
             button.clicked += () => {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
-                if ( serializedObject.isEditingMultipleObjects ) {
-                    foreach ( var obj in serializedObject.targetObjects ) {
+                if ( targets.Length > 1 ) {
+                    foreach ( var obj in targets ) {
                         ( (Tagger) obj ).AddTag( tag );
                     }
                 } else {
@@ -163,7 +163,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 var button = tagButton.Q<Button>( "tagButton" );
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
                 removeButton.tooltip = $"Remove {tag.name} tag from {target.name}";
-                if ( serializedObject.isEditingMultipleObjects ) {
+                if ( targets.Length > 1 ) {
                     tagButton.tooltip = $"Click to add {tag.name} tag to all selected gameobjects.";
                 } else {
                     if ( tag.Comment != string.Empty ) {
@@ -173,7 +173,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
                 StyleButton( button, tag );
                 button.clicked += () => {
-                    if ( serializedObject.isEditingMultipleObjects ) {
+                    if ( targets.Length > 1 ) {
                         GiveAllSelectedTag( tag );
                         if ( _searchField.value != string.Empty ) {
                             PopulateButtonsWithSearch();
@@ -187,8 +187,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     if ( !_isEditTaggerMode ) return;
                     Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
 
-                    if ( serializedObject.isEditingMultipleObjects ) {
-                        foreach ( var obj in serializedObject.targetObjects ) {
+                    if ( targets.Length > 1 ) {
+                        foreach ( var obj in targets ) {
                             ( (Tagger) obj ).RemoveTag( tag );
                         }
                     } else {
@@ -208,23 +208,23 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void GiveAllSelectedTag( NeatoTag tag ) {
-            foreach ( var obj in serializedObject.targetObjects ) {
+            foreach ( var obj in targets ) {
                 var tagger = (Tagger) obj;
                 tagger.AddTag( tag );
             }
         }
 
         void StyleButton( Button button, NeatoTag tag ) {
-            if ( serializedObject.isEditingMultipleObjects ) {
+            if ( targets.Length > 1 ) {
                 var occurrences = 0;
-                foreach ( var tagger in serializedObject.targetObjects ) {
+                foreach ( var tagger in targets ) {
                     var otherTagger = (Tagger) tagger;
                     if ( otherTagger.HasTag( tag ) ) {
                         occurrences++;
                     }
                 }
 
-                if ( occurrences == serializedObject.targetObjects.Length ) {
+                if ( occurrences == targets.Length ) {
                     button.text = tag.name;
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
@@ -243,16 +243,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void StyleButtonAvailable( Button button, NeatoTag tag ) {
-            if ( serializedObject.isEditingMultipleObjects ) {
+            if ( targets.Length > 1 ) {
                 var occurrences = 0;
-                foreach ( var tagger in serializedObject.targetObjects ) {
+                foreach ( var tagger in targets ) {
                     var otherTagger = (Tagger) tagger;
                     if ( otherTagger.HasTag( tag ) ) {
                         occurrences++;
                     }
                 }
 
-                if ( occurrences > 0 && occurrences < serializedObject.targetObjects.Length ) {
+                if ( occurrences > 0 && occurrences < targets.Length ) {
                     button.style.unityFontStyleAndWeight = FontStyle.Italic;
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
