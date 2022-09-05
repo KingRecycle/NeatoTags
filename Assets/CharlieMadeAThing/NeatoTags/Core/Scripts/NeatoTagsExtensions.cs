@@ -59,7 +59,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="gameObject"></param>
         /// <param name="tagName">Tag to check for</param>
         /// <returns>True if has matching tag, otherwise false.</returns>
-        public static bool HasTag( this GameObject gameObject, [NotNull]string tagName ) {
+        public static bool HasTag( this GameObject gameObject, string tagName ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagName );
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -66,7 +65,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _editTaggerButton = _root.Q<ToolbarButton>( "editTaggerButton" );
             _editTaggerButton.tooltip = $"Edit Tags for {target.name}";
-            
+
 
             _searchField.style.display = DisplayStyle.None;
             _addTagButton.style.display = DisplayStyle.None;
@@ -97,7 +96,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
         }
-        
+
         void CreateNewTag() {
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
             if ( targets.Length > 1 ) {
@@ -108,7 +107,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             } else {
                 ( (Tagger) target ).AddTag( tag );
             }
-            
+
             PopulateButtons();
         }
 
@@ -228,7 +227,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     button.text = tag.name;
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
-
                 } else {
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;

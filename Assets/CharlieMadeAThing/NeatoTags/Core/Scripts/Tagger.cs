@@ -18,6 +18,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public List<NeatoTag> GetTags => tags;
         
         void Awake() {
+            tags.RemoveAll(nTag => nTag == null);
             _taggers.Add( gameObject, this );
             _nonTaggedObjects.Add( gameObject );
             foreach ( var neatoTagAsset in tags ) {
@@ -145,6 +146,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTag">Tag to add.</param>
         public void AddTag( NeatoTag neatoTag ) {
+            if( neatoTag == null ) return;
             tags.Add( neatoTag );
             tags = tags.ToHashSet().ToList();
             _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
