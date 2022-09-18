@@ -12,13 +12,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         static Dictionary<GameObject, Tagger> _taggers = new();
         static Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new();
         static HashSet<GameObject> _nonTaggedObjects = new();
-        
+
         //This Tagger's tags.
         [SerializeField] List<NeatoTag> tags = new();
         public List<NeatoTag> GetTags => tags;
-        
+
         void Awake() {
-            tags.RemoveAll(nTag => nTag == null);
+            tags.RemoveAll( nTag => nTag == null );
             _taggers.Add( gameObject, this );
             _nonTaggedObjects.Add( gameObject );
             foreach ( var neatoTagAsset in tags ) {
@@ -26,19 +26,28 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 _taggedObjects[neatoTagAsset].Add( gameObject );
                 _nonTaggedObjects.Remove( gameObject );
             }
-            
         }
-        
+
+        void Reset() {
+            RemoveAllTags();
+            NeatoTagTaggerTracker.RegisterTagger( this );
+        }
+
 
         void OnDestroy() {
             foreach ( var neatoTag in tags ) {
                 _taggedObjects[neatoTag].Remove( gameObject );
             }
+
             _taggers.Remove( gameObject );
             _nonTaggedObjects.Remove( gameObject );
         }
 
-        
+        void OnValidate() {
+            NeatoTagTaggerTracker.RegisterTagger( this );
+            tags.RemoveAll( neatoTag => neatoTag == null );
+        }
+
 
         /// <summary>
         /// Checks if a gameobject has a Tagger component.
@@ -75,7 +84,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool HasTag( NeatoTag neatoTag ) {
             return tags.Contains( neatoTag );
         }
-        
+
         /// <summary>
         /// Checks if Tagger has a specific tag by tag name.
         /// </summary>
@@ -93,7 +102,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool AnyTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return tagList.Any( HasTag );
         }
-        
+
         /// <summary>
         /// Checks if Tagger has any of the tags in the list by name.
         /// </summary>
@@ -111,7 +120,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool AllTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return tagList.All( HasTag );
         }
-        
+
         /// <summary>
         /// Checks if all of the tags in the list are in the Tagger by name.
         /// </summary>
@@ -129,7 +138,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool NoTagsMatch( IEnumerable<NeatoTag> tagList ) {
             return !tagList.Any( HasTag );
         }
-        
+
         /// <summary>
         /// Checks if Tagger doesn't have any of the tags in the list by name.
         /// </summary>
@@ -138,15 +147,14 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool NoTagsMatch( IEnumerable<string> tagList ) {
             return !tagList.Any( HasTag );
         }
-        
-        
-        
+
+
         /// <summary>
         /// Add a tag to the tagger.
         /// </summary>
         /// <param name="neatoTag">Tag to add.</param>
         public void AddTag( NeatoTag neatoTag ) {
-            if( neatoTag == null ) return;
+            if ( neatoTag == null ) return;
             tags.Add( neatoTag );
             tags = tags.ToHashSet().ToList();
             _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
@@ -162,8 +170,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             tags.Remove( neatoTag );
             if ( !_taggedObjects.ContainsKey( neatoTag ) ) return;
             _taggedObjects[neatoTag].Remove( gameObject );
-            if( tags.Count == 0 ) {
+            if ( tags.Count == 0 ) {
                 _nonTaggedObjects.Add( gameObject );
+            }
+        }
+
+        /// <summary>
+        /// Remove ALL tags from the tagger.
+        /// </summary>
+        /// <param name="neatoTag">Tag to remove.</param>
+        public void RemoveAllTags() {
+            // for ( var i = tags.Count - 1; i >= 0; i++ ) {
+            //     RemoveTag( tags[i] );
+            // }
+
+            foreach ( var neatoTag in tags ) {
+                RemoveTag( neatoTag );
             }
         }
 
@@ -176,14 +198,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public TagFilter StartFilter() {
             return new TagFilter( this );
         }
-        
+
         /// <summary>
         /// Starts a filter for tagged GameObjects.
         /// If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
         /// <param name="gameObjectsToCheckAgainst">Optional list of GameObjects</param>
         /// <returns>Returns TagFilter for chaining filter functions</returns>
-        public static GameObjectFilter StartGameObjectFilter( IEnumerable<GameObject> gameObjectsToCheckAgainst = null ) {
+        public static GameObjectFilter
+            StartGameObjectFilter( IEnumerable<GameObject> gameObjectsToCheckAgainst = null ) {
             var gameObjects = gameObjectsToCheckAgainst ?? _taggers.Keys;
             return new GameObjectFilter( gameObjectsToCheckAgainst );
         }
@@ -194,15 +217,14 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Don't use directly. Use StartGameObjectFilter() instead.
         /// </summary>
         public class GameObjectFilter {
-
             readonly HashSet<GameObject> _matches;
-            
+
             public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
                 _matches = new HashSet<GameObject>();
                 var gameObjectsToFilter = gameObjects == null ? _taggers.Keys : gameObjects.Where( x => x.IsTagged() );
                 _matches.UnionWith( gameObjectsToFilter );
             }
-            
+
             /// <summary>
             /// Returns the result of the filter.
             /// Will not return duplicate GameObjects.
@@ -211,7 +233,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public HashSet<GameObject> GetMatches() {
                 return _matches;
             }
-            
+
             /// <summary>
             /// Filters for GameObjects that have the tag.
             /// </summary>
@@ -220,11 +242,11 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithTag( NeatoTag tag ) {
                 _taggedObjects.TryGetValue( tag, out var tempMatches );
                 tempMatches ??= new HashSet<GameObject>();
-                
-                _matches.IntersectWith(tempMatches);
+
+                _matches.IntersectWith( tempMatches );
                 return this;
             }
-            
+
             /// <summary>
             /// Filters for GameObjects that have all of the tags.
             /// </summary>
@@ -233,7 +255,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithTags( IEnumerable<NeatoTag> tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
             }
-            
+
             /// <summary>
             /// Filters for GameObjects that have all of the tags.
             /// </summary>
@@ -242,7 +264,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithTags( params NeatoTag[] tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
             }
-            
+
             /// <summary>
             /// Filter for GameObjects that don't have the tag.
             /// </summary>
@@ -252,7 +274,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 _matches.RemoveWhere( taggedObject => taggedObject.HasTag( tag ) );
                 return this;
             }
-            
+
             /// <summary>
             /// Filters for GameObjects that have none of the tags.
             /// </summary>
@@ -261,7 +283,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithoutTags( IEnumerable<NeatoTag> tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithoutTag( neatoTag ) );
             }
-            
+
             /// <summary>
             /// Filters for GameObjects that have none of the tags.
             /// </summary>
@@ -270,19 +292,21 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithoutTags( params NeatoTag[] tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithoutTag( neatoTag ) );
             }
-            
+
             /// <summary>
             /// Filter for GameObjects that have any of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
             public GameObjectFilter WithAnyTags( IEnumerable<NeatoTag> tags ) {
-                foreach ( var taggedObject in _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
-                    _matches.IntersectWith(taggedObject.Value);
+                foreach ( var taggedObject in
+                         _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
+                    _matches.IntersectWith( taggedObject.Value );
                 }
+
                 return this;
             }
-            
+
             /// <summary>
             /// Filter for GameObjects that have any of the tags.
             /// </summary>
@@ -290,10 +314,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <returns></returns>
             public GameObjectFilter WithAnyTags( params NeatoTag[] tags ) {
                 var tempMatches = new HashSet<GameObject>();
-                foreach ( var taggedObject in _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
+                foreach ( var taggedObject in
+                         _taggedObjects.Where( taggedObject => tags.Contains( taggedObject.Key ) ) ) {
                     tempMatches.UnionWith( taggedObject.Value );
                 }
-                _matches.IntersectWith(tempMatches);
+
+                _matches.IntersectWith( tempMatches );
                 return this;
             }
         }
@@ -317,7 +343,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public bool IsMatch() {
                 return _matchesFilter;
             }
-            
+
 
             /// <summary>
             /// Checks if gameobject has tag.

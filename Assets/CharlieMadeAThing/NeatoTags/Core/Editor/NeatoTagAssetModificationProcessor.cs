@@ -6,6 +6,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         static readonly List<NeatoTagDrawer> NEATO_TAG_DRAWERS = new();
 
+
         //When an asset is created, deleted, or renamed, this method is called.
         //Sadly I can't specify a type of asset to watch for, so I have to watch for all of them.
         //This shouldn't be too slow since it's only called once even if there are multiple assets being modified.

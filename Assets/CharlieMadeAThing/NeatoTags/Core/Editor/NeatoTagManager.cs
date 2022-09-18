@@ -25,6 +25,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static Button _deleteTagButton;
         static Button _setTagFolderButton;
         static Label _tagDirectoryLabel;
+        static Button _selectAllButton;
 
         //Selected Data
         static NeatoTag _selectedTag;
@@ -35,6 +36,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Top Half
         ToolbarButton _addTagButton;
+        
+        
 
 
         public void CreateGUI() {
@@ -60,6 +63,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _renameButton = _root.Q<Button>( "renameButton" );
             _renameButton.style.visibility = Visibility.Hidden;
+            
+            _selectAllButton = _root.Q<Button>( "selectAllButton" );
+            _selectAllButton.style.visibility = Visibility.Hidden;
 
             _renameButtonDisplay = _tagButtonTemplate.Instantiate().Q<Button>();
             _renameButtonDisplay.style.visibility = Visibility.Hidden;
@@ -233,10 +239,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
             _renameButton.style.visibility = Visibility.Visible;
+            _selectAllButton.style.visibility = Visibility.Visible;
 
             _renameButton.clicked += () => {
                 DoRename();
                 _renameField.value = string.Empty;
+            };
+
+            _selectAllButton.clicked += () => {
+                NeatoTagTaggerTracker.SelectAllGameObjectsWithTaggerThatHasTag( _selectedTag );
             };
 
             if ( _selectedTagColorField != null ) {
@@ -290,5 +301,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             PopulateAllTagsBox();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
+        
     }
 }

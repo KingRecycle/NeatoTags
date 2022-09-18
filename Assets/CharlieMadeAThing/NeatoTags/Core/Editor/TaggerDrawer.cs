@@ -22,6 +22,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         VisualElement _root;
         ToolbarSearchField _searchField;
         Label _searchLabel;
+
+        //Tagger (not the drawer)
+        Tagger _tagger;
         ToolbarSearchField _taggerSearchAvailable;
         GroupBox _tagViewerDeselected;
         GroupBox _tagViewerSelected;
@@ -95,6 +98,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
+
+            _tagger = (Tagger) target;
+        }
+
+        void OnDisable() {
+            if ( target == null ) {
+                NeatoTagTaggerTracker.UnregisterTagger( _tagger );
+            }
         }
 
         void CreateNewTag() {

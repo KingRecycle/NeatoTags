@@ -7,6 +7,7 @@
                     <uie:ToolbarSpacer />
                     <ui:TextField picking-mode="Ignore" name="renameField" style="margin-left: 1px; margin-right: 0; margin-top: 1px; margin-bottom: 0; width: 25%; height: 16px; flex-wrap: nowrap; justify-content: flex-start; min-width: 35%; position: relative; top: auto; left: auto; min-height: 16px; align-items: stretch; padding-top: 2px;" />
                     <ui:Button text="Rename" display-tooltip-when-elided="true" name="renameButton" tooltip="Rename the current selected tag" style="max-width: none; position: relative; top: auto; left: auto; height: 18px; visibility: visible; color: rgb(238, 238, 238); -unity-font: none; -unity-font-style: normal;" />
+                    <ui:Button tabindex="-1" text="Select All" display-tooltip-when-elided="true" name="selectAllButton" />
                 </uie:Toolbar>
             </ui:GroupBox>
             <ui:GroupBox style="margin-left: 0; margin-right: 0; margin-top: 0; padding-left: 0; padding-top: 0; -unity-text-outline-width: 0; -unity-text-outline-color: rgb(45, 45, 45); border-left-color: rgb(45, 45, 45); border-right-color: rgb(45, 45, 45); border-top-color: rgb(45, 45, 45); border-bottom-color: rgb(45, 45, 45); border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; width: 100%; height: auto; padding-bottom: 0; min-width: 25%; align-items: flex-start; max-width: 100%; margin-bottom: 30px;">
