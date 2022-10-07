@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -32,6 +33,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
             NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
+        }
+
+        void OnDisable() {
+            NeatoTagAssetModificationProcessor.UnregisterNeatoTagDrawer( this );
         }
 
         public override VisualElement CreateInspectorGUI() {

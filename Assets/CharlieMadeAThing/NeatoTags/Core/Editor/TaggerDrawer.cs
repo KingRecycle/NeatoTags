@@ -106,6 +106,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( target == null ) {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger );
             }
+            NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
         }
 
         void CreateNewTag() {

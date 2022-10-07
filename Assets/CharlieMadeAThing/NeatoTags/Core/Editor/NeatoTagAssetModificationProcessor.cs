@@ -36,6 +36,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             TAGGER_DRAWERS.Add( taggerDrawer );
         }
+        
+        public static void UnregisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
+            TAGGER_DRAWERS.Remove( taggerDrawer );
+        }
 
         //Grabs the NeatoTagDrawer. Doesn't work if not a list for some reason...
         public static void RegisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
@@ -44,6 +48,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             NEATO_TAG_DRAWERS.Add( neatoTagDrawer );
+        }
+        
+        public static void UnregisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
+            NEATO_TAG_DRAWERS.Remove( neatoTagDrawer );
         }
     }
 }
