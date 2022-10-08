@@ -48,12 +48,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _searchField = _root.Q<ToolbarSearchField>( "taggerSearch" );
             _searchField.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
-            _searchField.tooltip = $"Search through tags currently tagged to {target.name}";
+            _searchField.tooltip = $"Search through tags currently tagged to {target.name}. Use ^ at the beginning to search for exact matches.";
             _searchLabel = _root.Q<Label>( "searchLabel" );
 
             _taggerSearchAvailable = _root.Q<ToolbarSearchField>( "taggerSearchAvailable" );
             _taggerSearchAvailable.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
-            _taggerSearchAvailable.tooltip = $"Search through tags currently available to add to {target.name}";
+            _taggerSearchAvailable.tooltip = $"Search through tags currently available to add to {target.name}. Use ^ at the beginning to search for exact matches.";
 
             _addTagButton = _root.Q<Button>( "addTagButton" );
             _addTagButton.tooltip = $"Create a new tag and add it to {target.name}";
@@ -282,18 +282,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public void PopulateButtons() {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
-            var allTags = TagAssetCreation.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
 
-            if ( ( (Tagger) target ).GetTags != null ) {
-                foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
+            var taggerTarget = (Tagger) target;
+            foreach ( var neatoTagAsset in allTags ) {
+                if ( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
                     _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                }
-
-                foreach ( var neatoTagAsset in allTags.Where( x => !( (Tagger) target ).GetTags.Contains( x ) ) ) {
-                    _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
-                }
-            } else {
-                foreach ( var neatoTagAsset in allTags ) {
+                } else {
                     _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                 }
             }
@@ -304,27 +299,28 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
 
-            var allTags = TagAssetCreation.GetAllTags();
-            //Selected Tags
-            foreach ( var neatoTagAsset in allTags.Where( x => ( (Tagger) target ).GetTags.Contains( x ) ) ) {
-                if ( !string.IsNullOrEmpty( _searchField.value ) && !string.IsNullOrWhiteSpace( _searchField.value ) ) {
-                    if ( Regex.IsMatch( neatoTagAsset.name, _searchField.value, RegexOptions.IgnoreCase ) ) {
+            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
+            var taggerTarget = (Tagger) target;
+            
+            foreach ( var neatoTagAsset in allTags ) {
+                //Search for already selected tags
+                if( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
+                    if ( !string.IsNullOrWhiteSpace( _searchField.value ) ) {
+                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_searchField.value}", RegexOptions.IgnoreCase ) ) {
+                            _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
+                        }
+                    } else {
                         _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
                     }
                 } else {
-                    _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                }
-            }
-
-            //Available Tags
-            foreach ( var neatoTagAsset in allTags.Where( x => !( (Tagger) target ).GetTags.Contains( x ) ) ) {
-                if ( !string.IsNullOrEmpty( _taggerSearchAvailable.value ) &&
-                     !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
-                    if ( Regex.IsMatch( neatoTagAsset.name, _taggerSearchAvailable.value, RegexOptions.IgnoreCase ) ) {
+                    //Search for available tags
+                    if ( !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
+                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_taggerSearchAvailable.value}", RegexOptions.IgnoreCase ) ) {
+                            _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
+                        }
+                    } else {
                         _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                     }
-                } else {
-                    _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                 }
             }
         }

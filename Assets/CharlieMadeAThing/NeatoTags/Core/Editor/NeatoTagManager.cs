@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
@@ -38,8 +40,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         ToolbarButton _addTagButton;
         
         
-
-
         public void CreateGUI() {
             // Each editor window contains a root VisualElement object
             _root = rootVisualElement;
@@ -66,6 +66,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             
             _selectAllButton = _root.Q<Button>( "selectAllButton" );
             _selectAllButton.style.visibility = Visibility.Hidden;
+            
 
             _renameButtonDisplay = _tagButtonTemplate.Instantiate().Q<Button>();
             _renameButtonDisplay.style.visibility = Visibility.Hidden;
@@ -94,6 +95,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _deleteTagButton.style.visibility = Visibility.Hidden;
 
             _tagSearchField = _root.Q<ToolbarSearchField>( "tagSearchField" );
+            _tagSearchField.tooltip = $"Search for tags by name. Use ^ at the beginning of your search to search for exact matches.";
             _tagSearchField.RegisterValueChangedCallback( evt => { PopulateButtonsWithSearch( evt.newValue ); } );
 
             PopulateAllTagsBox();
@@ -112,6 +114,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             DisplayTag();
         }
 
+        static bool _isDirty = true;
+        void OnEnable() {
+            //Keeping track of Tagger components in the scene so got to do an initial grab of all the components on editor scene load.
+            //Afterwards, they are registered as they are created and unregistered as the component is removed from gameobjects.
+            if ( _isDirty ) {
+                EditorSceneManager.sceneOpened += OnSceneOpened;
+                NeatoTagTaggerTracker.RegisterTaggersInScene();
+                _isDirty = false;
+            }
+        }
+
+        void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
+            _isDirty = true;
+        }
+
         void UpdatePathLabel() {
             var tagFolderLocation = TagAssetCreation.GetTagFolderLocation();
             var tagPath = tagFolderLocation == string.Empty ? "Not Assigned" : tagFolderLocation;
@@ -125,9 +142,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             _allTagsBox.Clear();
-            var allTags = TagAssetCreation.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
             foreach ( var neatoTagAsset in allTags ) {
-                if ( Regex.IsMatch( neatoTagAsset.name, evtNewValue, RegexOptions.IgnoreCase ) ) {
+                if ( Regex.IsMatch( neatoTagAsset.name, $"{evtNewValue}", RegexOptions.IgnoreCase ) ) {
                     _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );
                 }
             }
@@ -146,7 +163,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _allTagsBox.Clear();
             BUTTON_ACTION_MAP.Clear();
 
-            var allTags = TagAssetCreation.GetAllTags();
+            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
 
             foreach ( var neatoTagAsset in allTags ) {
                 _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );
@@ -239,7 +256,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
             _renameButton.style.visibility = Visibility.Visible;
+            _renameButton.tooltip = $"Rename {_selectedTag.name} tag.";
             _selectAllButton.style.visibility = Visibility.Visible;
+            _selectAllButton.tooltip = $"Select all gameobjects in scene with the {_selectedTag.name} tag.";
 
             _renameButton.clicked += () => {
                 DoRename();

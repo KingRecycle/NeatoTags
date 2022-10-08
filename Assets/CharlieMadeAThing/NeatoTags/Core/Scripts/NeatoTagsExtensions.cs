@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -66,7 +65,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #endregion
 
         #region HasAnyTagsMatch
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with any of the given tags.
         /// </summary>
@@ -76,7 +75,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAnyTagsMatching( this GameObject gameObject, params NeatoTag[] tagParams ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagParams );
         }
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with any of the given tags.
         /// </summary>
@@ -96,7 +95,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagList );
         }
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with any of the given tags.
         /// </summary>
@@ -106,11 +105,11 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAnyTagsMatching( this GameObject gameObject, IEnumerable<string> tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AnyTagsMatch( tagList );
         }
-        
+
         #endregion
 
         #region HasAllTagsMatching
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with all of the given tags.
         /// </summary>
@@ -120,7 +119,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAllTagsMatching( this GameObject gameObject, params NeatoTag[] tagParams ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagParams );
         }
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with all of the given tags.
         /// </summary>
@@ -140,7 +139,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
         }
-        
+
         /// <summary>
         /// Returns true if the gameobject is tagged with all of the given tags.
         /// </summary>
@@ -150,11 +149,11 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<string> tagNameList ) {
             return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagNameList );
         }
-        
+
         #endregion
 
         #region HasNoTagsMatching
-        
+
         /// <summary>
         /// Return true if the gameobject is not tagged with any of the given tags.
         /// </summary>
@@ -165,7 +164,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             //If there is no tagger, then it is not tagged with any of the given tags.
             return !Tagger.TryGetTagger( gameObject, out var tagger ) || tagger.NoTagsMatch( tagList );
         }
-        
+
         /// <summary>
         /// Return true if the gameobject is not tagged with any of the given tags.
         /// </summary>
@@ -186,9 +185,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) {
             //If there is no tagger, then it is not tagged with any of the given tags.
             return !Tagger.TryGetTagger( gameObject, out var tagger ) || tagger.NoTagsMatch( tagList );
-            
         }
-        
+
         /// <summary>
         /// Return true if the gameobject is not tagged with any of the given tags.
         /// </summary>
@@ -198,9 +196,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static bool HasNoTagsMatching( this GameObject gameObject, IEnumerable<string> tagNameList ) {
             //If there is no tagger, then it is not tagged with any of the given tags.
             return !Tagger.TryGetTagger( gameObject, out var tagger ) || tagger.NoTagsMatch( tagNameList );
-            
         }
-        
+
         #endregion
 
         /// <summary>

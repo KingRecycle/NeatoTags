@@ -28,10 +28,20 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             var humans = Tagger.StartGameObjectFilter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag )
                 .GetMatches();
             var ghosts = Tagger.StartGameObjectFilter( spookyGameObjects ).WithTag( ghostTag ).GetMatches();
+            
+            //Use .Filter() for cleaner looking function 
+            var ghostAndHumans = Tagger.Filter( spookyGameObjects ).WithAnyTags( ghostTag, humanTag ).GetMatches();
 
             //Use direct reference to tag (recommended) or use the tag name (not recommended)
             Debug.Log( spookyGameObjects[0].HasTag( "Ghost" ) );
             Debug.Log( spookyGameObjects[0].HasTag( ghostTag ) );
+            
+            
+            
+            
+            //We can also use the static function Tagger.GetAllGameObjectsWithTagger() to get all GameObjects with a Tagger Component
+            //This is useful if you want to filter all GameObjects in the scene
+            var allGameObjects = Tagger.GetAllGameObjectsWithTagger();
         }
 
         void Update() {
