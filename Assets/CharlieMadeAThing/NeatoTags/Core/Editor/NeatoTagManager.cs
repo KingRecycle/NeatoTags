@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Unity.Plastic.Antlr3.Runtime.Debug;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
@@ -10,6 +11,9 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
+    /// <summary>
+    /// The NeatoTags Manager window.
+    /// </summary>
     public class NeatoTagManager : EditorWindow {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualElement _root;
@@ -20,7 +24,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Bottom Half
         static Button _renameButton;
-        static Button _renameButtonDisplay;
+        static Button _selectedTagButton;
         static TextField _renameField;
         static Toolbar _renameToolbar;
         static GroupBox _tagInfoBox;
@@ -41,10 +45,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         
         
         public void CreateGUI() {
-            // Each editor window contains a root VisualElement object
             _root = rootVisualElement;
-
-            // Import UXML
+            
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatTagManagerUxml );
             visualTree.CloneTree( _root );
@@ -68,34 +70,29 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectAllButton.style.visibility = Visibility.Hidden;
             
 
-            _renameButtonDisplay = _tagButtonTemplate.Instantiate().Q<Button>();
-            _renameButtonDisplay.style.visibility = Visibility.Hidden;
+            _selectedTagButton = _tagButtonTemplate.Instantiate().Q<Button>();
+            _selectedTagButton.style.visibility = Visibility.Hidden;
 
             _addTagButton = _root.Q<ToolbarButton>( "addTagButton" );
-            _addTagButton.clicked += () => {
-                var newTag = TagAssetCreation.CreateNewTag( "New Tag" );
-                PopulateAllTagsBox();
-                if ( newTag ) {
-                    BUTTON_ACTION_MAP.First( x => x.Key.text == newTag.name ).Value.Invoke();
-                }
-            };
+            _addTagButton.clicked -= AddNewTag;
+            _addTagButton.clicked += AddNewTag;
 
             _setTagFolderButton = _root.Q<Button>( "setTagFolderButton" );
-            _setTagFolderButton.clicked += () => {
-                TagAssetCreation.SetTagFolder();
-                UpdatePathLabel();
-            };
+            _setTagFolderButton.clicked -= SetTagFolder;
+            _setTagFolderButton.clicked += SetTagFolder;
 
             _tagDirectoryLabel = _root.Q<Label>( "tagDirectoryLabel" );
             UpdatePathLabel();
 
 
             _deleteTagButton = _root.Q<Button>( "deleteTagButton" );
+            _deleteTagButton.clicked -= DeleteSelectedTag;
             _deleteTagButton.clicked += DeleteSelectedTag;
             _deleteTagButton.style.visibility = Visibility.Hidden;
 
             _tagSearchField = _root.Q<ToolbarSearchField>( "tagSearchField" );
             _tagSearchField.tooltip = $"Search for tags by name. Use ^ at the beginning of your search to search for exact matches.";
+            _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearch( evt.newValue ); } );
             _tagSearchField.RegisterValueChangedCallback( evt => { PopulateButtonsWithSearch( evt.newValue ); } );
 
             PopulateAllTagsBox();
@@ -119,23 +116,24 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             //Keeping track of Tagger components in the scene so got to do an initial grab of all the components on editor scene load.
             //Afterwards, they are registered as they are created and unregistered as the component is removed from gameobjects.
             if ( _isDirty ) {
+                EditorSceneManager.sceneOpened -= OnSceneOpened;
                 EditorSceneManager.sceneOpened += OnSceneOpened;
                 NeatoTagTaggerTracker.RegisterTaggersInScene();
                 _isDirty = false;
             }
         }
 
-        void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
+        static void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
             _isDirty = true;
         }
 
-        void UpdatePathLabel() {
+        static void UpdatePathLabel() {
             var tagFolderLocation = TagAssetCreation.GetTagFolderLocation();
             var tagPath = tagFolderLocation == string.Empty ? "Not Assigned" : tagFolderLocation;
             _tagDirectoryLabel.text = $"Default Tag Folder Location: {tagPath}";
         }
-        
-        void PopulateButtonsWithSearch( string evtNewValue ) {
+
+        static void PopulateButtonsWithSearch( string evtNewValue ) {
             if ( evtNewValue == string.Empty ) {
                 PopulateAllTagsBox();
                 return;
@@ -150,7 +148,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        void DeleteSelectedTag() {
+        static void DeleteSelectedTag() {
             if ( !_selectedTag ) return;
             TagAssetCreation.DeleteTag( _selectedTag );
             _selectedTag = null;
@@ -189,13 +187,18 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             button.clicked += () => BUTTON_ACTION_MAP[button].Invoke();
             return button;
         }
+        
+        //Checks if the tag name is valid and if the name doesn't already exist.
+        static bool CanRenameTag( string newName ) {
+            //Trim the name to remove any leading or trailing spaces.
+            if ( newName == string.Empty ) {
+                Debug.LogWarning( $"[Neato Tag Manager]: Tried to rename tag {_selectedTag.name} but no name was entered." );
+            }
 
-        static bool CanRenameTag() {
-            if ( _renameField.value != string.Empty ) {
-                foreach ( var element in _allTagsBox.Children() ) {
-                    if ( element is Button tagButton && tagButton.text == _renameField.value ) {
-                        return false;
-                    }
+            foreach ( var element in _allTagsBox.Children() ) {
+                var button = element.Q<Button>();
+                if ( button.text.Equals( newName ) ) {
+                    Debug.LogWarning($"Tried to rename tag {_selectedTag.name} to {newName} but a tag with that name already exists.");
                 }
             }
 
@@ -203,26 +206,29 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         static void DoRename() {
-            if ( !CanRenameTag() ) return;
+            var newName = _renameField.text.Trim();
+            if ( !CanRenameTag( newName ) ) return;
             var color = _selectedTag.Color;
             var comment = _selectedTag.Comment;
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag );
-            AssetDatabase.RenameAsset( tagPath, _renameField.value );
+            AssetDatabase.RenameAsset( tagPath, newName );
             _selectedTag.Color = color;
             _selectedTag.Comment = comment;
             PopulateAllTagsBox();
             BUTTON_ACTION_MAP.First( x => x.Key.text == _selectedTag.name ).Value.Invoke();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
+            _renameField.value = string.Empty;
         }
 
-        void UnDisplayTag() {
+        static void UnDisplayTag() {
             _tagInfoBox.Remove( _selectedTagInfoElement );
             _renameField.style.visibility = Visibility.Hidden;
             _renameButton.style.visibility = Visibility.Hidden;
-            _renameButtonDisplay.style.visibility = Visibility.Hidden;
+            _selectedTagButton.style.visibility = Visibility.Hidden;
             _deleteTagButton.style.visibility = Visibility.Hidden;
         }
-
+        
+        //NOTE: Don't forget to unsubscribe from events before subscribing to them again.
         static void DisplayTag() {
             var visualTree = AssetDatabase
                 .LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml )
@@ -247,27 +253,29 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTagColorField?.UnregisterValueChangedCallback( UpdateTagColor );
             _selectedTagTextField?.UnregisterValueChangedCallback( UpdateTagComment );
 
+            
+            //Event when Enter/Return key is pressed when rename field is focused.
+            _renameField.UnregisterCallback<KeyDownEvent>( evt => {
+                if ( evt.keyCode != KeyCode.Return ) return;
+                DoRename();
+            } );
             _renameField.RegisterCallback<KeyDownEvent>( evt => {
-                if ( evt.keyCode == KeyCode.Return ) {
-                    DoRename();
-                    _renameField.value = string.Empty;
-                }
+                if ( evt.keyCode != KeyCode.Return ) return;
+                DoRename();
             } );
 
+            //Event when Rename button is clicked
+            _renameButton.clicked -= DoRename;
+            _renameButton.clicked += DoRename;
 
             _renameButton.style.visibility = Visibility.Visible;
             _renameButton.tooltip = $"Rename {_selectedTag.name} tag.";
+            
             _selectAllButton.style.visibility = Visibility.Visible;
             _selectAllButton.tooltip = $"Select all gameobjects in scene with the {_selectedTag.name} tag.";
-
-            _renameButton.clicked += () => {
-                DoRename();
-                _renameField.value = string.Empty;
-            };
-
-            _selectAllButton.clicked += () => {
-                NeatoTagTaggerTracker.SelectAllGameObjectsWithTaggerThatHasTag( _selectedTag );
-            };
+            
+            _selectAllButton.clicked -= SelectAllWithTag;
+            _selectAllButton.clicked += SelectAllWithTag;
 
             if ( _selectedTagColorField != null ) {
                 _selectedTagColorField.value = _selectedTag.Color;
@@ -280,36 +288,59 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
 
-            _renameToolbar.hierarchy.Insert( 2, _renameButtonDisplay );
+            _renameToolbar.hierarchy.Insert( 2, _selectedTagButton );
 
             _renameField.style.visibility = Visibility.Visible;
-            _renameButtonDisplay.style.visibility = Visibility.Visible;
-            _renameButtonDisplay.tooltip = $"Click to show {_selectedTag.name} in the project view.";
-            _renameButtonDisplay.style.backgroundColor = _selectedTag.Color;
-            _renameButtonDisplay.style.color =
+            _selectedTagButton.style.visibility = Visibility.Visible;
+            _selectedTagButton.tooltip = $"Click to show {_selectedTag.name} in the project view.";
+            _selectedTagButton.style.backgroundColor = _selectedTag.Color;
+            _selectedTagButton.style.color =
                 TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
-            _renameButtonDisplay.text = _selectedTag.name;
-            _renameButtonDisplay.style.color =
+            _selectedTagButton.text = _selectedTag.name;
+            _selectedTagButton.style.color =
                 TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
-            _renameButtonDisplay.clicked += () => {
-                EditorUtility.FocusProjectWindow();
-                Selection.activeObject = _selectedTag;
-            };
+
+            _selectedTagButton.clicked -= SelectedTagAssetInProjectView;
+            _selectedTagButton.clicked += SelectedTagAssetInProjectView;
 
             _deleteTagButton.style.visibility = Visibility.Visible;
         }
 
+        //Called the SelectedAllGameObjectsWithTaggerThatHasTag() function
+        //Wrapper function to play nice with events/callbacks since they don't like functions with parameters.
+        static void SelectAllWithTag() {
+            NeatoTagTaggerTracker.SelectAllGameObjectsWithTaggerThatHasTag( _selectedTag );
+        }
+        
+        //Selects and puts into focus the selected tag in the project view.
+        static void SelectedTagAssetInProjectView() {
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = _selectedTag;
+        }
+
+        static void AddNewTag() {
+            var newTag = TagAssetCreation.CreateNewTag( "New Tag" );
+            PopulateAllTagsBox();
+            if ( newTag ) {
+                BUTTON_ACTION_MAP.First( x => x.Key.text == newTag.name ).Value.Invoke();
+            }
+        }
+
+        static void SetTagFolder() {
+            TagAssetCreation.SetTagFolder();
+            UpdatePathLabel();
+        }
+
         static void UpdateTagColor( ChangeEvent<Color> evt ) {
             _selectedTag.Color = evt.newValue;
-            _renameButtonDisplay.style.backgroundColor = _selectedTag.Color;
-            _renameButtonDisplay.style.color =
+            _selectedTagButton.style.backgroundColor = _selectedTag.Color;
+            _selectedTagButton.style.color =
                 TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
             foreach ( var element in _allTagsBox.Children() ) {
-                if ( element is Button tagButton && tagButton.text == _selectedTag.name ) {
-                    tagButton.style.backgroundColor = _selectedTag.Color;
-                    tagButton.style.color =
-                        TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
-                }
+                if ( element is not Button tagButton || tagButton.text != _selectedTag.name ) continue;
+                tagButton.style.backgroundColor = _selectedTag.Color;
+                tagButton.style.color =
+                    TaggerDrawer.GetColorLuminosity( _selectedTag.Color ) > 70 ? Color.black : Color.white;
             }
 
             NeatoTagAssetModificationProcessor.UpdateTaggers();

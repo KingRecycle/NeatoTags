@@ -24,10 +24,10 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //To filter out a list of Gameobjects, we can use the static function Tagger.StartGameObjectFilter()
             //We can pass in our own list of GameObjects to filter or leave it empty to filter all GameObjects that have a tagger in the scene.
             //Any GameObjects that do not have a Tagger Component will be ignored.
-            var allSpooks = Tagger.StartGameObjectFilter().WithTags( spookerTags ).GetMatches();
-            var humans = Tagger.StartGameObjectFilter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag )
+            var allSpooks = Tagger.Filter().WithTags( spookerTags ).GetMatches();
+            var humans = Tagger.Filter().WithTag( humanTag ).WithoutTags( witchTag, goblinTag, ghostTag )
                 .GetMatches();
-            var ghosts = Tagger.StartGameObjectFilter( spookyGameObjects ).WithTag( ghostTag ).GetMatches();
+            var ghosts = Tagger.Filter( spookyGameObjects ).WithTag( ghostTag ).GetMatches();
             
             //Use .Filter() for cleaner looking function 
             var ghostAndHumans = Tagger.Filter( spookyGameObjects ).WithAnyTags( ghostTag, humanTag ).GetMatches();
@@ -74,7 +74,7 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //Check if a gameobject has a Tagger component
             //GameObjects without a Tagger component are considered to not have any tags (HasTags() returns false) and (!HasTag() returns true)
             //and won't show up in the list of tagged objects.
-            //So if you want to be sure you are only checking tagged objects, you can use IsTagged()
+            //So if you want to be sure you are only checking tagged objects, you can use HasTagger()
             if ( !potentialSpook.IsTagged() ) return;
 
             //HasTag only cares about the specified tag.

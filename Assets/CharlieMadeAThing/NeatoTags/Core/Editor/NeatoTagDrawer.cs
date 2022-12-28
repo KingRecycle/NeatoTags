@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -6,6 +5,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
+    /// <summary>
+    /// The drawer for tags. This is mainly used when a tag is clicked in the project or when displaying a tag in the tag manager.
+    /// </summary>
     [CustomEditor( typeof( NeatoTag ) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
@@ -24,11 +26,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void OnEnable() {
             _root = new VisualElement();
-
-            // Load in UXML template and USS styles, then apply them to the root element.
+            
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml );
             visualTree.CloneTree( _root );
+            
             _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );

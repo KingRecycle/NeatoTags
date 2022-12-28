@@ -2,11 +2,17 @@
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
+    /// <summary>
+    /// ScriptableObject for storing editor preferences related to NeatoTags.
+    /// </summary>
     public class EditorDataHolder : ScriptableObject {
         [ReadOnly] public string tagFolderLocation;
     }
 
 
+    /// <summary>
+    /// Attribute for making a field read-only in the inspector.
+    /// </summary>
     public class ReadOnlyAttribute : PropertyAttribute {
     }
 

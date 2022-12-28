@@ -2,6 +2,9 @@
 using UnityEditor;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
+    /// <summary>
+    /// Keeps track of editor scripts (drawer scripts) which allows updating Tagger inspectors when tags are added/removed from the project.
+    /// </summary>
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         static readonly List<NeatoTagDrawer> NEATO_TAG_DRAWERS = new();

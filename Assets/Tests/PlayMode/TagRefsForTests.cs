@@ -1,7 +1,7 @@
 ﻿using CharlieMadeAThing.NeatoTags.Core;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags {
+namespace CharlieMadeAThing.NeatoTags.Tests {
     public class TagRefsForTests : MonoBehaviour {
         public NeatoTag cubeTag;
         public NeatoTag sphereTag;

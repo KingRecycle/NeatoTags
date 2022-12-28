@@ -92,7 +92,7 @@ namespace CharlieMadeAThing
             for ( var i = 0; i < iterations; i++ ) {
                 timer.Reset();
                 timer.Start();
-                var justHumans = Tagger.StartGameObjectFilter().WithTags( humanTag ).GetMatches();
+                var justHumans = Tagger.Filter().WithTags( humanTag ).GetMatches();
                 timer.Stop();
                 if ( timer.Elapsed < _leastTime ) _leastTime = timer.Elapsed;
                 if ( timer.Elapsed > _mostTime ) _mostTime = timer.Elapsed;

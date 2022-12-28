@@ -57,6 +57,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _addTagButton = _root.Q<Button>( "addTagButton" );
             _addTagButton.tooltip = $"Create a new tag and add it to {target.name}";
+            _addTagButton.clicked -= CreateNewTag;
             _addTagButton.clicked += CreateNewTag;
             _addTagTextField = _root.Q<TextField>( "addTagTextField" );
             _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
@@ -75,24 +76,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _addTagTextField.style.display = DisplayStyle.None;
             _searchLabel.style.display = DisplayStyle.None;
             _allTagsBox.style.display = DisplayStyle.None;
-            _editTaggerButton.clicked += () => {
-                _isEditTaggerMode = !_isEditTaggerMode;
-                if ( _isEditTaggerMode ) {
-                    _searchField.style.display = DisplayStyle.Flex;
-                    _addTagButton.style.display = DisplayStyle.Flex;
-                    _addTagTextField.style.display = DisplayStyle.Flex;
-                    _searchLabel.style.display = DisplayStyle.Flex;
-                    _allTagsBox.style.display = DisplayStyle.Flex;
-                    PopulateButtons();
-                } else {
-                    _searchField.style.display = DisplayStyle.None;
-                    _addTagButton.style.display = DisplayStyle.None;
-                    _addTagTextField.style.display = DisplayStyle.None;
-                    _searchLabel.style.display = DisplayStyle.None;
-                    _allTagsBox.style.display = DisplayStyle.None;
-                    PopulateButtons();
-                }
-            };
+            _editTaggerButton.clicked -= ShowEditTagger;
+            _editTaggerButton.clicked += ShowEditTagger;
 
 
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
@@ -107,6 +92,25 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger );
             }
             NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
+        }
+
+        void ShowEditTagger() {
+            _isEditTaggerMode = !_isEditTaggerMode;
+            if ( _isEditTaggerMode ) {
+                _searchField.style.display = DisplayStyle.Flex;
+                _addTagButton.style.display = DisplayStyle.Flex;
+                _addTagTextField.style.display = DisplayStyle.Flex;
+                _searchLabel.style.display = DisplayStyle.Flex;
+                _allTagsBox.style.display = DisplayStyle.Flex;
+                PopulateButtons();
+            } else {
+                _searchField.style.display = DisplayStyle.None;
+                _addTagButton.style.display = DisplayStyle.None;
+                _addTagTextField.style.display = DisplayStyle.None;
+                _searchLabel.style.display = DisplayStyle.None;
+                _allTagsBox.style.display = DisplayStyle.None;
+                PopulateButtons();
+            }
         }
 
         void CreateNewTag() {
@@ -155,6 +159,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             return button;
         }
+        
 
         VisualElement CreateSelectedButton( NeatoTag tag ) {
             var tagButton = _isEditTaggerMode
