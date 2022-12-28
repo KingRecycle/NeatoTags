@@ -19,6 +19,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public List<NeatoTag> GetTags => tags;
 
         void Awake() {
+            // Add this tagger and remove any null tags left behind.
             tags.RemoveAll( nTag => nTag == null );
             _taggers.Add( gameObject, this );
             _nonTaggedObjects.Add( gameObject );
@@ -30,6 +31,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         void OnDestroy() {
+            //Remove this tagger from everything
             foreach ( var neatoTag in tags ) {
                 _taggedObjects[neatoTag].Remove( gameObject );
             }
@@ -180,10 +182,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Remove ALL tags from the tagger.
         /// </summary>
         public void RemoveAllTags() {
-            // for ( var i = tags.Count - 1; i >= 0; i++ ) {
-            //     RemoveTag( tags[i] );
-            // }
-
             foreach ( var neatoTag in tags ) {
                 RemoveTag( neatoTag );
             }
