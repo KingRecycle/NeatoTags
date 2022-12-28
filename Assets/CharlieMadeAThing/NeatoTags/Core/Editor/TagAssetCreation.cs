@@ -84,8 +84,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //Non menu version of NewTag function
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             var allTags = GetAllTags();
-            if ( allTags.Any( x => x.name == tagName ) ) {
-                tagName = tagName + " " + allTags.Count( x => x.name == tagName );
+            var trimmedName = tagName.Trim();
+            if ( allTags.Any( x => x.name.Equals( trimmedName ) ) ) {
+                tagName = tagName + " " + allTags.Count( x => x.name.Equals( tagName )  );
             }
 
             if ( tagName == string.Empty ) {
