@@ -25,7 +25,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static void SelectAllGameObjectsWithTaggerThatHasTag( NeatoTag tag ) {
             Selection.objects = TAGGERS
                 .Where( tagger => tagger.HasTag( tag ) )
-                .Select( tagger => tagger.gameObject )
+                .Select( tagger => tagger.gameObject as Object )
                 .ToArray();
         }
 

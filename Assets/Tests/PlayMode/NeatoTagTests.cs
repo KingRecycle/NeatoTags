@@ -41,13 +41,13 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator IsTagged_DoesCubeHaveTagger_ReturnTrue() {
-            Assert.AreEqual( true, _cube.IsTagged() );
+            Assert.AreEqual( true, _cube.HasTagger() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator IsTagged_DoesPlaneHaveTagger_ReturnFalse() {
-            Assert.AreEqual( false, _plane.IsTagged() );
+            Assert.AreEqual( false, _plane.HasTagger() );
             yield return null;
         }
 

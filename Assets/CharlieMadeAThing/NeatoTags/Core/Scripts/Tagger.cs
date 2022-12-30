@@ -228,7 +228,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
                 _matches = new HashSet<GameObject>();
-                var gameObjectsToFilter = gameObjects == null ? _taggers.Keys : gameObjects.Where( x => x.IsTagged() );
+                var gameObjectsToFilter = gameObjects == null ? _taggers.Keys : gameObjects.Where( x => x.HasTagger() );
                 _matches.UnionWith( gameObjectsToFilter );
             }
 

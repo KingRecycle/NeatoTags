@@ -75,7 +75,7 @@ namespace CharlieMadeAThing.NeatoTags.Demo {
             //GameObjects without a Tagger component are considered to not have any tags (HasTags() returns false) and (!HasTag() returns true)
             //and won't show up in the list of tagged objects.
             //So if you want to be sure you are only checking tagged objects, you can use HasTagger()
-            if ( !potentialSpook.IsTagged() ) return;
+            if ( !potentialSpook.HasTagger() ) return;
 
             //HasTag only cares about the specified tag.
             //In this example the Witch gameobject which has the Witch and Human tag will also return true.
