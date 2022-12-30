@@ -193,8 +193,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
         /// To get result call .IsMatch() or .GetMatches()
         /// </summary>
-        /// <returns>TagFilter for chaining filter functions.</returns>
-        public TagFilter StartFilter() {
+        /// <returns>FilterTags for chaining filter functions.</returns>
+        public TagFilter FilterTags() {
             return new TagFilter( this );
         }
 
@@ -204,8 +204,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
         /// <param name="gameObjects">Optional list of GameObjects</param>
-        /// <returns>TagFilter for chaining filter functions</returns>
-        public static GameObjectFilter Filter( IEnumerable<GameObject> gameObjects ) {
+        /// <returns>FilterTags for chaining filter functions</returns>
+        public static GameObjectFilter FilterGameObjects( IEnumerable<GameObject> gameObjects ) {
             return new GameObjectFilter( gameObjects );
         }
 
@@ -213,15 +213,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Starts a filter for a list of gameobjects.
         /// If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
-        /// <returns>TagFilter for chaining filter functions</returns>
-        public static GameObjectFilter Filter() {
+        /// <returns>FilterTags for chaining filter functions</returns>
+        public static GameObjectFilter FilterGameObjects() {
             return new GameObjectFilter( _taggers.Keys );
         }
         
 
         /// <summary>
         /// GameObjectFilter class for chaining filter functions.
-        /// Don't use directly. Use Tagger.Filter() instead.
+        /// Don't use directly. Use Tagger.FilterGameObjects() instead.
         /// </summary>
         public sealed class GameObjectFilter {
             readonly HashSet<GameObject> _matches;
@@ -274,7 +274,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filter for GameObjects that don't have the tag.
+            /// FilterGameObjects for GameObjects that don't have the tag.
             /// </summary>
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
@@ -302,7 +302,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filter for GameObjects that have any of the tags.
+            /// FilterGameObjects for GameObjects that have any of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
@@ -316,7 +316,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filter for GameObjects that have any of the tags.
+            /// FilterGameObjects for GameObjects that have any of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
@@ -333,8 +333,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// TagFilter class for chaining filter functions.
-        /// Don't use directly. Use StartFilter() instead.
+        /// FilterTags class for chaining filter functions.
+        /// Don't use directly. Use FilterTags() instead.
         /// </summary>
         public class TagFilter {
             readonly Tagger _target;

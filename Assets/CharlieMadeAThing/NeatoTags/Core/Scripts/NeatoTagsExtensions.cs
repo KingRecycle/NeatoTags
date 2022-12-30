@@ -208,11 +208,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Can be null!
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <returns>TagFilter or null</returns>
-        public static Tagger.TagFilter StartTagFilter( this GameObject gameObject ) {
-            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.StartFilter() : null;
+        /// <returns>FilterTags or null</returns>
+        public static Tagger.TagFilter FilterTags( this GameObject gameObject ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
         }
-        
-        
+
     }
 }

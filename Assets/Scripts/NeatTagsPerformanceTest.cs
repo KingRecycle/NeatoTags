@@ -74,7 +74,7 @@ namespace CharlieMadeAThing
             for ( var i = 0; i < iterations; i++ ) {
                 timer.Reset();
                 timer.Start();
-                var justHumans = Tagger.Filter().WithTag( humanTag );
+                var justHumans = Tagger.FilterGameObjects().WithTag( humanTag );
 
                 //var justHumans = Tagger.IncludesAllTags( Tagger.GetAllGameObjectsWithTagger(), humanTag );
                 timer.Stop();
@@ -92,7 +92,7 @@ namespace CharlieMadeAThing
             for ( var i = 0; i < iterations; i++ ) {
                 timer.Reset();
                 timer.Start();
-                var justHumans = Tagger.Filter().WithTags( humanTag ).GetMatches();
+                var justHumans = Tagger.FilterGameObjects().WithTags( humanTag ).GetMatches();
                 timer.Stop();
                 if ( timer.Elapsed < _leastTime ) _leastTime = timer.Elapsed;
                 if ( timer.Elapsed > _mostTime ) _mostTime = timer.Elapsed;

@@ -300,64 +300,64 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         #endregion
 
-        #region StartTagFilter Tests
+        #region FilterTags Tests
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithTagCube_ReturnTrue() {
-            Assert.AreEqual( true, _cube.StartTagFilter().WithTag( _tagRefsForTests.cubeTag ).IsMatch() );
+            Assert.AreEqual( true, _cube.FilterTags().WithTag( _tagRefsForTests.cubeTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithTagSphere_ReturnFalse() {
-            Assert.AreEqual( false, _cube.StartTagFilter().WithTag( _tagRefsForTests.sphereTag ).IsMatch() );
+            Assert.AreEqual( false, _cube.FilterTags().WithTag( _tagRefsForTests.sphereTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithTagsListed_CubePlatonic_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).IsMatch() );
+                _cube.FilterTags().WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithTagsListed_CubeSphere_ReturnFalse() {
             Assert.AreEqual( false,
-                _cube.StartTagFilter().WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).IsMatch() );
+                _cube.FilterTags().WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagCube_ReturnFalse() {
-            Assert.AreEqual( false, _cube.StartTagFilter().WithoutTag( _tagRefsForTests.cubeTag ).IsMatch() );
+            Assert.AreEqual( false, _cube.FilterTags().WithoutTag( _tagRefsForTests.cubeTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagSphere_ReturnTrue() {
-            Assert.AreEqual( true, _cube.StartTagFilter().WithoutTag( _tagRefsForTests.sphereTag ).IsMatch() );
+            Assert.AreEqual( true, _cube.FilterTags().WithoutTag( _tagRefsForTests.sphereTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagsListed_CubePlatonic_ReturnFalse() {
             Assert.AreEqual( false,
-                _cube.StartTagFilter().WithoutTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).IsMatch() );
+                _cube.FilterTags().WithoutTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagsListed_SpherePlane_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithoutTags( _tagRefsForTests.sphereTag, _tagRefsForTests.planeTag ).IsMatch() );
+                _cube.FilterTags().WithoutTags( _tagRefsForTests.sphereTag, _tagRefsForTests.planeTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithAnyTagsListed_CubePlatonicPlane_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithAnyTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag,
+                _cube.FilterTags().WithAnyTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag,
                     _tagRefsForTests.planeTag ).IsMatch() );
             yield return null;
         }
@@ -365,7 +365,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_WithTagCube_WithTagPlatonic_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithTag( _tagRefsForTests.cubeTag ).WithTag( _tagRefsForTests.platonicTag )
+                _cube.FilterTags().WithTag( _tagRefsForTests.cubeTag ).WithTag( _tagRefsForTests.platonicTag )
                     .IsMatch() );
             yield return null;
         }
@@ -373,7 +373,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithTagCube_WithTagSphere_ReturnFalse() {
             Assert.AreEqual( false,
-                _cube.StartTagFilter().WithTag( _tagRefsForTests.cubeTag ).WithTag( _tagRefsForTests.sphereTag )
+                _cube.FilterTags().WithTag( _tagRefsForTests.cubeTag ).WithTag( _tagRefsForTests.sphereTag )
                     .IsMatch() );
             yield return null;
         }
@@ -381,7 +381,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_Capsule_WithTagCornerless_WithTagSphere_ReturnFalse() {
             Assert.AreEqual( false,
-                _capsule.StartTagFilter().WithTag( _tagRefsForTests.cornerlessTag ).WithTag( _tagRefsForTests.sphereTag )
+                _capsule.FilterTags().WithTag( _tagRefsForTests.cornerlessTag ).WithTag( _tagRefsForTests.sphereTag )
                     .IsMatch() );
             yield return null;
         }
@@ -389,7 +389,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_Sphere_WithTagCornerless_WithoutTagCapsule_ReturnFalse() {
             Assert.AreEqual( false,
-                _sphere.StartTagFilter().WithTag( _tagRefsForTests.cornerlessTag ).WithTag( _tagRefsForTests.capsuleTag )
+                _sphere.FilterTags().WithTag( _tagRefsForTests.cornerlessTag ).WithTag( _tagRefsForTests.capsuleTag )
                     .IsMatch() );
             yield return null;
         }
@@ -397,7 +397,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagsCornerlessAndSphere_ReturnFalse() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithoutTags( _tagRefsForTests.cornerlessTag, _tagRefsForTests.sphereTag )
+                _cube.FilterTags().WithoutTags( _tagRefsForTests.cornerlessTag, _tagRefsForTests.sphereTag )
                     .IsMatch() );
             yield return null;
         }
@@ -405,14 +405,14 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithoutTagsCapsuleAndSphere_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithoutTags( _tagRefsForTests.capsuleTag, _tagRefsForTests.sphereTag ).IsMatch() );
+                _cube.FilterTags().WithoutTags( _tagRefsForTests.capsuleTag, _tagRefsForTests.sphereTag ).IsMatch() );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartTagFilter_Cube_WithAnyTagsPlatonicPlaneSphere_ReturnTrue() {
             Assert.AreEqual( true,
-                _cube.StartTagFilter().WithAnyTags( _tagRefsForTests.platonicTag, _tagRefsForTests.planeTag,
+                _cube.FilterTags().WithAnyTags( _tagRefsForTests.platonicTag, _tagRefsForTests.planeTag,
                     _tagRefsForTests.sphereTag ).IsMatch() );
             yield return null;
         }
@@ -424,7 +424,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_PassInUninitializedList_ReturnsNothing() {
             var filteredShapes =
-                Tagger.Filter( _uninitializedList ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                Tagger.FilterGameObjects( _uninitializedList ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
@@ -432,14 +432,14 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_GetMatchesNoFilter_ReturnsNoShapes() {
             var filteredShapes =
-                Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTagCube_ReturnsOneCube() {
-            var filteredShapes = Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.cubeTag ).GetMatches();
+            var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag ).GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
             filteredShapes.TryGetValue( _cube, out var cubeShape );
             Assert.AreEqual( _cube, cubeShape );
@@ -449,7 +449,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTagPlane_ReturnsZeroShapes() {
             var filteredShapes =
-                Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
@@ -457,7 +457,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTagCornerless_ReturnsTwoShapes_SphereCapsule() {
             var filteredShapes =
-                Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).GetMatches();
+                Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).GetMatches();
             Assert.AreEqual( 2, filteredShapes.Count );
             if ( filteredShapes.Contains( _plane ) || filteredShapes.Contains( _cube ) ||
                  filteredShapes.Contains( _cylinder ) ) {
@@ -471,7 +471,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTags_CubePlatonic_ReturnsOneCube() {
-            var filteredShapes = Tagger.Filter( _shapes )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
             filteredShapes.TryGetValue( _cube, out var cubeShape );
@@ -481,7 +481,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTags_CubeSphere_ReturnsZeroShapes() {
-            var filteredShapes = Tagger.Filter( _shapes )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
@@ -490,7 +490,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithoutTagCube_ReturnsFourShapesNoCube() {
-            var filteredShapes = Tagger.Filter( _shapes ).WithoutTag( _tagRefsForTests.cubeTag )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.cubeTag )
                 .GetMatches();
             Assert.AreEqual( 4, filteredShapes.Count,
                 $"Cube should not be in the list of shapes. {string.Join( ", ", filteredShapes.Select( x => x.name ) )}" );
@@ -506,7 +506,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithoutTagPlane_ReturnsFiveShapes() {
-            var filteredShapes = Tagger.Filter( _shapes ).WithoutTag( _tagRefsForTests.planeTag )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.planeTag )
                 .GetMatches();
             Assert.AreEqual( 5, filteredShapes.Count );
             yield return null;
@@ -514,7 +514,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithoutTags_CubeSphere_ReturnsThreeShapesNoCubeOrSphere() {
-            var filteredShapes = Tagger.Filter( _shapes )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithoutTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
             Assert.AreEqual( 3, filteredShapes.Count );
             if ( filteredShapes.Contains( _cube ) ) {
@@ -531,7 +531,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator
             StartGameObjectFilter_WithAnyTags_CubeSphereCapsule_ReturnsThreeShapes_ReturnOnlyCubeSphereCapsule() {
-            var filteredShapes = Tagger.Filter( _shapes ).WithAnyTags( _tagRefsForTests.cubeTag,
+            var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithAnyTags( _tagRefsForTests.cubeTag,
                     _tagRefsForTests.sphereTag, _tagRefsForTests.capsuleTag )
                 .GetMatches();
             Assert.AreEqual( 3, filteredShapes.Count );
@@ -547,7 +547,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator
             StartGameObjectFilter_WithAnyTags_PlatonicPlane_ReturnsOneShape_ReturnOnlyCube() {
-            var filteredShapes = Tagger.Filter( _shapes )
+            var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithAnyTags( _tagRefsForTests.platonicTag, _tagRefsForTests.planeTag )
                 .GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
@@ -564,7 +564,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTagCornerless_WithoutTagSphere_ReturnOneShapeCapsule() {
             var filteredShapes =
-                Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).WithoutTag( _tagRefsForTests.sphereTag )
+                Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).WithoutTag( _tagRefsForTests.sphereTag )
                     .GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
             if ( filteredShapes.Contains( _plane ) || filteredShapes.Contains( _cube ) ||
@@ -580,7 +580,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator StartGameObjectFilter_WithTagCube_WithoutTagPlatonic_ReturnZeroShapes() {
             var filteredShapes =
-                Tagger.Filter( _shapes ).WithTag( _tagRefsForTests.cubeTag ).WithoutTag( _tagRefsForTests.platonicTag )
+                Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag ).WithoutTag( _tagRefsForTests.platonicTag )
                     .GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
 
