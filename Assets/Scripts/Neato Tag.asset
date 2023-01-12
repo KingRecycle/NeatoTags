@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c86a4dafb043439ca6a8a4a4680916, type: 3}
   m_Name: Neato Tag
   m_EditorClassIdentifier: 
-  color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  comment: 
+  color: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+  comment: Neato Tag!

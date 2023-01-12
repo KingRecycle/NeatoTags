@@ -114,6 +114,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void CreateNewTag() {
+            Undo.RecordObject( _tagger, "Create New Tag" );
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
             if ( targets.Length > 1 ) {
                 foreach ( var targetObject in targets ) {
