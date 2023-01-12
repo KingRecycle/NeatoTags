@@ -208,7 +208,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static void DoRename() {
             var newName = _renameField.text.Trim();
             if ( !CanRenameTag( newName ) ) return;
-            //Undo.RecordObject( _selectedTag, $"Rename Tag {_selectedTag.name} to {newName}" );
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
             PopulateAllTagsBox();
@@ -328,7 +327,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         static void UpdateTagColor( ChangeEvent<Color> evt ) {
-            //Undo.RecordObject( _selectedTag, "Change Tag Color" );
             _selectedTag.FindProperty("color").colorValue = evt.newValue;
             _selectedTagButton.style.backgroundColor = _selectedTag.FindProperty("color").colorValue;
             _selectedTagButton.style.color =
@@ -344,7 +342,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         static void UpdateTagComment( ChangeEvent<string> evt ) {
-            //Undo.RecordObject( _selectedTag, "Change Tag Comment" );
             _selectedTag.FindProperty("comment").stringValue = evt.newValue;
             PopulateAllTagsBox();
             _selectedTag.ApplyModifiedProperties();
