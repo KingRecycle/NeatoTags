@@ -334,5 +334,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public static float GetColorLuminosity( Color color ) {
             return ( 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b ) * 100f;
         }
+        
+        public static Color GetTextColorBasedOnBackground( Color backgroundColor ) {
+            var luminosity = GetColorLuminosity( backgroundColor );
+            return luminosity > 70 ? Color.black : Color.white;
+        }
     }
 }

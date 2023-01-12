@@ -79,9 +79,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void UpdateTagIconVisual( ChangeEvent<Color> evt ) {
             PropertyColor.colorValue = evt.newValue;
             _button.style.backgroundColor = PropertyColor.colorValue;
-            _button.style.color = TaggerDrawer.GetColorLuminosity( PropertyColor.colorValue ) > 70
-                ? Color.black
-                : Color.white;
+            _button.style.color = TaggerDrawer.GetTextColorBasedOnBackground( PropertyColor.colorValue );
             foreach ( var taggerDrawer in TAGGER_DRAWERS ) {
                 taggerDrawer.PopulateButtons();
             }
