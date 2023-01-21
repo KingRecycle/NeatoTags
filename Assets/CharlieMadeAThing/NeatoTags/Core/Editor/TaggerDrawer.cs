@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -24,7 +25,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         Label _searchLabel;
 
         //Tagger (not the drawer)
-        Tagger _tagger;
+        SerializedObject _tagger;
         ToolbarSearchField _taggerSearchAvailable;
         GroupBox _tagViewerDeselected;
         GroupBox _tagViewerSelected;
@@ -84,12 +85,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
 
-            _tagger = (Tagger) target;
+            _tagger = new SerializedObject( target );
         }
 
         void OnDisable() {
             if ( target == null ) {
-                NeatoTagTaggerTracker.UnregisterTagger( _tagger );
+                NeatoTagTaggerTracker.UnregisterTagger( _tagger.targetObject as Tagger );
             }
             NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
         }
@@ -114,7 +115,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void CreateNewTag() {
-            Undo.RecordObject( _tagger, "Create New Tag" );
+            Undo.RecordObject( serializedObject.targetObject, "Create New Tag" );
             var tag = TagAssetCreation.CreateNewTag( _addTagTextField.value, false );
             if ( targets.Length > 1 ) {
                 foreach ( var targetObject in targets ) {
@@ -125,6 +126,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 ( (Tagger) target ).AddTag( tag );
             }
 
+            UpdatePrefab();
             PopulateButtons();
         }
 
@@ -156,6 +158,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 } else {
                     PopulateButtons();
                 }
+                UpdatePrefab();
             };
 
             return button;
@@ -198,6 +201,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                             PopulateButtons();
                         }
                     }
+                    UpdatePrefab();
                 };
 
                 removeButton.clicked += () => {
@@ -218,6 +222,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     } else {
                         PopulateButtons();
                     }
+                    UpdatePrefab();
                 };
             }
 
@@ -329,6 +334,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     }
                 }
             }
+        }
+        
+        void UpdatePrefab()
+        {
+            EditorUtility.SetDirty(target);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
 
         public static float GetColorLuminosity( Color color ) {

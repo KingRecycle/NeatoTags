@@ -15,7 +15,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         VisualTreeAsset _tagButtonTemplate;
 
         
-#if  UNITY_2022_2_OR_NEWER
+#if  UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR
         
         public override VisualElement CreatePropertyGUI( SerializedProperty property ) {
             _root = new VisualElement {
