@@ -7,6 +7,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// </summary>
     public class EditorDataHolder : ScriptableObject {
         [ReadOnly] public string tagFolderLocation;
+        [Range( 1, 100 )] public int LuminosityThreshold = 70;
     }
 
 

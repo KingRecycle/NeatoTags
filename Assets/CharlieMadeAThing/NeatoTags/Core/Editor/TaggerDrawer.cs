@@ -348,7 +348,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         
         public static Color GetTextColorBasedOnBackground( Color backgroundColor ) {
             var luminosity = GetColorLuminosity( backgroundColor );
-            return luminosity > 70 ? Color.black : Color.white;
+            var dataContainer = TagAssetCreation.GetEditorDataContainer();
+            var threshold = 70;
+            if ( dataContainer ) {
+                threshold = dataContainer.LuminosityThreshold;
+            }
+            
+            return luminosity > threshold ? Color.black : Color.white;
         }
         
         public static Color GetTextColorBasedOnBackground( Color backgroundColor, float threshold ) {

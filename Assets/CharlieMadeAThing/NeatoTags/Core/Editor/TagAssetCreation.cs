@@ -62,7 +62,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return dataHolder == null ? "" : dataHolder.tagFolderLocation;
         }
 
-        static EditorDataHolder GetEditorDataContainer() {
+        public static EditorDataHolder GetEditorDataContainer() {
             var holdersGuids = AssetDatabase.FindAssets( "EditorDataContainer" );
 
             switch ( holdersGuids.Length ) {
@@ -85,12 +85,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             var allTags = GetAllTags();
             var trimmedName = tagName.Trim();
-            if ( allTags.Any( x => x.name.Equals( trimmedName ) ) ) {
-                tagName = tagName + " " + allTags.Count( x => x.name.Equals( tagName )  );
-            }
-
             if ( tagName == string.Empty ) {
                 tagName = "New Tag";
+            }
+            var counter = 0;
+            while ( CheckIfTagNameExist( tagName ) ) {
+                counter++;
+                tagName = $"{trimmedName} {counter}";
+                if ( counter <= 100 ) continue;
+                Debug.LogError( "[TagAssetCreation]: Could not create tag. Too many tags with the same name." );
+                return null;
             }
 
             NeatoTag newTag = null;
@@ -122,6 +126,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             return newTag;
+        }
+
+        static bool CheckIfTagNameExist( string name ) {
+            return GetAllTags().Any( x => x.name.Equals( name ) );
         }
 
         //Try and get the folder path that is selected.

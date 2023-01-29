@@ -11,6 +11,7 @@ TagManager:
   - TagRef
   - Plane
   - Quad
+  - Human
   layers:
   - Default
   - TransparentFX

@@ -223,6 +223,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _renameButton.style.visibility = Visibility.Hidden;
             _selectedTagButton.style.visibility = Visibility.Hidden;
             _deleteTagButton.style.visibility = Visibility.Hidden;
+            _selectAllButton.style.visibility = Visibility.Hidden;
         }
         
         //NOTE: Don't forget to unsubscribe from events before subscribing to them again.
