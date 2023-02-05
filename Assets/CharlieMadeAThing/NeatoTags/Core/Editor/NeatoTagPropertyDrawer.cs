@@ -15,7 +15,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         VisualTreeAsset _tagButtonTemplate;
 
         
-#if  UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR
+#if  UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR 
         
         public override VisualElement CreatePropertyGUI( SerializedProperty property ) {
             _root = new VisualElement {
@@ -30,7 +30,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     flexDirection = FlexDirection.Row,
                     overflow = Overflow.Hidden,
                     flexGrow = 1,
-                    maxWidth = Length.Percent( 50 )
+                    maxWidth = Length.Percent( 50 ),
+                    justifyContent = Justify.FlexEnd
                 }
             };
 
@@ -43,8 +44,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 label = string.Empty,
                 style = {
                     flexGrow = 1,
-                    alignSelf = Align.FlexStart,
+                    alignSelf = Align.FlexEnd,
                     alignContent = Align.Auto,
+                    maxWidth = Length.Percent( 65 ),
+                    justifyContent = Justify.FlexEnd
                 }
             };
             _propertyField.RegisterValueChangeCallback( UpdateTagDisplay );
@@ -54,7 +57,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 style = {
                     paddingBottom = 0,
                     paddingTop = 0,
-                    marginRight = 20,
+                    marginRight = 0,
                     justifyContent = Justify.FlexEnd,
                     flexGrow = 0,
                     maxWidth = Length.Percent( 50 )
