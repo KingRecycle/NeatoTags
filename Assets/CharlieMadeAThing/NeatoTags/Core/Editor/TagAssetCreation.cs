@@ -83,7 +83,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Non menu version of NewTag function
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
-            var allTags = GetAllTags();
             var trimmedName = tagName.Trim();
             if ( tagName == string.Empty ) {
                 tagName = "New Tag";

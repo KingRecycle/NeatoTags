@@ -3,7 +3,8 @@ using UnityEditor;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
-    /// Keeps track of editor scripts (drawer scripts) which allows updating Tagger inspectors when tags are added/removed from the project.
+    ///     Keeps track of editor scripts (drawer scripts) which allows updating Tagger inspectors when tags are added/removed
+    ///     from the project.
     /// </summary>
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
@@ -39,7 +40,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             TAGGER_DRAWERS.Add( taggerDrawer );
         }
-        
+
         public static void UnregisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
             TAGGER_DRAWERS.Remove( taggerDrawer );
         }
@@ -52,7 +53,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             NEATO_TAG_DRAWERS.Add( neatoTagDrawer );
         }
-        
+
         public static void UnregisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
             NEATO_TAG_DRAWERS.Remove( neatoTagDrawer );
         }

@@ -6,9 +6,10 @@ using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
-    /// The drawer for tags. This is mainly used when a tag is clicked in the project or when displaying a tag in the tag manager.
+    ///     The drawer for tags. This is mainly used when a tag is clicked in the project or when displaying a tag in the tag
+    ///     manager.
     /// </summary>
-    [CustomEditor( typeof( NeatoTag ) )]
+    [CustomEditor( typeof(NeatoTag) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
         Button _button;
@@ -26,11 +27,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void OnEnable() {
             _root = new VisualElement();
-            
+
             var visualTree =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml );
             visualTree.CloneTree( _root );
-            
+
             _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
@@ -92,6 +93,5 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             TAGGER_DRAWERS.Add( taggerDrawer );
         }
-        
     }
 }

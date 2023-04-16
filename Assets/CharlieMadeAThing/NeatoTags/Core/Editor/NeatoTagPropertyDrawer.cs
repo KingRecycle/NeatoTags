@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomPropertyDrawer( typeof( NeatoTag ) )]
+    [CustomPropertyDrawer( typeof(NeatoTag) )]
     public class NeatoTagPropertyDrawer : PropertyDrawer {
         static Texture2D _buttonTexture;
         Label _label;
@@ -14,15 +14,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         VisualElement _labelButtonContainer;
         VisualTreeAsset _tagButtonTemplate;
 
-        
-#if  UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR 
-        
+
+#if UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR
+
         public override VisualElement CreatePropertyGUI( SerializedProperty property ) {
             _root = new VisualElement {
                 style = {
                     flexDirection = FlexDirection.Row,
-                    justifyContent = Justify.SpaceBetween
-                }
+                    justifyContent = Justify.SpaceBetween,
+                },
             };
 
             _labelButtonContainer = new VisualElement {
@@ -31,8 +31,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     overflow = Overflow.Hidden,
                     flexGrow = 1,
                     maxWidth = Length.Percent( 50 ),
-                    justifyContent = Justify.FlexEnd
-                }
+                    justifyContent = Justify.FlexEnd,
+                },
             };
 
 
@@ -47,11 +47,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     alignSelf = Align.FlexEnd,
                     alignContent = Align.Auto,
                     maxWidth = Length.Percent( 65 ),
-                    justifyContent = Justify.FlexEnd
-                }
+                    justifyContent = Justify.FlexEnd,
+                },
             };
             _propertyField.RegisterValueChangeCallback( UpdateTagDisplay );
-            
+
 
             _label = new Label( property.displayName ) {
                 style = {
@@ -60,30 +60,32 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     marginRight = 0,
                     justifyContent = Justify.FlexEnd,
                     flexGrow = 0,
-                    maxWidth = Length.Percent( 50 )
-                }
+                    maxWidth = Length.Percent( 50 ),
+                },
             };
 
-            
+
             _root.Add( _label );
-            
+
             _labelButtonContainer.Add( _propertyField );
-            _root.Add(_labelButtonContainer);
+            _root.Add( _labelButtonContainer );
             return _root;
         }
 
         void UpdateTagDisplay( SerializedPropertyChangeEvent evt ) {
             var tag = evt.changedProperty.objectReferenceValue as NeatoTag;
-            if( _labelButtonContainer.Contains( _tagButton ) ) {
+            if ( _labelButtonContainer.Contains( _tagButton ) ) {
                 _labelButtonContainer.Remove( _tagButton );
             }
+
             _tagButton = _tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag == null ) {
                 _tagButton.style.display = DisplayStyle.None;
                 _label.style.display = DisplayStyle.Flex;
-            } else {
+            }
+            else {
                 //_labelButtonContainer.Add( _tagButton );
-                _labelButtonContainer.Insert(0, _tagButton);
+                _labelButtonContainer.Insert( 0, _tagButton );
                 _tagButton.tooltip = tag.Comment;
                 _tagButton.text = tag.name;
                 _tagButton.style.backgroundColor = tag.Color;
@@ -102,10 +104,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             evt.changedProperty.serializedObject.ApplyModifiedProperties();
         }
-        
+
 #else
     public override void OnGUI( Rect position, SerializedProperty property, GUIContent label ) {
-            
             // Using BeginProperty / EndProperty on the parent property means that
             // prefab override logic works on the entire property.
             EditorGUI.BeginProperty( position, label, property );

@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
-    [CustomEditor( typeof( Tagger ) )]
-    [CanEditMultipleObjects]
+    [CustomEditor( typeof(Tagger) ), CanEditMultipleObjects]
     public class TaggerDrawer : UnityEditor.Editor {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualTreeAsset _tagButtonWithXTemplate;
@@ -49,12 +47,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _searchField = _root.Q<ToolbarSearchField>( "taggerSearch" );
             _searchField.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
-            _searchField.tooltip = $"Search through tags currently tagged to {target.name}. Use ^ at the beginning to search for exact matches.";
+            _searchField.tooltip =
+                $"Search through tags currently tagged to {target.name}. Use ^ at the beginning to search for exact matches.";
             _searchLabel = _root.Q<Label>( "searchLabel" );
 
             _taggerSearchAvailable = _root.Q<ToolbarSearchField>( "taggerSearchAvailable" );
             _taggerSearchAvailable.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
-            _taggerSearchAvailable.tooltip = $"Search through tags currently available to add to {target.name}. Use ^ at the beginning to search for exact matches.";
+            _taggerSearchAvailable.tooltip =
+                $"Search through tags currently available to add to {target.name}. Use ^ at the beginning to search for exact matches.";
 
             _addTagButton = _root.Q<Button>( "addTagButton" );
             _addTagButton.tooltip = $"Create a new tag and add it to {target.name}";
@@ -62,8 +62,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _addTagButton.clicked += CreateNewTag;
             _addTagTextField = _root.Q<TextField>( "addTagTextField" );
             _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
-                if ( evt.keyCode == KeyCode.Return )
+                if ( evt.keyCode == KeyCode.Return ) {
                     CreateNewTag();
+                }
             } );
 
             _allTagsBox = _root.Q<GroupBox>( "allTagsBox" );
@@ -92,6 +93,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( target == null ) {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger.targetObject as Tagger );
             }
+
             NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
         }
 
@@ -104,7 +106,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 _searchLabel.style.display = DisplayStyle.Flex;
                 _allTagsBox.style.display = DisplayStyle.Flex;
                 PopulateButtons();
-            } else {
+            }
+            else {
                 _searchField.style.display = DisplayStyle.None;
                 _addTagButton.style.display = DisplayStyle.None;
                 _addTagTextField.style.display = DisplayStyle.None;
@@ -120,10 +123,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( targets.Length > 1 ) {
                 foreach ( var targetObject in targets ) {
                     var tagger = targetObject as Tagger;
-                    if ( tagger != null ) tagger.AddTag( tag );
+                    if ( tagger != null ) {
+                        tagger.AddTag( tag );
+                    }
                 }
-            } else {
-                ( (Tagger) target ).AddTag( tag );
+            }
+            else {
+                ( (Tagger)target ).AddTag( tag );
             }
 
             UpdatePrefab();
@@ -147,23 +153,25 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 Undo.RecordObject( target as Tagger, $"Added Tag: {tag.name}" );
                 if ( targets.Length > 1 ) {
                     foreach ( var obj in targets ) {
-                        ( (Tagger) obj ).AddTag( tag );
+                        ( (Tagger)obj ).AddTag( tag );
                     }
-                } else {
-                    ( (Tagger) target ).AddTag( tag );
+                }
+                else {
+                    ( (Tagger)target ).AddTag( tag );
                 }
 
                 if ( _taggerSearchAvailable.value != string.Empty ) {
                     PopulateButtonsWithSearch();
-                } else {
+                }
+                else {
                     PopulateButtons();
                 }
+
                 UpdatePrefab();
             };
 
             return button;
         }
-        
 
         VisualElement CreateSelectedButton( NeatoTag tag ) {
             var tagButton = _isEditTaggerMode
@@ -179,13 +187,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     StyleButton( button, tag );
                     button.clicked += () => { NeatoTagManager.ShowWindow( tag ); };
                 }
-            } else {
+            }
+            else {
                 var button = tagButton.Q<Button>( "tagButton" );
                 var removeButton = tagButton.Q<Button>( "removeTagButton" );
                 removeButton.tooltip = $"Remove {tag.name} tag from {target.name}";
                 if ( targets.Length > 1 ) {
                     tagButton.tooltip = $"Click to add {tag.name} tag to all selected gameobjects.";
-                } else {
+                }
+                else {
                     if ( tag.Comment != string.Empty ) {
                         tagButton.tooltip = tag.Comment;
                     }
@@ -197,31 +207,39 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                         GiveAllSelectedTag( tag );
                         if ( _searchField.value != string.Empty ) {
                             PopulateButtonsWithSearch();
-                        } else {
+                        }
+                        else {
                             PopulateButtons();
                         }
                     }
+
                     UpdatePrefab();
                 };
 
                 removeButton.clicked += () => {
-                    if ( !_isEditTaggerMode ) return;
+                    if ( !_isEditTaggerMode ) {
+                        return;
+                    }
+
                     Undo.RecordObject( target as Tagger, $"Removed Tag: {tag.name}" );
 
                     if ( targets.Length > 1 ) {
                         foreach ( var obj in targets ) {
-                            ( (Tagger) obj ).RemoveTag( tag );
+                            ( (Tagger)obj ).RemoveTag( tag );
                         }
-                    } else {
-                        ( (Tagger) target ).RemoveTag( tag );
+                    }
+                    else {
+                        ( (Tagger)target ).RemoveTag( tag );
                     }
 
 
                     if ( _searchField.value != string.Empty ) {
                         PopulateButtonsWithSearch();
-                    } else {
+                    }
+                    else {
                         PopulateButtons();
                     }
+
                     UpdatePrefab();
                 };
             }
@@ -231,7 +249,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void GiveAllSelectedTag( NeatoTag tag ) {
             foreach ( var obj in targets ) {
-                var tagger = (Tagger) obj;
+                var tagger = (Tagger)obj;
                 tagger.AddTag( tag );
             }
         }
@@ -240,7 +258,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( targets.Length > 1 ) {
                 var occurrences = 0;
                 foreach ( var tagger in targets ) {
-                    var otherTagger = (Tagger) tagger;
+                    var otherTagger = (Tagger)tagger;
                     if ( otherTagger.HasTag( tag ) ) {
                         occurrences++;
                     }
@@ -250,13 +268,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     button.text = tag.name;
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
-                } else {
+                }
+                else {
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
                     button.style.unityFontStyleAndWeight = FontStyle.Italic;
                     button.text = tag.name + $"({occurrences})";
                 }
-            } else {
+            }
+            else {
                 button.text = tag.name;
                 button.style.backgroundColor = tag.Color;
                 button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
@@ -267,7 +287,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( targets.Length > 1 ) {
                 var occurrences = 0;
                 foreach ( var tagger in targets ) {
-                    var otherTagger = (Tagger) tagger;
+                    var otherTagger = (Tagger)tagger;
                     if ( otherTagger.HasTag( tag ) ) {
                         occurrences++;
                     }
@@ -278,12 +298,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
                     button.text = tag.name + $"({occurrences})";
-                } else {
+                }
+                else {
                     button.text = tag.name;
                     button.style.backgroundColor = tag.Color;
                     button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
                 }
-            } else {
+            }
+            else {
                 button.text = tag.name;
                 button.style.backgroundColor = tag.Color;
                 button.style.color = GetColorLuminosity( tag.Color ) > 70 ? Color.black : Color.white;
@@ -295,11 +317,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerSelected.Clear();
             var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
 
-            var taggerTarget = (Tagger) target;
+            var taggerTarget = (Tagger)target;
             foreach ( var neatoTagAsset in allTags ) {
                 if ( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
                     _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                } else {
+                }
+                else {
                     _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                 }
             }
@@ -311,41 +334,44 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerSelected.Clear();
 
             var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
-            var taggerTarget = (Tagger) target;
-            
+            var taggerTarget = (Tagger)target;
+
             foreach ( var neatoTagAsset in allTags ) {
                 //Search for already selected tags
-                if( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
+                if ( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
                     if ( !string.IsNullOrWhiteSpace( _searchField.value ) ) {
                         if ( Regex.IsMatch( neatoTagAsset.name, $"{_searchField.value}", RegexOptions.IgnoreCase ) ) {
                             _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
                         }
-                    } else {
+                    }
+                    else {
                         _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
                     }
-                } else {
+                }
+                else {
                     //Search for available tags
                     if ( !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
-                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_taggerSearchAvailable.value}", RegexOptions.IgnoreCase ) ) {
+                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_taggerSearchAvailable.value}",
+                                RegexOptions.IgnoreCase ) ) {
                             _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                         }
-                    } else {
+                    }
+                    else {
                         _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
                     }
                 }
             }
         }
-        
-        void UpdatePrefab()
-        {
-            EditorUtility.SetDirty(target);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+
+        void UpdatePrefab() {
+            EditorUtility.SetDirty( target );
+            PrefabUtility.RecordPrefabInstancePropertyModifications( target );
         }
 
         public static float GetColorLuminosity( Color color ) {
             return ( 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b ) * 100f;
         }
-        
+
         public static Color GetTextColorBasedOnBackground( Color backgroundColor ) {
             var luminosity = GetColorLuminosity( backgroundColor );
             var dataContainer = TagAssetCreation.GetEditorDataContainer();
@@ -353,12 +379,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( dataContainer ) {
                 threshold = dataContainer.LuminosityThreshold;
             }
-            
-            return luminosity > threshold ? Color.black : Color.white;
-        }
-        
-        public static Color GetTextColorBasedOnBackground( Color backgroundColor, float threshold ) {
-            var luminosity = GetColorLuminosity( backgroundColor );
+
             return luminosity > threshold ? Color.black : Color.white;
         }
     }
