@@ -11,6 +11,9 @@
 /[Cc]ache/
 /[Mm]emoryCaptures/
 /[Aa]lphaBuild/
+/[Pp]Project[Ss]ettings/
+/[Uu]ser[Ss]ettings/
+
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
