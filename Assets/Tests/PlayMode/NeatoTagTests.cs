@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
+using Unity.PerformanceTesting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+
 
 namespace CharlieMadeAThing.NeatoTags.Tests {
     public class NeatoTagTests {
@@ -19,6 +22,8 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         TagRefsForTests _tagRefsForTests;
         GameObject[] _uninitializedList;
+
+        int _spawnCount = 5000;
 
         [SetUp]
         public void TestSetup() {
@@ -421,24 +426,43 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         #region StartGameObjectFilter Tests
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_PassInUninitializedList_ReturnsNothing() {
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( _uninitializedList ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _uninitializedList ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_GetMatchesNoFilter_ReturnsNoShapes() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTagCube_ReturnsOneCube() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag ).GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
             filteredShapes.TryGetValue( _cube, out var cubeShape );
@@ -446,16 +470,29 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTagPlane_ReturnsZeroShapes() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.planeTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTagCornerless_ReturnsTwoShapes_SphereCapsule() {
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).GetMatches();
             Assert.AreEqual( 2, filteredShapes.Count );
@@ -469,8 +506,15 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTags_CubePlatonic_ReturnsOneCube() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes )
+                        .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.platonicTag ).GetMatches();
             Assert.AreEqual( 1, filteredShapes.Count );
@@ -479,8 +523,15 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTags_CubeSphere_ReturnsZeroShapes() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes )
+                        .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
@@ -488,8 +539,15 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         }
 
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithoutTagCube_ReturnsFourShapesNoCube() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.cubeTag )
+                        .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.cubeTag )
                 .GetMatches();
             Assert.AreEqual( 4, filteredShapes.Count,
@@ -504,16 +562,30 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithoutTagPlane_ReturnsFiveShapes() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.planeTag )
+                        .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithoutTag( _tagRefsForTests.planeTag )
                 .GetMatches();
             Assert.AreEqual( 5, filteredShapes.Count );
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithoutTags_CubeSphere_ReturnsThreeShapesNoCubeOrSphere() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes )
+                        .WithoutTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithoutTags( _tagRefsForTests.cubeTag, _tagRefsForTests.sphereTag ).GetMatches();
             Assert.AreEqual( 3, filteredShapes.Count );
@@ -528,9 +600,17 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator
             StartGameObjectFilter_WithAnyTags_CubeSphereCapsule_ReturnsThreeShapes_ReturnOnlyCubeSphereCapsule() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithAnyTags( _tagRefsForTests.cubeTag,
+                            _tagRefsForTests.sphereTag, _tagRefsForTests.capsuleTag )
+                        .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes ).WithAnyTags( _tagRefsForTests.cubeTag,
                     _tagRefsForTests.sphereTag, _tagRefsForTests.capsuleTag )
                 .GetMatches();
@@ -544,9 +624,17 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator
             StartGameObjectFilter_WithAnyTags_PlatonicPlane_ReturnsOneShape_ReturnOnlyCube() {
+            Measure.Method( () => {
+                    var filteredShapes = Tagger.FilterGameObjects( _shapes )
+                        .WithAnyTags( _tagRefsForTests.platonicTag, _tagRefsForTests.planeTag )
+                        .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes = Tagger.FilterGameObjects( _shapes )
                 .WithAnyTags( _tagRefsForTests.platonicTag, _tagRefsForTests.planeTag )
                 .GetMatches();
@@ -561,8 +649,17 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTagCornerless_WithoutTagSphere_ReturnOneShapeCapsule() {
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag )
+                            .WithoutTag( _tagRefsForTests.sphereTag )
+                            .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).WithoutTag( _tagRefsForTests.sphereTag )
                     .GetMatches();
@@ -577,13 +674,106 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
-        [UnityTest]
+        [UnityTest, Performance]
         public IEnumerator StartGameObjectFilter_WithTagCube_WithoutTagPlatonic_ReturnZeroShapes() {
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag )
+                            .WithoutTag( _tagRefsForTests.platonicTag )
+                            .GetMatches();
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 9 )
+                .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cubeTag ).WithoutTag( _tagRefsForTests.platonicTag )
                     .GetMatches();
             Assert.AreEqual( 0, filteredShapes.Count );
 
+            yield return null;
+        }
+
+        #endregion
+
+        #region GameObjectFilter BIG Tests
+
+        [UnityTest, Performance]
+        public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_RandomGameObjectsHaveTag() {
+            var newShapes = new List<GameObject>();
+            for ( var i = 0; i < 5000; i++ ) {
+                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
+            }
+
+            foreach ( var shape in newShapes ) {
+                shape.AddComponent<Tagger>().AddTag( _tagRefsForTests.testTags[ Random.Range( 0, _tagRefsForTests.testTags.Length ) ] );
+            }
+            
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
+                } )
+                .SetUp( () => {
+                    
+                })
+                .WarmupCount( 1 )
+                .MeasurementCount( 10 )
+                .GC()
+                .Run();
+            Assert.Pass();
+            yield return null;
+        }
+        
+        [UnityTest, Performance]
+        public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_All5000HaveTag() {
+            var newShapes = new List<GameObject>();
+            for ( var i = 0; i < 5000; i++ ) {
+                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
+            }
+
+            foreach ( var shape in newShapes ) {
+                shape.AddComponent<Tagger>().AddTag( _tagRefsForTests.testTags[0] );
+            }
+            
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
+                } )
+                .SetUp( () => {
+                    
+                })
+                .WarmupCount( 1 )
+                .MeasurementCount( 10 )
+                .GC()
+                .Run();
+            Assert.Pass();
+            yield return null;
+        }
+        
+        [UnityTest, Performance]
+        public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_LookFor1TagOn1GameObjectIn5000() {
+            var newShapes = new List<GameObject>();
+            for ( var i = 0; i < 5000; i++ ) {
+                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
+            }
+
+            for ( var i = 0; i < newShapes.Count; i++ ) {
+                newShapes[i].AddComponent<Tagger>().AddTag( i == newShapes.Count - 1
+                    ? _tagRefsForTests.testTags[0]
+                    : _tagRefsForTests.testTags[Random.Range( 1, _tagRefsForTests.testTags.Length )] );
+            }
+
+            Measure.Method( () => {
+                    var filteredShapes =
+                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
+                } )
+                .SetUp( () => {
+                    
+                })
+                .WarmupCount( 1 )
+                .MeasurementCount( 10 )
+                .GC()
+                .Run();
+            Assert.Pass();
             yield return null;
         }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
     public static class NeatoTagTaggerTracker {
+        #if UNITY_EDITOR
         static readonly HashSet<Tagger> TAGGERS = new();
         
         public static void RegisterTagger( Tagger tagger ) {
@@ -41,5 +42,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             return objectsInScene;
         }
+        
+        #endif
     }
 }

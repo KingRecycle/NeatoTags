@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1957582315987688495}
   m_Layer: 0
   m_Name: TestObject
-  m_TagString: Untagged
+  m_TagString: Neato Tag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45,7 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 501fb58898c061d469e1f038995b8024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tags: []
+  tags:
+  - {fileID: 11400000, guid: aec7d8d781e8b9b4390d59d9f9a02119, type: 2}
 --- !u!1 &5558058233920927412
 GameObject:
   m_ObjectHideFlags: 0
