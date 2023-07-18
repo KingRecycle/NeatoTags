@@ -7,3 +7,7 @@ No need for a singleton Tag Manager or the use of GetComponent! Just need the Ga
 Neato Tags have a color and comment property.
 
 I don't know about you but I'd say that's pretty neat!
+
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/KingRecycle)
+
