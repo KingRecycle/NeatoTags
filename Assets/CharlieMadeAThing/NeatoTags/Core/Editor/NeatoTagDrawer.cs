@@ -11,7 +11,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// </summary>
     [CustomEditor( typeof(NeatoTag) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
-        static readonly List<TaggerDrawer> TAGGER_DRAWERS = new();
+        static readonly List<TaggerDrawer> TaggerDrawers = new();
         Button _button;
         ColorField _colorField;
         TextField _commentField;
@@ -81,17 +81,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             PropertyColor.colorValue = evt.newValue;
             _button.style.backgroundColor = PropertyColor.colorValue;
             _button.style.color = TaggerDrawer.GetTextColorBasedOnBackground( PropertyColor.colorValue );
-            foreach ( var taggerDrawer in TAGGER_DRAWERS ) {
+            foreach ( var taggerDrawer in TaggerDrawers ) {
                 taggerDrawer.PopulateButtons();
             }
         }
 
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
-            if ( TAGGER_DRAWERS.Contains( taggerDrawer ) ) {
+            if ( TaggerDrawers.Contains( taggerDrawer ) ) {
                 return;
             }
 
-            TAGGER_DRAWERS.Add( taggerDrawer );
+            TaggerDrawers.Add( taggerDrawer );
         }
     }
 }

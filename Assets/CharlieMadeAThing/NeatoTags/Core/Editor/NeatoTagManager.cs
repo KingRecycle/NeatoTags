@@ -17,7 +17,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualElement _root;
 
-        static readonly Dictionary<Button, Action> BUTTON_ACTION_MAP = new();
+        static readonly Dictionary<Button, Action> ButtonActionMap = new();
         static GroupBox _allTagsBox;
         static ToolbarSearchField _tagSearchField;
 
@@ -163,7 +163,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static void PopulateAllTagsBox() {
             _allTagsBox.Clear();
-            BUTTON_ACTION_MAP.Clear();
+            ButtonActionMap.Clear();
 
             var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
 
@@ -183,12 +183,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             button.style.backgroundColor = tag.Color;
             button.style.color = TaggerDrawer.GetTextColorBasedOnBackground( button.style.backgroundColor.value );
 
-            BUTTON_ACTION_MAP.Add( button, () => {
+            ButtonActionMap.Add( button, () => {
                 _selectedTag = new SerializedObject( tag );
                 DisplayTag();
             } );
 
-            button.clicked += () => BUTTON_ACTION_MAP[button].Invoke();
+            button.clicked += () => ButtonActionMap[button].Invoke();
             return button;
         }
 
@@ -220,7 +220,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
             PopulateAllTagsBox();
-            BUTTON_ACTION_MAP.First( x => x.Key.text == _selectedTag.targetObject.name ).Value.Invoke();
+            ButtonActionMap.First( x => x.Key.text == _selectedTag.targetObject.name ).Value.Invoke();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
             _selectedTag.ApplyModifiedProperties();
@@ -334,7 +334,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var newTag = TagAssetCreation.CreateNewTag( "New Tag" );
             PopulateAllTagsBox();
             if ( newTag ) {
-                BUTTON_ACTION_MAP.First( x => x.Key.text == newTag.name ).Value.Invoke();
+                ButtonActionMap.First( x => x.Key.text == newTag.name ).Value.Invoke();
             }
         }
 

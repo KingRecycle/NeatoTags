@@ -2,21 +2,29 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-namespace CharlieMadeAThing.NeatoTags.Core {
+namespace CharlieMadeAThing.NeatoTags.Core.Editor {
+    /// <summary>
+    ///     Tracks all <see cref="Tagger" />s in the scene.
+    ///     Allows for selecting all <see cref="Tagger" />s that have a specific <see cref="NeatoTag" />.
+    /// </summary>
     public static class NeatoTagTaggerTracker {
-        #if UNITY_EDITOR
-        static readonly HashSet<Tagger> TAGGERS = new();
-        
+#if UNITY_EDITOR
+        static readonly HashSet<Tagger> Taggers = new();
+
         public static void RegisterTagger( Tagger tagger ) {
-            TAGGERS.Add( tagger );
+            CleanUpNulls();
+            Taggers.Add( tagger );
         }
 
         public static void UnregisterTagger( Tagger tagger ) {
-            TAGGERS.Remove( tagger );
+            CleanUpNulls();
+            Taggers.Remove( tagger );
         }
 
         public static void RegisterTaggersInScene() {
+            Taggers.Clear();
             var taggers = GetAllObjectsOnlyInScene();
             foreach ( var tagger in taggers ) {
                 RegisterTagger( tagger );
@@ -24,25 +32,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         public static void SelectAllGameObjectsWithTaggerThatHasTag( NeatoTag tag ) {
-            Selection.objects = TAGGERS
+            Selection.objects = Taggers
                 .Where( tagger => tagger.HasTag( tag ) )
                 .Select( tagger => tagger.gameObject as Object )
                 .ToArray();
         }
 
-        static List<Tagger> GetAllObjectsOnlyInScene()
-        {
-            var objectsInScene = new List<Tagger>();
-
-            foreach (var tagger in (Tagger[]) Resources.FindObjectsOfTypeAll(typeof(Tagger)))
-            {
-                if (!EditorUtility.IsPersistent(tagger.transform.root.gameObject) && tagger.hideFlags is not (HideFlags.NotEditable or HideFlags.HideAndDontSave))
-                    objectsInScene.Add(tagger);
-            }
-
-            return objectsInScene;
+        static void CleanUpNulls() {
+            Taggers.RemoveWhere( tagger => tagger == null );
         }
-        
-        #endif
+
+        static IEnumerable<Tagger> GetAllObjectsOnlyInScene() {
+            var rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+
+            return rootObjects.SelectMany( rootObject => rootObject.GetComponentsInChildren<Tagger>() );
+        }
+
+#endif
     }
 }

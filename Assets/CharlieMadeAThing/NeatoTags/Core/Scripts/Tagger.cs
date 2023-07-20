@@ -1,21 +1,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CharlieMadeAThing.NeatoTags.Core.Editor;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
     /// <summary>
-    /// Stores and tracks attached gameobject and its tags.
-    /// Also tracks all tagged gameobjects in the scene using static variables.
-    /// Provides methods for querying the gameobject tags.
+    ///     Stores and tracks attached gameobject and its tags.
+    ///     Also tracks all tagged gameobjects in the scene using static variables.
+    ///     Provides methods for querying the gameobject tags.
     /// </summary>
     [Serializable]
     public class Tagger : MonoBehaviour {
-        static Dictionary<GameObject, Tagger> _taggers = new(); // All taggers in the scene
-        static Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new(); // All tagged objects in the scene by tag.
-        static HashSet<GameObject> _nonTaggedObjects = new(); // All gameobjects in the scene that have a Tagger component but no tags.
-        
-        [SerializeField] List<NeatoTag> tags = new(); // This tagger's tags for it's gameobject.
+        // All taggers in the scene (@runtime).
+        static Dictionary<GameObject, Tagger> _taggers = new();
+
+        // All tagged objects in the scene by tag (@runtime).
+        static Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new(); 
+
+        // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
+        static HashSet<GameObject> _nonTaggedObjects = new(); 
+
+        //This is a bit of a hacky way to get the inspector to repaint when a tag is added or removed
+        //when the edit tagger button has not been pressed.
+    #if UNITY_EDITOR
+        public delegate void RepaintAction();
+
+        public event RepaintAction WantRepaint;
+    #endif
+
+
+        [SerializeField] List<NeatoTag> tags = new(); // This taggers tags for its gameobject.
         public List<NeatoTag> GetTags => tags;
 
         void Awake() {
@@ -38,11 +53,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             _taggers.Remove( gameObject );
             _nonTaggedObjects.Remove( gameObject );
+
+        #if UNITY_EDITOR
+            NeatoTagTaggerTracker.UnregisterTagger( this );
+        #endif
         }
 
 
         /// <summary>
-        /// All gameobjects in the scene with a tagger component.
+        ///     All gameobjects in the scene with a tagger component.
         /// </summary>
         /// <returns>List of gameobjects in the scene with a tagger component.</returns>
         public static List<GameObject> GetAllGameObjectsWithTagger() {
@@ -51,8 +70,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 
         /// <summary>
-        /// Checks if a gameobject has a Tagger component.
-        /// This checks a dictionary so never calls GetComponent.
+        ///     Checks if a gameobject has a Tagger component.
+        ///     This checks a dictionary so never calls GetComponent.
         /// </summary>
         /// <param name="gameObject">Gameobject to check</param>
         /// <returns>true if Gameobject has a Tagger component, false if not.</returns>
@@ -61,8 +80,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if a gameobject has a Tagger component.
-        /// If true it will out the Tagger component.
+        ///     Checks if a gameobject has a Tagger component.
+        ///     If true it will out the Tagger component.
         /// </summary>
         /// <param name="gameObject">Gameobject to check</param>
         /// <param name="tagger">Gameobject's Tagger component</param>
@@ -72,7 +91,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Gets a Dictionary of all the gameobjects that have a Tagger component.
+        ///     Gets a Dictionary of all the gameobjects that have a Tagger component.
         /// </summary>
         /// <returns>a Dictionary where the keys are Gameobjects and Values are the respective Tagger component.</returns>
         public static Dictionary<GameObject, Tagger> GetGameobjectsWithTagger() {
@@ -80,7 +99,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger has a specific tag.
+        ///     Checks if Tagger has a specific tag.
         /// </summary>
         /// <param name="neatoTag">The tag to check for</param>
         /// <returns>True if Tagger has the tag, otherwise false.</returns>
@@ -89,7 +108,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger has a specific tag by tag name.
+        ///     Checks if Tagger has a specific tag by tag name.
         /// </summary>
         /// <param name="neatoTag">The tag name to check for</param>
         /// <returns>True if Tagger has the tag, otherwise false.</returns>
@@ -98,7 +117,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger has any of the tags in the list.
+        ///     Checks if Tagger has any of the tags in the list.
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>True if Tagger has any of the tags, otherwise false.</returns>
@@ -107,7 +126,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger has any of the tags in the list by name.
+        ///     Checks if Tagger has any of the tags in the list by name.
         /// </summary>
         /// <param name="tagList">IEnumerable of tag names</param>
         /// <returns>True if Tagger has any of the tags, otherwise false.</returns>
@@ -116,7 +135,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if all of the tags in the list are in the Tagger.
+        ///     Checks if all of the tags in the list are in the Tagger.
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>True if Tagger has all of the tags, otherwise false.</returns>
@@ -125,7 +144,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if all of the tags in the list are in the Tagger by name.
+        ///     Checks if all of the tags in the list are in the Tagger by name.
         /// </summary>
         /// <param name="tagList">IEnumerable of tag names</param>
         /// <returns>True if Tagger has all of the tags, otherwise false.</returns>
@@ -134,7 +153,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger doesn't have any of the tags in the list.
+        ///     Checks if Tagger doesn't have any of the tags in the list.
         /// </summary>
         /// <param name="tagList">IEnumerable of tags</param>
         /// <returns>True if Tagger has none of the tags in the list, otherwise false.</returns>
@@ -143,7 +162,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Checks if Tagger doesn't have any of the tags in the list by name.
+        ///     Checks if Tagger doesn't have any of the tags in the list by name.
         /// </summary>
         /// <param name="tagList">IEnumerable of tag names</param>
         /// <returns>True if Tagger has none of the tags in the list, otherwise false.</returns>
@@ -153,7 +172,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 
         /// <summary>
-        /// Add a tag to the tagger.
+        ///     Add a tag to the tagger.
         /// </summary>
         /// <param name="neatoTag">Tag to add.</param>
         public void AddTag( NeatoTag neatoTag ) {
@@ -166,7 +185,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Remove a tag from the tagger.
+        ///     Remove a tag from the tagger.
         /// </summary>
         /// <param name="neatoTag">Tag to remove.</param>
         public void RemoveTag( NeatoTag neatoTag ) {
@@ -179,7 +198,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Remove ALL tags from the tagger.
+        ///     Remove ALL tags from the tagger.
         /// </summary>
         public void RemoveAllTags() {
             foreach ( var neatoTag in tags ) {
@@ -189,9 +208,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 
         /// <summary>
-        /// Starts a filter for tags on a GameObject.
-        /// WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
-        /// To get result call .IsMatch() or .GetMatches()
+        ///     Starts a filter for tags on a GameObject.
+        ///     WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
+        ///     To get result call .IsMatch() or .GetMatches()
         /// </summary>
         /// <returns>FilterTags for chaining filter functions.</returns>
         public TagFilter FilterTags() {
@@ -199,9 +218,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Starts a filter for a list of gameobjects.
-        /// Given a list of gameobjects, this will return a new list of gameobjects using the tag filter.
-        /// If nothing is passed in, it will check against ALL tagged GameObjects.
+        ///     Starts a filter for a list of gameobjects.
+        ///     Given a list of gameobjects, this will return a new list of gameobjects using the tag filter.
+        ///     If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
         /// <param name="gameObjects">Optional list of GameObjects</param>
         /// <returns>FilterTags for chaining filter functions</returns>
@@ -210,18 +229,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// Starts a filter for a list of gameobjects.
-        /// If nothing is passed in, it will check against ALL tagged GameObjects.
+        ///     Starts a filter for a list of gameobjects.
+        ///     If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
         /// <returns>FilterTags for chaining filter functions</returns>
         public static GameObjectFilter FilterGameObjects() {
             return new GameObjectFilter( _taggers.Keys );
         }
-        
+
 
         /// <summary>
-        /// GameObjectFilter class for chaining filter functions.
-        /// Don't use directly. Use Tagger.FilterGameObjects() instead.
+        ///     GameObjectFilter class for chaining filter functions.
+        ///     Don't use directly. Use Tagger.FilterGameObjects() instead.
         /// </summary>
         public sealed class GameObjectFilter {
             readonly HashSet<GameObject> _matches;
@@ -233,8 +252,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// the result of the filter.
-            /// Will not return duplicate GameObjects.
+            ///     the result of the filter.
+            ///     Will not return duplicate GameObjects.
             /// </summary>
             /// <returns>HashSet of GameObjects</returns>
             public HashSet<GameObject> GetMatches() {
@@ -243,7 +262,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 
             /// <summary>
-            /// Filters for GameObjects that have the tag.
+            ///     Filters for GameObjects that have the tag.
             /// </summary>
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
@@ -256,7 +275,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filters for GameObjects that have all of the tags.
+            ///     Filters for GameObjects that have all of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
@@ -265,7 +284,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filters for GameObjects that have all of the tags.
+            ///     Filters for GameObjects that have all of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
@@ -274,7 +293,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// FilterGameObjects for GameObjects that don't have the tag.
+            ///     FilterGameObjects for GameObjects that don't have the tag.
             /// </summary>
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
@@ -284,7 +303,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filters for GameObjects that have none of the tags.
+            ///     Filters for GameObjects that have none of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
@@ -293,7 +312,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Filters for GameObjects that have none of the tags.
+            ///     Filters for GameObjects that have none of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
@@ -302,7 +321,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// FilterGameObjects for GameObjects that have any of the tags.
+            ///     FilterGameObjects for GameObjects that have any of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
@@ -316,7 +335,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// FilterGameObjects for GameObjects that have any of the tags.
+            ///     FilterGameObjects for GameObjects that have any of the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
@@ -333,8 +352,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         /// <summary>
-        /// FilterTags class for chaining filter functions.
-        /// Don't use directly. Use FilterTags() instead.
+        ///     FilterTags class for chaining filter functions.
+        ///     Don't use directly. Use FilterTags() instead.
         /// </summary>
         public class TagFilter {
             readonly Tagger _target;
@@ -345,7 +364,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if the filter matches.
+            ///     Checks if the filter matches.
             /// </summary>
             /// <returns>true if filter matches, otherwise false.</returns>
             public bool IsMatch() {
@@ -354,7 +373,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 
             /// <summary>
-            /// Checks if gameobject has tag.
+            ///     Checks if gameobject has tag.
             /// </summary>
             /// <param name="tag">Tag to check for</param>
             /// <returns></returns>
@@ -364,7 +383,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject has all the tags in params.
+            ///     Checks if gameobject has all the tags in params.
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
@@ -377,7 +396,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject has all the tags in list.
+            ///     Checks if gameobject has all the tags in list.
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
@@ -390,7 +409,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject doesn't have tag.
+            ///     Checks if gameobject doesn't have tag.
             /// </summary>
             /// <param name="tag">Tags to check for</param>
             /// <returns></returns>
@@ -401,7 +420,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject doesn't have tags in params.
+            ///     Checks if gameobject doesn't have tags in params.
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
@@ -414,7 +433,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject doesn't have tags in list.
+            ///     Checks if gameobject doesn't have tags in list.
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
@@ -427,7 +446,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject has any of the tags in list.
+            ///     Checks if gameobject has any of the tags in list.
             /// </summary>
             /// <param name="tagList">Tags to check for</param>
             /// <returns></returns>
@@ -439,7 +458,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            /// Checks if gameobject has any of the tags in params.
+            ///     Checks if gameobject has any of the tags in params.
             /// </summary>
             /// <param name="tags">Tags to check for</param>
             /// <returns></returns>
@@ -451,16 +470,20 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
+        void RepaintInspector() {
+            WantRepaint?.Invoke();
+        }
+
         void Reset() {
             RemoveAllTags();
-            NeatoTagTaggerTracker.RegisterTagger( this );
+            RepaintInspector();
         }
 
         void OnValidate() {
             NeatoTagTaggerTracker.RegisterTagger( this );
             tags.RemoveAll( neatoTag => neatoTag == null );
         }
-#endif
+    #endif
     }
 }

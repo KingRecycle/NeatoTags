@@ -28,6 +28,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         GroupBox _tagViewerDeselected;
         GroupBox _tagViewerSelected;
 
+        Tagger Target => target as Tagger;
+
         void OnEnable() {
             _root = new VisualElement();
 
@@ -85,16 +87,22 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
-
-            _tagger = new SerializedObject( target );
+            Target.WantRepaint += DoRepaint;
+            _tagger = new SerializedObject( Target );
         }
 
         void OnDisable() {
-            if ( target == null ) {
+            Target.WantRepaint -= DoRepaint;
+            if ( Target == null ) {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger.targetObject as Tagger );
             }
 
             NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
+        }
+        
+        void DoRepaint() {
+            PopulateButtons();
+            Repaint();
         }
 
         void ShowEditTagger() {
@@ -252,6 +260,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 var tagger = (Tagger)obj;
                 tagger.AddTag( tag );
             }
+
+            Repaint();
         }
 
         void StyleButton( Button button, NeatoTag tag ) {
