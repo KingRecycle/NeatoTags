@@ -4,6 +4,8 @@ using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
 using Unity.PerformanceTesting;
+using Unity.Profiling;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -23,7 +25,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         TagRefsForTests _tagRefsForTests;
         GameObject[] _uninitializedList;
 
-        int _spawnCount = 5000;
+        int[] _spawnAmounts = { 1, 10, 100, 1000, 10000 };
 
         [SetUp]
         public void TestSetup() {
@@ -700,83 +702,38 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest, Performance]
         public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_RandomGameObjectsHaveTag() {
             var newShapes = new List<GameObject>();
-            for ( var i = 0; i < 5000; i++ ) {
-                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
-            }
 
-            foreach ( var shape in newShapes ) {
-                shape.AddComponent<Tagger>().AddTag( _tagRefsForTests.testTags[ Random.Range( 0, _tagRefsForTests.testTags.Length ) ] );
+
+            foreach ( var amount in _spawnAmounts ) {
+                var sg = new SampleGroup( $"Filter 1 GameObject from {amount}", SampleUnit.Millisecond );
+                
+                var amountToSpawn = amount;
+                Measure.Method( () => { Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches(); } )
+                    .SetUp( () => {
+                        for ( var j = 0; j < amountToSpawn; j++ ) {
+                            var shape = GameObject.CreatePrimitive( PrimitiveType.Cube );
+                            newShapes.Add( shape );
+
+                            shape.AddComponent<Tagger>().AddTag( j == amountToSpawn - 1
+                                ? _tagRefsForTests.testTags[0]
+                                : _tagRefsForTests.testTags[1] );
+                        }
+                    })
+                    .CleanUp( () => {
+                        foreach ( var shapeGo in newShapes ) {
+                            Object.DestroyImmediate( shapeGo );
+                        }
+                        newShapes.Clear();
+                    })
+                    .WarmupCount( 5 )
+                    .MeasurementCount( 10 )
+                    .SampleGroup(sg)
+                    .Run();
             }
             
-            Measure.Method( () => {
-                    var filteredShapes =
-                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
-                } )
-                .SetUp( () => {
-                    
-                })
-                .WarmupCount( 1 )
-                .MeasurementCount( 10 )
-                .GC()
-                .Run();
             Assert.Pass();
             yield return null;
         }
-        
-        [UnityTest, Performance]
-        public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_All5000HaveTag() {
-            var newShapes = new List<GameObject>();
-            for ( var i = 0; i < 5000; i++ ) {
-                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
-            }
-
-            foreach ( var shape in newShapes ) {
-                shape.AddComponent<Tagger>().AddTag( _tagRefsForTests.testTags[0] );
-            }
-            
-            Measure.Method( () => {
-                    var filteredShapes =
-                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
-                } )
-                .SetUp( () => {
-                    
-                })
-                .WarmupCount( 1 )
-                .MeasurementCount( 10 )
-                .GC()
-                .Run();
-            Assert.Pass();
-            yield return null;
-        }
-        
-        [UnityTest, Performance]
-        public IEnumerator BigGameObjectFilter_GetMatchesCube_Performance_LookFor1TagOn1GameObjectIn5000() {
-            var newShapes = new List<GameObject>();
-            for ( var i = 0; i < 5000; i++ ) {
-                newShapes.Add( GameObject.CreatePrimitive( PrimitiveType.Cube ) );
-            }
-
-            for ( var i = 0; i < newShapes.Count; i++ ) {
-                newShapes[i].AddComponent<Tagger>().AddTag( i == newShapes.Count - 1
-                    ? _tagRefsForTests.testTags[0]
-                    : _tagRefsForTests.testTags[Random.Range( 1, _tagRefsForTests.testTags.Length )] );
-            }
-
-            Measure.Method( () => {
-                    var filteredShapes =
-                        Tagger.FilterGameObjects( newShapes ).WithTag( _tagRefsForTests.testTags[0] ).GetMatches();
-                } )
-                .SetUp( () => {
-                    
-                })
-                .WarmupCount( 1 )
-                .MeasurementCount( 10 )
-                .GC()
-                .Run();
-            Assert.Pass();
-            yield return null;
-        }
-
         #endregion
     }
 }
