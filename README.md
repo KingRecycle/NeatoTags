@@ -22,7 +22,14 @@ I don't know about you but I'd say that's pretty neat!
 - Query by tag string name (If you change a tag's name you must update your strings!)
 
 ## Getting Started
+This is currently where I keep my whole project for Neato Tags but I assume you are here for just Neato Tags itself then:
+- Just grab the CharlieMadeAThing folder `Assets/CharlieMadeAThing` -> https://github.com/KingRecycle/NeatoTags/tree/master/Assets/CharlieMadeAThing
+- Grab Neato Tags from the Asset Store -> https://assetstore.unity.com/packages/tools/utilities/neato-tags-229829
+
 A "Quick Start" guide is included.
+
+If you want to watch a boring video instead of reading:
+https://www.youtube.com/watch?v=MIrbBueYae0
 
 Once added to your project there are a few ways to create tags, one way is to use the Neato Tag Manager window.
 
