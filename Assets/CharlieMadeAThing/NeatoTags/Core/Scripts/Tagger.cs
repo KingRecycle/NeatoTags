@@ -201,8 +201,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Remove ALL tags from the tagger.
         /// </summary>
         public void RemoveAllTags() {
-            foreach ( var neatoTag in tags ) {
-                RemoveTag( neatoTag );
+            for ( var i = tags.Count - 1; i >= 0; i-- ) {
+                RemoveTag( tags[i] );
             }
         }
 

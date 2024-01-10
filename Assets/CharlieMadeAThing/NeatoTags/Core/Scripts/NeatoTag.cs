@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -7,6 +8,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     public class NeatoTag : ScriptableObject {
         [SerializeField] Color color = Color.gray;
         [SerializeField] string comment = string.Empty;
+        
 
         public Color Color {
             get => color;
