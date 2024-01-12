@@ -10,7 +10,7 @@
                 <uie:ToolbarSpacer />
                 <uie:ToolbarSearchField focusable="true" name="taggerSearch" style="width: 200px; margin-top: 0; margin-bottom: 0; height: 18px; top: 3px;" />
             </uie:Toolbar>
-            <ui:GroupBox name="tagViewer" style="flex-direction: row;" />
+            <ui:GroupBox name="tagViewer" style="flex-direction: row; flex-wrap: wrap;" />
         </ui:VisualElement>
         <ui:GroupBox name="allTagsBox">
             <ui:GroupBox text="Available Tags" style="flex-direction: row; padding-top: 0; align-items: stretch; padding-left: 0; padding-bottom: 0; height: 20px;">
