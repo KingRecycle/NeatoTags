@@ -12,41 +12,51 @@ using Random = UnityEngine.Random;
 namespace CharlieMadeAThing
 {
     public class NeatTagsPerformanceTest : MonoBehaviour {
-        public NeatoTag nTag;
-        public string unityTag;
-        public GameObject target;
+        public NeatoTag[] tags;
         
-        public uint spawnCount = 1000;
-        public uint iterations = 100000;
+        public GameObject[] targets;
         
-        List<GameObject> spawnedObjects = new();
+        int[] _spawnAmounts = { 10, 100, 1000, 5000 };
+        
+        List<GameObject> _spawnedObjects = new();
 
-        void Awake() {
-            for ( var i = 0; i < spawnCount; i++ ) {
-                var obj = new GameObject( $"TestObject {i}" ) {
-                    transform = {
-                        position = new Vector3( Random.Range( -100, 100 ), Random.Range( -100, 100 ), Random.Range( -100, 100 ) ),
-                    },
-                };
-                spawnedObjects.Add( obj );
+        void Start() {
+            foreach ( var spawnAmount in _spawnAmounts ) {
+                SpawnObjects( spawnAmount );
+                var withTagTime = RunAction( WithTagTest, 10 );
+                Debug.Log($"With {spawnAmount} objects, WithTag took {withTagTime}ms");
+                
+                //Destroy all spawned objects
+                foreach ( var spawnedObject in _spawnedObjects ) {
+                    Destroy( spawnedObject );
+                }
             }
         }
 
-
-        void NeatoTagTest() {
-            for ( var i = 0; i < iterations; i++ ) {
-                target.HasTag( nTag );
+        void SpawnObjects( int amount ) {
+            var index = 0;
+            for ( var i = 0; i < amount; i++ ) {
+                if ( index >= targets.Length ) index = 0;
+                var go = Instantiate( targets[index], transform );
+                _spawnedObjects.Add( go );
+                index++;
             }
         }
         
-        void UnityTagTest() {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-            for ( var i = 0; i < iterations; i++ ) {
-                target.CompareTag( unityTag );
+        //Run action a given amount of times and return the average time it took to run
+        double RunAction( Action action, int amount ) {
+            var sw = new Stopwatch();
+            sw.Start();
+            for ( var i = 0; i < amount; i++ ) {
+                action();
             }
-            stopwatch.Stop();
-            Debug.Log( $"UnityTagTest ( {iterations} iterations ) took: {stopwatch.ElapsedMilliseconds}ms" );
+            sw.Stop();
+            return sw.Elapsed.TotalMilliseconds / amount;
         }
+
+        void WithTagTest() {
+            Tagger.FilterGameObjects().WithTags( tags[0] );
+        }
+
     }
 }
