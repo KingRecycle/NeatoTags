@@ -198,6 +198,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( newName == string.Empty ) {
                 Debug.LogWarning(
                     $"[Neato Tag Manager]: Tried to rename tag {_selectedTag.targetObject.name} but no name was entered." );
+                return false;
             }
 
             foreach ( var element in _allTagsBox.Children() ) {
@@ -205,6 +206,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 if ( button.text.Equals( newName ) ) {
                     Debug.LogWarning(
                         $"Tried to rename tag {_selectedTag.targetObject.name} to {newName} but a tag with that name already exists." );
+                    return false;
                 }
             }
 
