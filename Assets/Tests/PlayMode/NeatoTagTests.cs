@@ -163,6 +163,42 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             yield return null;
         }
 
+        [UnityTest] public IEnumerator RemoveTag_RemoveTagByStringName_CheckIfTagExistAfterRemove_ReturnFalse() {
+            _cylinder.AddTag( _tagRefsForTests.cylinderTag );
+            _cylinder.RemoveTag( "Cylinder" );
+            Assert.AreEqual( false, _cylinder.HasTag( _tagRefsForTests.cylinderTag ) );
+            yield return null;
+        }
+
+        #endregion
+
+        #region Create New Tags at Runtime Tests
+
+        [UnityTest]
+        public IEnumerator CreateNewTagAtRuntime_AddTagToCube_CheckIfCubeHasNewTag_ReturnTrue() {
+            _cube.TryCreateTag( "Very Sharp" );
+            Assert.AreEqual( true, _cube.HasTag( "Very Sharp" ) );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator CreateNewTagAtRuntime_AddSameTagTwice_CheckIfOnlyOneWasCreated_ReturnTrue() {
+            var tempGo = new GameObject().AddComponent<Tagger>().gameObject;
+            tempGo.TryCreateTag( "Pointy" );
+            tempGo.TryCreateTag( "Pointy" );
+            Debug.Log( tempGo.GetComponent<Tagger>().GetTags.Count );
+            Assert.AreEqual( true, tempGo.GetComponent<Tagger>().GetTags.Count == 1 );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator CreateNewTagAtRuntime_AddWhitespaceNameTag_CheckIfTagWasCreatedAndAdded_ReturnFalse() {
+            _cube.TryCreateTag( " " );
+            Assert.AreEqual( false, _cube.HasTag( " " ) );
+            Assert.AreEqual( false, _cube.HasTag( "" ) );
+            yield return null;
+        }
+
         #endregion
 
         #region HasAnyTagsMatching Tests

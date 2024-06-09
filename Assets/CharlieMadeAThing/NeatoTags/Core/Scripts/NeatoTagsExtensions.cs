@@ -22,6 +22,17 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public static Tagger.TagFilter FilterTags( this GameObject gameObject ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
 
+        /// <summary>
+        ///    Try and create a new tag and add it to the gameobject.
+        ///    Tag is temporary and will not be saved.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="newTagName">Name of new tag.</param>
+        /// <returns>Returns false if gameobject has no tagger or tag with same name already exist.</returns>
+        public static bool TryCreateTag( this GameObject gameObject, string newTagName ) {
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.TryCreateAndAddTag( newTagName );
+        }
+
         #region AddRemoveTags
 
         /// <summary>
@@ -46,13 +57,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="gameObject"></param>
         /// <param name="tag">Tag to remove</param>
         public static void RemoveTag( this GameObject gameObject, NeatoTag tag ) {
-            if ( tag == null ) {
-                Debug.LogWarning($"Attempting to remove tag from {gameObject} but tag argument is null!");
-                return;
-            }
-
             if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
                 tagger.RemoveTag( tag );
+            }
+        }
+        
+        /// <summary>
+        ///     Remove a tag by name from this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tagName"></param>
+        public static void RemoveTag( this GameObject gameObject, string tagName ) {
+            if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                tagger.RemoveTag( tagName );
             }
         }
 
