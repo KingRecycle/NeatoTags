@@ -139,15 +139,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             // Draw fields - pass GUIContent.none to each so they are drawn without labels
 
             //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTag), false );
-            var obj = EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
-
+            EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
+            
             var oldColor = GUI.backgroundColor;
             var p = property.objectReferenceValue as NeatoTag;
             if ( p ) {
                 var lum = TaggerDrawer.GetColorLuminosity( p.Color ) > 70 ? Color.black : Color.white;
                 buttonStyle.normal.textColor = lum;
                 GUI.backgroundColor = p.Color;
-                var btn = GUI.Button( buttonPlaceRect, p.name, buttonStyle );
+                GUI.Button( buttonPlaceRect, p.name, buttonStyle );
                 GUI.backgroundColor = oldColor;
             }
 

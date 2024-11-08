@@ -115,7 +115,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void OnEnable() {
             //Keeping track of Tagger components in the scene so got to do an initial grab of all the components on editor scene load.
-            //Afterwards, they are registered as they are created and unregistered as the component is removed from gameobjects.
+            //Afterward, they are registered as they are created and unregistered as the component is removed from gameobjects.
             if ( _isDirty ) {
                 EditorSceneManager.sceneOpened -= OnSceneOpened;
                 EditorSceneManager.sceneOpened += OnSceneOpened;

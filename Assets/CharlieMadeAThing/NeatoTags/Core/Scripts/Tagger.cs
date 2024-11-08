@@ -22,10 +22,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
         static HashSet<GameObject> _nonTaggedObjects = new();
-
+        
         //--------------------------------------------------------------------------------------------------------------
 
-        // This taggers tags for its gameobject.
+        // This tagger's tags for its gameobject.
         [SerializeField] List<NeatoTag> tags = new();
         public List<NeatoTag> GetTags => tags;
 
@@ -57,7 +57,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         #region Query Methods
-
+        
         /// <summary>
         ///     All gameobjects in the scene with a tagger component.
         /// </summary>
@@ -125,7 +125,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool AllTagsMatch( IEnumerable<NeatoTag> tagList ) => tagList.All( HasTag );
 
         /// <summary>
-        ///     Checks if all of the tags in the list are in the Tagger by name.
+        ///     Checks if all the tags in the list are in the Tagger by name.
         /// </summary>
         /// <param name="tagList">IEnumerable of tag names</param>
         /// <returns>True if Tagger has all the tags, otherwise false.</returns>
@@ -315,7 +315,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            ///     Filters for GameObjects that have all of the tags.
+            ///     Filters for GameObjects that have all the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
@@ -324,7 +324,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             /// <summary>
-            ///     Filters for GameObjects that have all of the tags.
+            ///     Filters for GameObjects that have all the tags.
             /// </summary>
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
