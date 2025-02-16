@@ -218,6 +218,32 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _nonTaggedObjects.Remove( gameObject );
             _isCacheDirty = true;
         }
+        
+        /// <summary>
+        ///    Add a list of tags to the tagger.
+        /// </summary>
+        /// <param name="neatoTagsToAdd">Tags to add.</param>
+        public void AddTags( IEnumerable<NeatoTag> neatoTagsToAdd ) {
+            if ( neatoTagsToAdd == null ) return;
+            
+            var changed = false;
+            foreach ( var neatoTag in neatoTagsToAdd ) {
+                if ( neatoTag == null || tags.Contains( neatoTag ) ) {
+                    Debug.LogWarning( "[NeatoTags]: You are trying to add a tag that is either null or already exist on tagger." );
+                    continue;
+                }
+                tags.Add( neatoTag );
+                _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
+                _taggedObjects[neatoTag].Add( gameObject );
+                _nonTaggedObjects.Remove( gameObject );
+                changed = true;
+            }
+
+            if ( changed ) {
+                _nonTaggedObjects.Remove( gameObject );
+                _isCacheDirty = true;
+            }
+        }
 
         /// <summary>
         ///     Remove a tag from the tagger.
