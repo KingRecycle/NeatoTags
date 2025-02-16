@@ -128,7 +128,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         static bool CheckIfTagNameExist( string name ) {
-            return GetAllTags().Any( x => x.name.Equals( name ) );
+            return GetAllTags().Select( t => t.name ).Contains( name );
         }
 
         //Try and get the folder path that is selected.
