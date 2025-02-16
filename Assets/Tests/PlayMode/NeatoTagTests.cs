@@ -115,6 +115,17 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
             Assert.AreEqual( true, !_plane.HasTag( _tagRefsForTests.sphereTag ) );
             yield return null;
         }
+        
+        [UnityTest,Performance]
+        public IEnumerator HasTag_String_Performance() {
+            Measure.Method( () => {
+                    _cube.HasTag( "Cube" );
+                } )
+                .WarmupCount( 1 )
+                .MeasurementCount( 100000 )
+                .Run();
+            yield return null;
+        }
 
         #endregion
 
@@ -847,5 +858,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         // }
 
         #endregion
+        
+        
     }
 }

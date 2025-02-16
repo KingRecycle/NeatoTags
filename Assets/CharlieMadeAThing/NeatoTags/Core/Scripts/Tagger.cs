@@ -27,6 +27,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         // This tagger's tags for its gameobject.
         [SerializeField] List<NeatoTag> tags = new();
+        HashSet<string> _cachedTagNames;
+        bool _isCacheDirty = true;
         public List<NeatoTag> GetTags => tags;
 
         void Awake() {
@@ -55,6 +57,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             WantRepaint = null;
 #endif
         }
+        
+        #region Cache Methods
+
+        void UpdateCache() {
+            if ( !_isCacheDirty ) return;
+            _cachedTagNames = tags.Select( neatoTag => neatoTag.name ).ToHashSet();
+            _isCacheDirty = false;
+        }
+        #endregion
 
         #region Query Methods
         
@@ -100,7 +111,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="neatoTag">The tag name to check for</param>
         /// <returns>True if Tagger has the tag, otherwise false.</returns>
         public bool HasTag( string neatoTag ) {
-            return tags.Any( t => t.name == neatoTag );
+            UpdateCache();
+            return _cachedTagNames.Contains( neatoTag );
         }
 
         /// <summary>
@@ -204,6 +216,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
             _taggedObjects[neatoTag].Add( gameObject );
             _nonTaggedObjects.Remove( gameObject );
+            _isCacheDirty = true;
         }
 
         /// <summary>
