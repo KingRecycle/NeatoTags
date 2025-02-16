@@ -50,6 +50,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 tagger.AddTag( tag );
             }
         }
+        
+        /// <summary>
+        ///     Adds all tags from a list to this gameobject's Tagger component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tags">List of tags to add.</param>
+        public static void AddTags( this GameObject gameObject, params NeatoTag[] tags ) {
+            if ( tags == null ) {
+                Debug.LogWarning($"Attempting to add tags to {gameObject} but tags argument is null!");
+                return;
+            }
+
+            if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                tagger.AddTags( tags );
+            }
+        }
 
         /// <summary>
         ///     Removes a tag from this gameobject.
