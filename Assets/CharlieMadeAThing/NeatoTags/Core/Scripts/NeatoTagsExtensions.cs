@@ -82,7 +82,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tag">Tag to check for.</param>
-        /// <returns>True if has matching tag, otherwise false.</returns>
+        /// <returns>True if it has matching tag, otherwise false.</returns>
         public static bool HasTag( this GameObject gameObject, NeatoTag tag ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tag );
 
@@ -91,7 +91,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagName">Tag to check for</param>
-        /// <returns>True if has matching tag, otherwise false.</returns>
+        /// <returns>True if it has matching tag, otherwise false.</returns>
         public static bool HasTag( this GameObject gameObject, string tagName ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagName );
 
@@ -140,7 +140,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #region HasAllTagsMatching
 
         /// <summary>
-        ///     Returns true if the gameobject is tagged with all of the given tags.
+        ///     Returns true if the gameobject is tagged with all the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagParams">params array of tags</param>
@@ -149,7 +149,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagParams );
 
         /// <summary>
-        ///     Returns true if the gameobject is tagged with all of the given tags.
+        ///     Returns true if the gameobject is tagged with all the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagNameParams">params array of tag names</param>
@@ -158,7 +158,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagNameParams );
 
         /// <summary>
-        ///     Returns true if the gameobject is tagged with all of the given tags.
+        ///     Returns true if the gameobject is tagged with all the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagList">IEnumerable of tags</param>
@@ -167,7 +167,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
 
         /// <summary>
-        ///     Returns true if the gameobject is tagged with all of the given tags.
+        ///     Returns true if the gameobject is tagged with all the given tags.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagNameList">IEnumerable of tag names</param>
