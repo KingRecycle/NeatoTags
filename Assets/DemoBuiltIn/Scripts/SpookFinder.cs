@@ -4,7 +4,7 @@ using CharlieMadeAThing.NeatoTags.Core;
 using TMPro;
 using UnityEngine;
 
-namespace CharlieMadeAThing.NeatoTags.DemoBuiltIn {
+namespace CharlieMadeAThing.NeatoTags.DemoBRP {
     public class SpookFinder : MonoBehaviour {
         public List<NeatoTag> spookerTags;
 
