@@ -108,3 +108,5 @@ Assets/Resources/DOTweenSettings.asset.meta
 
 # Ignore Unity editor layout files
 *.dwlt
+
+*.mdc

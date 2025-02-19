@@ -15,18 +15,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         // Static collections for tracking tagged objects and taggers in the scene.
 
         // All taggers in the scene (@runtime).
-        static Dictionary<GameObject, Tagger> _taggers = new();
+        static readonly Dictionary<GameObject, Tagger> _taggers = new();
 
         // All tagged objects in the scene by tag (@runtime).
-        static Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new();
+        static readonly Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new();
 
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
-        static HashSet<GameObject> _nonTaggedObjects = new();
+        static readonly HashSet<GameObject> _nonTaggedObjects = new();
         
         //--------------------------------------------------------------------------------------------------------------
 
         // This tagger's tags for its gameobject.
-        [SerializeField] List<NeatoTag> tags = new();
+        [SerializeField] readonly List<NeatoTag> tags = new();
         HashSet<string> _cachedTagNames;
         bool _isCacheDirty = true;
         public List<NeatoTag> GetTags => tags;
