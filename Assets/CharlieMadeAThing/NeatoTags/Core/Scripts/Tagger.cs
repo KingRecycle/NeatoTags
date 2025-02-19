@@ -170,8 +170,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <returns>Returns new tag if successful otherwise returns null.</returns>
         public NeatoTag CreateTag( string tagName ) {
             var trimmedName = tagName.Trim();
-            if ( trimmedName == string.Empty ) {
-                Debug.LogWarning( $"A tag name can't be an empty string." );
+            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
+                Debug.LogWarning( "A tag name can't be empty or whitespace." );
+                return null;
+            }
+            
+            if ( !IsValidTagName( trimmedName ) ) {
+                Debug.LogWarning( $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
                 return null;
             }
 
@@ -183,6 +188,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             neatoTag.name = trimmedName;
             return neatoTag;
+        }
+
+        bool IsValidTagName( string name ) {
+            return System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
         }
 
         /// <summary>
