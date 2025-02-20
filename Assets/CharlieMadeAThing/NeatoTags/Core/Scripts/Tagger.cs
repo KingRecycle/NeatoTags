@@ -59,7 +59,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
         
         #region Cache Methods
-
+        
         void UpdateCache() {
             if ( !_isCacheDirty ) return;
             _cachedTagNames = _tags.Select( neatoTag => neatoTag.name ).ToHashSet();
@@ -162,53 +162,47 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #region Add and Remove Methods
 
         /// <summary>
-        ///     Create a new tag.
-        ///     This tag will be deleted if not saved.
+        ///     Gets an existing tag with the given name or creates a new one if it doesn't exist.
+        ///     Tags created this way will not be saved to the project/game.
+        ///     You must implement your own way of saving tags to the project/game.
         ///     Name is trimmed of whitespace.
         /// </summary>
-        /// <param name="tagName">Name of the new tag.</param>
-        /// <returns>Returns new tag if successful otherwise returns null.</returns>
-        public NeatoTag CreateTag( string tagName ) {
+        /// <param name="tagName">Name of the tag to get or create.</param>
+        /// <returns>Returns existing or new tag if successful, otherwise returns null.</returns>
+        public NeatoTag GetOrCreate(string tagName) {
             var trimmedName = tagName.Trim();
-            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
-                Debug.LogWarning( "A tag name can't be empty or whitespace." );
+            if (string.IsNullOrWhiteSpace(trimmedName)) {
+                Debug.LogWarning("A tag name can't be empty or whitespace.");
                 return null;
             }
             
-            if ( !IsValidTagName( trimmedName ) ) {
-                Debug.LogWarning( $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
+            if (!IsValidTagName(trimmedName)) {
+                Debug.LogWarning($"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores.");
                 return null;
             }
 
+            // Check if tag already exists
+            var existingTag = _taggedObjects.Keys.FirstOrDefault(t => t.name == trimmedName);
+            if (existingTag != null) {
+                return existingTag;
+            }
+
+            // Create new tag if it doesn't exist
             var neatoTag = ScriptableObject.CreateInstance<NeatoTag>();
-            if ( _taggedObjects.Keys.Any( t => t.name == trimmedName ) ) {
-                Debug.LogWarning( $"You are trying to create a tag with the name {trimmedName} that already exists." );
-                return null;
-            }
-
             neatoTag.name = trimmedName;
+            AddTag(neatoTag);
             return neatoTag;
         }
 
+        /// <summary>
+        ///     Checks if a tag name is valid.
+        /// </summary>
+        /// <param name="name">Name of the tag to check.</param>
+        /// <returns>True if the tag name is valid, otherwise false.</returns>
         bool IsValidTagName( string name ) {
             return System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
         }
 
-        /// <summary>
-        ///     Create a new tag and add it to the tagger.
-        ///     This tag will be deleted if not saved.
-        ///     Name is trimmed of whitespace.
-        /// </summary>
-        /// <param name="tagName">Name of the new tag.</param>
-        public bool TryCreateAndAddTag( string tagName ) {
-            var neatoTag = CreateTag( tagName );
-            if ( neatoTag == null ) {
-                return false;
-            }
-
-            AddTag( neatoTag );
-            return true;
-        }
 
         /// <summary>
         ///     Add a tag to the tagger.
