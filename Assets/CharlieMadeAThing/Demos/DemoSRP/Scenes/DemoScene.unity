@@ -1327,13 +1327,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spookerTags:
-  - {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
-  - {fileID: 11400000, guid: 829bec202422edd408d728fc00c5e39d, type: 2}
-  - {fileID: 11400000, guid: 2b1f38d553bc5cc4888f5ce09a860d1a, type: 2}
-  humanTag: {fileID: 11400000, guid: 51eb8b725bb3fbb45b7585f16f844939, type: 2}
-  ghostTag: {fileID: 11400000, guid: 2b1f38d553bc5cc4888f5ce09a860d1a, type: 2}
-  goblinTag: {fileID: 11400000, guid: 1442b2d57a66f6d4889f13a724fef317, type: 2}
-  witchTag: {fileID: 11400000, guid: 829bec202422edd408d728fc00c5e39d, type: 2}
+  - {fileID: 11400000, guid: 2c90178b65359e644b3e07789088cfd9, type: 2}
+  - {fileID: 11400000, guid: c82fb44412adb604a831eed1e42f82d7, type: 2}
+  - {fileID: 11400000, guid: 43c5a57f9282c824098dfc491cffe525, type: 2}
+  humanTag: {fileID: 11400000, guid: ef45d3e4453d76b41b2cec727dde46a7, type: 2}
+  ghostTag: {fileID: 11400000, guid: 2c90178b65359e644b3e07789088cfd9, type: 2}
+  goblinTag: {fileID: 11400000, guid: c82fb44412adb604a831eed1e42f82d7, type: 2}
+  witchTag: {fileID: 11400000, guid: 43c5a57f9282c824098dfc491cffe525, type: 2}
   spookyGameObjects:
   - {fileID: 1356551398}
   - {fileID: 1725705717}

@@ -203,7 +203,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             return System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
         }
 
-
         /// <summary>
         ///     Add a tag to the tagger.
         /// </summary>
