@@ -23,14 +23,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
 
         /// <summary>
-        ///    Try and create a new tag and add it to the gameobject.
-        ///    Tag is temporary and will not be saved.
+        ///     Gets or creates a tag and adds it to the gameobject.
+        ///     Tags created this way will not be saved to the project/game.
+        ///     You must implement your own way of saving tags to the project/game.
+        ///     Name is trimmed of whitespace.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="newTagName">Name of new tag.</param>
-        /// <returns>Returns false if gameobject has no tagger or tag with same name already exist.</returns>
-        public static bool TryCreateTag( this GameObject gameObject, string newTagName ) {
-            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.TryCreateAndAddTag( newTagName );
+        /// <param name="newTagName">Name of the tag to get or create.</param>
+        /// <returns>Returns tag if successful, otherwise returns new tag with given name.</returns>
+        public static NeatoTag GetOrCreateTag( this GameObject gameObject, string newTagName ) {
+            if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                return tagger.GetOrCreate( newTagName );
+            }
+            return null;
         }
 
         #region AddRemoveTags

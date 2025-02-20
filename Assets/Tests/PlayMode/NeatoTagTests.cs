@@ -195,7 +195,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
         [UnityTest]
         public IEnumerator CreateNewTagAtRuntime_AddTagToCube_CheckIfCubeHasNewTag_ReturnTrue() {
-            _cube.TryCreateTag( "Very Sharp" );
+            _cube.GetOrCreateTag( "Very Sharp" );
             Assert.AreEqual( true, _cube.HasTag( "Very Sharp" ) );
             yield return null;
         }
@@ -203,8 +203,8 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         [UnityTest]
         public IEnumerator CreateNewTagAtRuntime_AddSameTagTwice_CheckIfOnlyOneWasCreated_ReturnTrue() {
             var tempGo = new GameObject().AddComponent<Tagger>().gameObject;
-            tempGo.TryCreateTag( "Pointy" );
-            tempGo.TryCreateTag( "Pointy" );
+            tempGo.GetOrCreateTag( "Pointy" );
+            tempGo.GetOrCreateTag( "Pointy" );
             Debug.Log( tempGo.GetComponent<Tagger>().GetTags.Count );
             Assert.AreEqual( true, tempGo.GetComponent<Tagger>().GetTags.Count == 1 );
             yield return null;
@@ -212,7 +212,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
         
         [UnityTest]
         public IEnumerator CreateNewTagAtRuntime_AddWhitespaceNameTag_CheckIfTagWasCreatedAndAdded_ReturnFalse() {
-            _cube.TryCreateTag( " " );
+            _cube.GetOrCreateTag( " " );
             Assert.AreEqual( false, _cube.HasTag( " " ) );
             Assert.AreEqual( false, _cube.HasTag( "" ) );
             yield return null;
@@ -568,6 +568,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
                    .Run();
             var filteredShapes =
                 Tagger.FilterGameObjects( _shapes ).WithTag( _tagRefsForTests.cornerlessTag ).GetMatches();
+            Debug.Log("Filtered shapes: " + string.Join( ", ", filteredShapes.Select( x => x.name ) ));
             Assert.AreEqual( 2, filteredShapes.Count );
             if ( filteredShapes.Contains( _plane ) || filteredShapes.Contains( _cube ) ||
                  filteredShapes.Contains( _cylinder ) ) {
