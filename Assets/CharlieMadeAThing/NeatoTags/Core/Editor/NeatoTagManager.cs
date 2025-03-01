@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -17,7 +15,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static VisualTreeAsset _tagButtonTemplate;
         static VisualElement _root;
 
-        static readonly Dictionary<Button, Action> ButtonActionMap = new();
         static GroupBox _allTagsBox;
         static ToolbarSearchField _tagSearchField;
 
@@ -155,15 +152,20 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             TagAssetCreation.DeleteTag( _selectedTag.targetObject as NeatoTag );
+            //Remove tag button from tag manager window.
+            foreach ( var ele in _allTagsBox.Children() ) {
+                if ( ele is not Button { userData: NeatoTag tag } || tag != _selectedTag.targetObject ) continue;
+                _allTagsBox.Remove( ele );
+                break;
+            }
+
             _selectedTag = null;
-            PopulateAllTagsBox();
             UnDisplayTag();
         }
 
 
         static void PopulateAllTagsBox() {
             _allTagsBox.Clear();
-            ButtonActionMap.Clear();
 
             var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
 
@@ -182,13 +184,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             button.text = tag.name;
             button.style.backgroundColor = tag.Color;
             button.style.color = TaggerDrawer.GetTextColorBasedOnBackground( button.style.backgroundColor.value );
+            button.userData = tag;
 
-            ButtonActionMap.Add( button, () => {
-                _selectedTag = new SerializedObject( tag );
+            button.clicked += () => {
+                var associatedTag = button.userData as NeatoTag;
+                if ( associatedTag == null ) return;
+                _selectedTag = new SerializedObject( associatedTag );
                 DisplayTag();
-            } );
+            };
 
-            button.clicked += () => ButtonActionMap[button].Invoke();
             return button;
         }
 
@@ -221,8 +225,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
+            TagAssetCreation.InvalidateTagCache();
             PopulateAllTagsBox();
-            ButtonActionMap.First( x => x.Key.text == _selectedTag.targetObject.name ).Value.Invoke();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
             _selectedTag.ApplyModifiedProperties();
@@ -334,9 +338,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static void AddNewTag() {
             var newTag = TagAssetCreation.CreateNewTag( "New Tag" );
-            PopulateAllTagsBox();
-            if ( newTag ) {
-                ButtonActionMap.First( x => x.Key.text == newTag.name ).Value.Invoke();
+            var newTagButton = CreateTagButton( newTag );
+            _allTagsBox.Add( newTagButton );
+
+            if ( !newTag ) return;
+            foreach ( var element in _allTagsBox.Children() ) {
+                if ( element is not Button { userData: NeatoTag tag } || tag != newTag ) continue;
+                _selectedTag = new SerializedObject( newTag );
+                DisplayTag();
+                break;
             }
         }
 

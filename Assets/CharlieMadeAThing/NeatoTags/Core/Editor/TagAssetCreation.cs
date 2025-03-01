@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class TagAssetCreation : EditorWindow {
+        static HashSet<NeatoTag> _cachedTags;
+        static Dictionary<string, NeatoTag> _tagNameLookup;
+        static bool _tagCacheDirty = true;
+
         public static void SetTagFolder() {
             var path = EditorUtility.OpenFolderPanel( "Tag Folder Location", "Assets", "" );
             var tagPath = GetTagFolderLocation();
@@ -23,7 +26,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 AssetDatabase.CreateAsset( newDataHolder, newPath );
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
-            } else {
+            }
+            else {
                 GetEditorDataContainer().tagFolderLocation = selectedFolder;
             }
         }
@@ -84,86 +88,112 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //Non menu version of NewTag function
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             var trimmedName = tagName.Trim();
-            if ( tagName == string.Empty ) {
+            if ( string.IsNullOrEmpty( trimmedName ) ) {
                 tagName = "New Tag";
             }
+
             var counter = 0;
-            while ( CheckIfTagNameExist( tagName ) ) {
+            var uniqueName = tagName;
+            while ( _tagNameLookup != null && _tagNameLookup.ContainsKey( uniqueName ) ) {
                 counter++;
-                tagName = $"{trimmedName} {counter}";
-                if ( counter <= 100 ) continue;
-                Debug.LogError( "[TagAssetCreation]: Could not create tag. Too many tags with the same name." );
+                uniqueName = $"{trimmedName} {counter}";
+                if ( counter <= 1000 ) continue;
+                Debug.LogError( "[TagAssetCreation]: Could not create tag. Hard limit reached. Try a different name." );
                 return null;
             }
 
-            NeatoTag newTag = null;
-            var dataHolder = GetEditorDataContainer();
-            if ( dataHolder == null || string.IsNullOrEmpty( dataHolder.tagFolderLocation ) ) {
-                if ( TryGetActiveFolderPath( out var path ) ) {
-                    newTag = CreateInstance<NeatoTag>();
-                    var newPath = AssetDatabase.GenerateUniqueAssetPath( $"{path}/{tagName}.asset" );
-                    AssetDatabase.CreateAsset( newTag, newPath );
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
-                    if ( shouldFocusInProjectWindow ) {
-                        EditorUtility.FocusProjectWindow();
-                        Selection.activeObject = newTag;
-                    }
-                } else {
-                    EditorUtility.DisplayDialog( "Error",
-                        "Please set the tag folder location first or have a project folder selected.", "OK" );
-                }
-            } else {
-                newTag = CreateInstance<NeatoTag>();
-                AssetDatabase.CreateAsset( newTag, $"{dataHolder.tagFolderLocation}/{tagName}.asset" );
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-                if ( shouldFocusInProjectWindow ) {
-                    EditorUtility.FocusProjectWindow();
-                    Selection.activeObject = newTag;
-                }
+            var newTag = CreateInstance<NeatoTag>();
+            var assetPath = GetTagAssetPath( uniqueName );
+            AssetDatabase.CreateAsset( newTag, assetPath );
+            AssetDatabase.SaveAssets();
+
+            if ( _cachedTags != null && _tagNameLookup != null ) {
+                _cachedTags.Add( newTag );
+                _tagNameLookup[uniqueName] = newTag;
+            }
+            else {
+                InvalidateTagCache();
+            }
+
+            if ( shouldFocusInProjectWindow ) {
+                EditorUtility.FocusProjectWindow();
+                Selection.activeObject = newTag;
             }
 
             return newTag;
         }
 
-        static bool CheckIfTagNameExist( string name ) {
-            return GetAllTags().Select( t => t.name ).Contains( name );
+        static string GetTagAssetPath( string tagName ) {
+            var dataHolder = GetEditorDataContainer();
+            if ( dataHolder != null && !string.IsNullOrEmpty( dataHolder.tagFolderLocation ) ) {
+                return AssetDatabase.GenerateUniqueAssetPath( $"{dataHolder.tagFolderLocation}/{tagName}.asset" );
+            }
+
+            if ( TryGetActiveFolderPath( out var path ) ) {
+                return AssetDatabase.GenerateUniqueAssetPath( $"{path}/{tagName}.asset" );
+            }
+
+            EditorUtility.DisplayDialog( "Error",
+                "Please set the tag folder location first or have a project folder selected.", "OK" );
+            return null;
         }
 
         //Try and get the folder path that is selected.
         static bool TryGetActiveFolderPath( out string path ) {
-            var tryGetActiveFolderPath = typeof( ProjectWindowUtil ).GetMethod( "TryGetActiveFolderPath",
+            var tryGetActiveFolderPath = typeof(ProjectWindowUtil).GetMethod( "TryGetActiveFolderPath",
                 BindingFlags.Static | BindingFlags.NonPublic );
 
             object[] args = { null };
-            var found = tryGetActiveFolderPath != null && (bool) tryGetActiveFolderPath.Invoke( null, args );
-            path = (string) args[0];
+            var found = tryGetActiveFolderPath != null && (bool)tryGetActiveFolderPath.Invoke( null, args );
+            path = (string)args[0];
 
             return found;
         }
 
         public static void DeleteTag( NeatoTag selectedTag ) {
             if ( !selectedTag ) return;
-            AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
+            if ( _cachedTags != null && _tagNameLookup != null ) {
+                _cachedTags.Remove( selectedTag );
+                _tagNameLookup.Remove( selectedTag.name );
+                AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
+            }
+            else {
+                InvalidateTagCache();
+            }
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
-        /// <summary>
-        /// Gives back a Hashset of all tags in the project.
-        /// </summary>
-        /// <returns>Hashset of all tags in the project.</returns>
-        public static HashSet<NeatoTag> GetAllTags() {
-            var tagSet = new HashSet<NeatoTag>();
+        public static void InvalidateTagCache() {
+            _tagCacheDirty = true;
+        }
+
+        static void RefreshTagCache() {
+            _cachedTags = new HashSet<NeatoTag>();
+            _tagNameLookup = new Dictionary<string, NeatoTag>();
+
             var guids = AssetDatabase.FindAssets( "t:NeatoTag" );
             foreach ( var guid in guids ) {
                 var path = AssetDatabase.GUIDToAssetPath( guid );
                 var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>( path );
-                tagSet.Add( tagAsset );
+                _cachedTags.Add( tagAsset );
+                _tagNameLookup[tagAsset.name] = tagAsset;
             }
 
-            return tagSet;
+            _tagCacheDirty = false;
+        }
+
+        /// <summary>
+        ///     Gives back a Hashset of all tags in the project.
+        /// </summary>
+        /// <returns>Hashset of all tags in the project.</returns>
+        public static HashSet<NeatoTag> GetAllTags() {
+            if ( _tagCacheDirty || _cachedTags == null ) {
+                RefreshTagCache();
+            }
+
+            return _cachedTags;
         }
     }
 }
