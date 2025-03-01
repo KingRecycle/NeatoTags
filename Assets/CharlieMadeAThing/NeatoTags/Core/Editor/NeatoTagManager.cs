@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEditor;
@@ -38,6 +39,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Top Half
         ToolbarButton _addTagButton;
+
+        //Fields for Async Population
+        static List<NeatoTag> _tagsToProcess;
+        static int _currentTagIndex;
+        static bool _isPopulating;
+        static readonly int _batchSize = 10;
+        static double _lastSearchTime;
+        static string _pendingSearchText;
+        static bool _searchPending;
+        static readonly float _searchWaitTime = 0.1f;
 
 
         public void CreateGUI() {
@@ -89,10 +100,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField = _root.Q<ToolbarSearchField>( "tagSearchField" );
             _tagSearchField.tooltip =
                 "Search for tags by name. Use ^ at the beginning of your search to search for exact matches.";
-            _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearch( evt.newValue ); } );
-            _tagSearchField.RegisterValueChangedCallback( evt => { PopulateButtonsWithSearch( evt.newValue ); } );
+            SetupSearchField();
 
-            PopulateAllTagsBox();
+            PopulateAllTagsBoxAsync();
         }
 
         [MenuItem( "Window/Neato Tag Manager" )]
@@ -131,20 +141,52 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagDirectoryLabel.text = $"Default Tag Folder Location: {tagPath}";
         }
 
-        static void PopulateButtonsWithSearch( string evtNewValue ) {
-            if ( evtNewValue == string.Empty ) {
-                PopulateAllTagsBox();
+        static void PopulateButtonsWithSearchAsync( string evtNewValue ) {
+            if ( string.IsNullOrEmpty( evtNewValue ) ) {
+                PopulateAllTagsBoxAsync();
                 return;
             }
 
-            _allTagsBox.Clear();
-            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
-            foreach ( var neatoTagAsset in allTags ) {
-                if ( Regex.IsMatch( neatoTagAsset.name, $"{evtNewValue}", RegexOptions.IgnoreCase ) ) {
-                    _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );
-                }
+            if ( _isPopulating ) {
+                EditorApplication.update -= ProcessTagBatch;
             }
+
+            _allTagsBox.Clear();
+            var allTags = TagAssetCreation.GetAllTags().ToList()
+                .Where( t => Regex.IsMatch( t.name, $"{evtNewValue}", RegexOptions.IgnoreCase ) )
+                .OrderBy( tag => tag.name )
+                .ToList();
+
+            _tagsToProcess = allTags;
+            _currentTagIndex = 0;
+            _isPopulating = true;
+
+            EditorApplication.update += ProcessTagBatch;
         }
+
+        static void SetupSearchField() {
+            _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearchAsync( evt.newValue ); } );
+            _tagSearchField.RegisterValueChangedCallback( evt => {
+                _pendingSearchText = evt.newValue;
+                _lastSearchTime = EditorApplication.timeSinceStartup;
+                if ( !_searchPending ) {
+                    _searchPending = true;
+                    EditorApplication.update += ProcessSearchDebounce;
+                }
+            } );
+        }
+
+        //Prevents the search field from updating too frequently and causing performance issues.
+        static void ProcessSearchDebounce() {
+            if ( EditorApplication.timeSinceStartup - _lastSearchTime < _searchWaitTime ) {
+                return;
+            }
+
+            _searchPending = false;
+            EditorApplication.update -= ProcessSearchDebounce;
+            PopulateButtonsWithSearchAsync( _pendingSearchText );
+        }
+        
 
         static void DeleteSelectedTag() {
             if ( !_selectedTag.targetObject ) {
@@ -163,17 +205,42 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             UnDisplayTag();
         }
 
-
-        static void PopulateAllTagsBox() {
-            _allTagsBox.Clear();
-
-            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
-
-            foreach ( var neatoTagAsset in allTags ) {
-                _allTagsBox.Add( CreateTagButton( neatoTagAsset ) );
+        static void PopulateAllTagsBoxAsync() {
+            if ( _isPopulating ) {
+                EditorApplication.update -= ProcessTagBatch;
+                return;
             }
+
+            _allTagsBox.Clear();
+            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
+            _tagsToProcess = allTags.ToList();
+            _currentTagIndex = 0;
+            _isPopulating = true;
+            EditorApplication.update += ProcessTagBatch;
         }
 
+        static void ProcessTagBatch() {
+            if ( !_isPopulating || _tagsToProcess == null ) {
+                EditorApplication.update -= ProcessTagBatch;
+                return;
+            }
+
+            // Process a batch of tags
+            var endIndex = Mathf.Min( _currentTagIndex + _batchSize, _tagsToProcess.Count );
+            for ( var i = _currentTagIndex; i < endIndex; i++ ) {
+                _allTagsBox.Add( CreateTagButton( _tagsToProcess[i] ) );
+            }
+
+            _currentTagIndex = endIndex;
+
+            // Check if we're done
+            if ( _currentTagIndex >= _tagsToProcess.Count ) {
+                _isPopulating = false;
+                _tagsToProcess = null;
+                EditorApplication.update -= ProcessTagBatch;
+                EditorUtility.ClearProgressBar();
+            }
+        }
 
         static Button CreateTagButton( NeatoTag tag ) {
             var button = _tagButtonTemplate.Instantiate().Q<Button>();
@@ -226,7 +293,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
             TagAssetCreation.InvalidateTagCache();
-            PopulateAllTagsBox();
+            PopulateAllTagsBoxAsync();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
             _selectedTag.ApplyModifiedProperties();
@@ -376,7 +443,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static void UpdateTagComment( ChangeEvent<string> evt ) {
             _selectedTag.FindProperty( "comment" ).stringValue = evt.newValue;
-            PopulateAllTagsBox();
             _selectedTag.ApplyModifiedProperties();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
