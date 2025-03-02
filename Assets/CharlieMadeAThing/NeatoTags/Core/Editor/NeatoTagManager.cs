@@ -44,11 +44,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static List<NeatoTag> _tagsToProcess;
         static int _currentTagIndex;
         static bool _isPopulating;
-        static readonly int _batchSize = 10;
+        static readonly int _batchSize = 2;
         static double _lastSearchTime;
         static string _pendingSearchText;
         static bool _searchPending;
-        static readonly float _searchWaitTime = 0.1f;
+        static readonly float _searchWaitTime = 0.3f;
+        static bool _isBackspaceHeld;
 
 
         public void CreateGUI() {
@@ -149,6 +150,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             if ( _isPopulating ) {
                 EditorApplication.update -= ProcessTagBatch;
+                _isPopulating = false;
             }
 
             _allTagsBox.Clear();
@@ -165,26 +167,90 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         static void SetupSearchField() {
+            // Clear any existing callbacks to avoid duplicates
             _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearchAsync( evt.newValue ); } );
-            _tagSearchField.RegisterValueChangedCallback( evt => {
-                _pendingSearchText = evt.newValue;
+            
+            _tagSearchField.UnregisterCallback<KeyDownEvent>(OnKeyDown);
+            _tagSearchField.UnregisterCallback<KeyUpEvent>(OnKeyUp);
+            
+            // Register new callbacks
+            _tagSearchField.RegisterCallback<KeyDownEvent>(OnKeyDown);
+            _tagSearchField.RegisterCallback<KeyUpEvent>(OnKeyUp);
+            
+            _tagSearchField.RegisterValueChangedCallback(OnValueChanged);
+            _tagSearchField.Focus();
+        }
+        
+        static void OnKeyDown(KeyDownEvent keydownEvent) {
+            if (keydownEvent.keyCode == KeyCode.Backspace) {
+                _isBackspaceHeld = true;
+        
+                // Cancel any pending search
+                if (_searchPending) {
+                    _searchPending = false;
+                    EditorApplication.update -= ProcessSearchDebounce;
+                }
+            }
+        }
+
+        static void OnKeyUp(KeyUpEvent keydownEvent) {
+            if (keydownEvent.keyCode == KeyCode.Backspace) {
+                _isBackspaceHeld = false;
                 _lastSearchTime = EditorApplication.timeSinceStartup;
-                if ( !_searchPending ) {
+        
+                // Schedule a search after a delay
+                if (!_searchPending) {
                     _searchPending = true;
                     EditorApplication.update += ProcessSearchDebounce;
                 }
-            } );
+            }
         }
 
-        //Prevents the search field from updating too frequently and causing performance issues.
-        static void ProcessSearchDebounce() {
-            if ( EditorApplication.timeSinceStartup - _lastSearchTime < _searchWaitTime ) {
+        static void OnValueChanged(ChangeEvent<string> evt) {
+            _pendingSearchText = evt.newValue;
+            _lastSearchTime = EditorApplication.timeSinceStartup;
+    
+            // Don't trigger immediate search for backspace
+            if (_isBackspaceHeld) {
+                // Stop any current population
+                if (_isPopulating) {
+                    EditorApplication.update -= ProcessTagBatch;
+                    _isPopulating = false;
+                }
                 return;
             }
-
+    
+            // For non-backspace changes, schedule search with debounce
+            if (!_searchPending) {
+                _searchPending = true;
+                EditorApplication.update += ProcessSearchDebounce;
+            }
+        }
+        
+        //Prevents the search field from updating too frequently and causing performance issues.
+        static void ProcessSearchDebounce() {
+            // If we're still holding backspace, don't process yet
+            if (_isBackspaceHeld) {
+                return;
+            }
+    
+            float debounceTime = string.IsNullOrEmpty(_pendingSearchText) ? 0.1f : _searchWaitTime;
+    
+            // Wait for the debounce time to elapse
+            if (EditorApplication.timeSinceStartup - _lastSearchTime < debounceTime) {
+                return;
+            }
+    
             _searchPending = false;
             EditorApplication.update -= ProcessSearchDebounce;
-            PopulateButtonsWithSearchAsync( _pendingSearchText );
+    
+            // Only populate if we're not still holding backspace
+            if (!_isBackspaceHeld && !string.IsNullOrEmpty(_pendingSearchText)) {
+                PopulateButtonsWithSearchAsync(_pendingSearchText);
+            }
+            else {
+                PopulateAllTagsBoxAsync();
+            }
         }
         
 
@@ -446,5 +512,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTag.ApplyModifiedProperties();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
+        
     }
 }
