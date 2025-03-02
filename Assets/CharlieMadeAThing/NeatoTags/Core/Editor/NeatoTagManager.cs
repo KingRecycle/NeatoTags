@@ -363,6 +363,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
             _selectedTag.ApplyModifiedProperties();
+            DisplayTag();
         }
 
         static void UnDisplayTag() {
