@@ -174,8 +174,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField.UnregisterCallback<KeyUpEvent>(OnKeyUp);
             
             // Register new callbacks
-            _tagSearchField.RegisterCallback<KeyDownEvent>(OnKeyDown);
-            _tagSearchField.RegisterCallback<KeyUpEvent>(OnKeyUp);
+            _tagSearchField.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
+            _tagSearchField.RegisterCallback<KeyUpEvent>(OnKeyUp, TrickleDown.TrickleDown);
             
             _tagSearchField.RegisterValueChangedCallback(OnValueChanged);
             _tagSearchField.Focus();
