@@ -44,11 +44,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static List<NeatoTag> _tagsToProcess;
         static int _currentTagIndex;
         static bool _isPopulating;
-        static readonly int _batchSize = 2;
+        static readonly int BatchSize = 6;
         static double _lastSearchTime;
         static string _pendingSearchText;
         static bool _searchPending;
-        static readonly float _searchWaitTime = 0.3f;
+        static readonly float SearchWaitTime = 0.2f;
         static bool _isBackspaceHeld;
 
 
@@ -234,7 +234,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return;
             }
     
-            float debounceTime = string.IsNullOrEmpty(_pendingSearchText) ? 0.1f : _searchWaitTime;
+            float debounceTime = string.IsNullOrEmpty(_pendingSearchText) ? 0.1f : SearchWaitTime;
     
             // Wait for the debounce time to elapse
             if (EditorApplication.timeSinceStartup - _lastSearchTime < debounceTime) {
@@ -292,7 +292,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             // Process a batch of tags
-            var endIndex = Mathf.Min( _currentTagIndex + _batchSize, _tagsToProcess.Count );
+            var endIndex = Mathf.Min( _currentTagIndex + BatchSize, _tagsToProcess.Count );
             for ( var i = _currentTagIndex; i < endIndex; i++ ) {
                 _allTagsBox.Add( CreateTagButton( _tagsToProcess[i] ) );
             }
