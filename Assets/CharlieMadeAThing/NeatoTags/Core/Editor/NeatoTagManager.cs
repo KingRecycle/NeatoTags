@@ -44,11 +44,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         List<NeatoTag> _tagsToProcess;
         int _currentTagIndex;
         bool _isPopulating;
-        readonly int BatchSize = 6;
+        readonly int _batchSize = 6;
         double _lastSearchTime;
         string _pendingSearchText;
         bool _searchPending;
-        readonly float SearchWaitTime = 0.2f;
+        readonly float _searchWaitTime = 0.2f;
         bool _isBackspaceHeld;
 
 
@@ -82,27 +82,22 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTagButton.style.visibility = Visibility.Hidden;
 
             _addTagButton = _root.Q<ToolbarButton>( "addTagButton" );
-            _addTagButton.clicked -= AddNewTag;
-            _addTagButton.clicked += AddNewTag;
 
             _setTagFolderButton = _root.Q<Button>( "setTagFolderButton" );
-            _setTagFolderButton.clicked -= SetTagFolder;
-            _setTagFolderButton.clicked += SetTagFolder;
 
             _tagDirectoryLabel = _root.Q<Label>( "tagDirectoryLabel" );
             UpdatePathLabel();
 
 
             _deleteTagButton = _root.Q<Button>( "deleteTagButton" );
-            _deleteTagButton.clicked -= DeleteSelectedTag;
-            _deleteTagButton.clicked += DeleteSelectedTag;
             _deleteTagButton.style.visibility = Visibility.Hidden;
 
             _tagSearchField = _root.Q<ToolbarSearchField>( "tagSearchField" );
             _tagSearchField.tooltip =
                 "Search for tags by name. Use ^ at the beginning of your search to search for exact matches.";
+            UnregisterCallbacks();
+            RegisterCallbacks();
             SetupSearchField();
-
             PopulateAllTagsBoxAsync();
         }
 
@@ -130,6 +125,28 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 NeatoTagTaggerTracker.RegisterTaggersInScene();
                 _isDirty = false;
             }
+        }
+
+        void OnDisable() {
+            UnregisterCallbacks();
+        }
+
+        void RegisterCallbacks() {
+            _addTagButton.clicked += AddNewTag;
+            _setTagFolderButton.clicked += SetTagFolder;
+            _deleteTagButton.clicked += DeleteSelectedTag;
+            _tagSearchField.RegisterValueChangedCallback( OnValueChanged );
+            _tagSearchField.RegisterCallback<KeyDownEvent>( OnKeyDown );
+            _tagSearchField.RegisterCallback<KeyUpEvent>( OnKeyUp );
+        }
+
+        void UnregisterCallbacks() {
+            _addTagButton.clicked -= AddNewTag;
+            _setTagFolderButton.clicked -= SetTagFolder;
+            _deleteTagButton.clicked -= DeleteSelectedTag;
+            _tagSearchField.UnregisterValueChangedCallback( OnValueChanged );
+            _tagSearchField.UnregisterCallback<KeyDownEvent>( OnKeyDown );
+            _tagSearchField.UnregisterCallback<KeyUpEvent>( OnKeyUp );
         }
 
         void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
@@ -168,91 +185,94 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void SetupSearchField() {
             // Clear any existing callbacks to avoid duplicates
-            _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearchAsync( evt.newValue ); } );
-            
-            _tagSearchField.UnregisterCallback<KeyDownEvent>(OnKeyDown);
-            _tagSearchField.UnregisterCallback<KeyUpEvent>(OnKeyUp);
-            
+            _tagSearchField.UnregisterValueChangedCallback( evt => {
+                PopulateButtonsWithSearchAsync( evt.newValue );
+            } );
+
+            _tagSearchField.UnregisterCallback<KeyDownEvent>( OnKeyDown );
+            _tagSearchField.UnregisterCallback<KeyUpEvent>( OnKeyUp );
+
             // Register new callbacks
-            _tagSearchField.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
-            _tagSearchField.RegisterCallback<KeyUpEvent>(OnKeyUp, TrickleDown.TrickleDown);
-            
-            _tagSearchField.RegisterValueChangedCallback(OnValueChanged);
+            _tagSearchField.RegisterCallback<KeyDownEvent>( OnKeyDown, TrickleDown.TrickleDown );
+            _tagSearchField.RegisterCallback<KeyUpEvent>( OnKeyUp, TrickleDown.TrickleDown );
+
+            _tagSearchField.RegisterValueChangedCallback( OnValueChanged );
             _tagSearchField.Focus();
         }
-        
-        void OnKeyDown(KeyDownEvent keydownEvent) {
-            if (keydownEvent.keyCode == KeyCode.Backspace) {
+
+        void OnKeyDown( KeyDownEvent keydownEvent ) {
+            if ( keydownEvent.keyCode == KeyCode.Backspace ) {
                 _isBackspaceHeld = true;
-        
+
                 // Cancel any pending search
-                if (_searchPending) {
+                if ( _searchPending ) {
                     _searchPending = false;
                     EditorApplication.update -= ProcessSearchDebounce;
                 }
             }
         }
 
-        void OnKeyUp(KeyUpEvent keydownEvent) {
-            if (keydownEvent.keyCode == KeyCode.Backspace) {
+        void OnKeyUp( KeyUpEvent keydownEvent ) {
+            if ( keydownEvent.keyCode == KeyCode.Backspace ) {
                 _isBackspaceHeld = false;
                 _lastSearchTime = EditorApplication.timeSinceStartup;
-        
+
                 // Schedule a search after a delay
-                if (!_searchPending) {
+                if ( !_searchPending ) {
                     _searchPending = true;
                     EditorApplication.update += ProcessSearchDebounce;
                 }
             }
         }
 
-        void OnValueChanged(ChangeEvent<string> evt) {
+        void OnValueChanged( ChangeEvent<string> evt ) {
             _pendingSearchText = evt.newValue;
             _lastSearchTime = EditorApplication.timeSinceStartup;
-    
+
             // Don't trigger immediate search for backspace
-            if (_isBackspaceHeld) {
+            if ( _isBackspaceHeld ) {
                 // Stop any current population
-                if (_isPopulating) {
+                if ( _isPopulating ) {
                     EditorApplication.update -= ProcessTagBatch;
                     _isPopulating = false;
                 }
+
                 return;
             }
-    
+
             // For non-backspace changes, schedule search with debounce
-            if (!_searchPending) {
+            if ( !_searchPending ) {
                 _searchPending = true;
                 EditorApplication.update += ProcessSearchDebounce;
             }
         }
-        
+
         //Prevents the search field from updating too frequently and causing performance issues.
         void ProcessSearchDebounce() {
             // If we're still holding backspace, don't process yet
-            if (_isBackspaceHeld) {
+            if ( _isBackspaceHeld ) {
                 return;
             }
-    
-            float debounceTime = string.IsNullOrEmpty(_pendingSearchText) ? 0.1f : SearchWaitTime;
-    
+
+            var debounceTime = string.IsNullOrEmpty( _pendingSearchText ) ? 0.1f : _searchWaitTime;
+
             // Wait for the debounce time to elapse
-            if (EditorApplication.timeSinceStartup - _lastSearchTime < debounceTime) {
+            if ( EditorApplication.timeSinceStartup - _lastSearchTime < debounceTime ) {
                 return;
             }
-    
+
             _searchPending = false;
             EditorApplication.update -= ProcessSearchDebounce;
-    
+
             // Only populate if we're not still holding backspace
-            if (!_isBackspaceHeld && !string.IsNullOrEmpty(_pendingSearchText)) {
-                PopulateButtonsWithSearchAsync(_pendingSearchText);
+            if ( !_isBackspaceHeld && !string.IsNullOrEmpty( _pendingSearchText ) ) {
+                PopulateButtonsWithSearchAsync( _pendingSearchText );
             }
             else {
                 PopulateAllTagsBoxAsync();
             }
         }
-        
+
 
         void DeleteSelectedTag() {
             if ( !_selectedTag.targetObject ) {
@@ -292,7 +312,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             // Process a batch of tags
-            var endIndex = Mathf.Min( _currentTagIndex + BatchSize, _tagsToProcess.Count );
+            var endIndex = Mathf.Min( _currentTagIndex + _batchSize, _tagsToProcess.Count );
             for ( var i = _currentTagIndex; i < endIndex; i++ ) {
                 _allTagsBox.Add( CreateTagButton( _tagsToProcess[i] ) );
             }
@@ -355,15 +375,28 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( !CanRenameTag( newName ) ) {
                 return;
             }
-
+            
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
+            _selectedTag.targetObject.name = newName;
+            EditorUtility.SetDirty(_selectedTag.targetObject);
+            
+            AssetDatabase.SaveAssets();
+            _selectedTag.Update();
+            _selectedTag.ApplyModifiedProperties();
+            
             TagAssetCreation.InvalidateTagCache();
             PopulateAllTagsBoxAsync();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
-            _selectedTag.ApplyModifiedProperties();
+            
             DisplayTag();
+        }
+
+        void RenameFieldOnKeyDown( KeyDownEvent evt ) {
+            if ( evt.keyCode == KeyCode.Return ) {
+                DoRename();
+            }
         }
 
         void UnDisplayTag() {
@@ -402,20 +435,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
             //Event when Enter/Return key is pressed when rename field is focused.
-            _renameField.UnregisterCallback<KeyDownEvent>( evt => {
-                if ( evt.keyCode != KeyCode.Return ) {
-                    return;
-                }
-
-                DoRename();
-            } );
-            _renameField.RegisterCallback<KeyDownEvent>( evt => {
-                if ( evt.keyCode != KeyCode.Return ) {
-                    return;
-                }
-
-                DoRename();
-            } );
+            _renameField.UnregisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
+            _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
 
             //Event when Rename button is clicked
             _renameButton.clicked -= DoRename;
@@ -513,6 +534,5 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTag.ApplyModifiedProperties();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
-        
     }
 }
