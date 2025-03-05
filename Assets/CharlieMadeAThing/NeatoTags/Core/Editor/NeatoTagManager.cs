@@ -13,43 +13,43 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     ///     The NeatoTags Manager window.
     /// </summary>
     public class NeatoTagManager : EditorWindow {
-        static VisualTreeAsset _tagButtonTemplate;
-        static VisualElement _root;
+        VisualTreeAsset _tagButtonTemplate;
+        VisualElement _root;
 
-        static GroupBox _allTagsBox;
-        static ToolbarSearchField _tagSearchField;
+        GroupBox _allTagsBox;
+        ToolbarSearchField _tagSearchField;
 
         //Bottom Half
-        static Button _renameButton;
-        static Button _selectedTagButton;
-        static TextField _renameField;
-        static Toolbar _renameToolbar;
-        static GroupBox _tagInfoBox;
-        static Button _deleteTagButton;
-        static Button _setTagFolderButton;
-        static Label _tagDirectoryLabel;
-        static Button _selectAllButton;
+        Button _renameButton;
+        Button _selectedTagButton;
+        TextField _renameField;
+        Toolbar _renameToolbar;
+        GroupBox _tagInfoBox;
+        Button _deleteTagButton;
+        Button _setTagFolderButton;
+        Label _tagDirectoryLabel;
+        Button _selectAllButton;
 
         //Selected Data
-        static SerializedObject _selectedTag;
-        static TextField _selectedTagTextField;
-        static ColorField _selectedTagColorField;
+        SerializedObject _selectedTag;
+        TextField _selectedTagTextField;
+        ColorField _selectedTagColorField;
 
-        static VisualElement _selectedTagInfoElement;
+        VisualElement _selectedTagInfoElement;
 
         //Top Half
         ToolbarButton _addTagButton;
 
         //Fields for Async Population
-        static List<NeatoTag> _tagsToProcess;
-        static int _currentTagIndex;
-        static bool _isPopulating;
-        static readonly int BatchSize = 6;
-        static double _lastSearchTime;
-        static string _pendingSearchText;
-        static bool _searchPending;
-        static readonly float SearchWaitTime = 0.2f;
-        static bool _isBackspaceHeld;
+        List<NeatoTag> _tagsToProcess;
+        int _currentTagIndex;
+        bool _isPopulating;
+        readonly int BatchSize = 6;
+        double _lastSearchTime;
+        string _pendingSearchText;
+        bool _searchPending;
+        readonly float SearchWaitTime = 0.2f;
+        bool _isBackspaceHeld;
 
 
         public void CreateGUI() {
@@ -112,14 +112,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             wnd.titleContent = new GUIContent( "Neato Tag Manager" );
         }
 
-        public static void ShowWindow( NeatoTag tag ) {
+        public void ShowWindow( NeatoTag tag ) {
             var wnd = GetWindow<NeatoTagManager>();
             wnd.titleContent = new GUIContent( "Neato Tag Manager" );
             _selectedTag = new SerializedObject( tag );
             DisplayTag();
         }
 
-        static bool _isDirty = true;
+        bool _isDirty = true;
 
         void OnEnable() {
             //Keeping track of Tagger components in the scene so got to do an initial grab of all the components on editor scene load.
@@ -132,17 +132,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        static void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
+        void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
             _isDirty = true;
         }
 
-        static void UpdatePathLabel() {
+        void UpdatePathLabel() {
             var tagFolderLocation = TagAssetCreation.GetTagFolderLocation();
             var tagPath = tagFolderLocation == string.Empty ? "Not Assigned" : tagFolderLocation;
             _tagDirectoryLabel.text = $"Default Tag Folder Location: {tagPath}";
         }
 
-        static void PopulateButtonsWithSearchAsync( string evtNewValue ) {
+        void PopulateButtonsWithSearchAsync( string evtNewValue ) {
             if ( string.IsNullOrEmpty( evtNewValue ) ) {
                 PopulateAllTagsBoxAsync();
                 return;
@@ -166,7 +166,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             EditorApplication.update += ProcessTagBatch;
         }
 
-        static void SetupSearchField() {
+        void SetupSearchField() {
             // Clear any existing callbacks to avoid duplicates
             _tagSearchField.UnregisterValueChangedCallback( evt => { PopulateButtonsWithSearchAsync( evt.newValue ); } );
             
@@ -181,7 +181,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField.Focus();
         }
         
-        static void OnKeyDown(KeyDownEvent keydownEvent) {
+        void OnKeyDown(KeyDownEvent keydownEvent) {
             if (keydownEvent.keyCode == KeyCode.Backspace) {
                 _isBackspaceHeld = true;
         
@@ -193,7 +193,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        static void OnKeyUp(KeyUpEvent keydownEvent) {
+        void OnKeyUp(KeyUpEvent keydownEvent) {
             if (keydownEvent.keyCode == KeyCode.Backspace) {
                 _isBackspaceHeld = false;
                 _lastSearchTime = EditorApplication.timeSinceStartup;
@@ -206,7 +206,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        static void OnValueChanged(ChangeEvent<string> evt) {
+        void OnValueChanged(ChangeEvent<string> evt) {
             _pendingSearchText = evt.newValue;
             _lastSearchTime = EditorApplication.timeSinceStartup;
     
@@ -228,7 +228,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
         
         //Prevents the search field from updating too frequently and causing performance issues.
-        static void ProcessSearchDebounce() {
+        void ProcessSearchDebounce() {
             // If we're still holding backspace, don't process yet
             if (_isBackspaceHeld) {
                 return;
@@ -254,7 +254,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
         
 
-        static void DeleteSelectedTag() {
+        void DeleteSelectedTag() {
             if ( !_selectedTag.targetObject ) {
                 return;
             }
@@ -271,7 +271,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             UnDisplayTag();
         }
 
-        static void PopulateAllTagsBoxAsync() {
+        void PopulateAllTagsBoxAsync() {
             if ( _isPopulating ) {
                 EditorApplication.update -= ProcessTagBatch;
                 return;
@@ -285,7 +285,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             EditorApplication.update += ProcessTagBatch;
         }
 
-        static void ProcessTagBatch() {
+        void ProcessTagBatch() {
             if ( !_isPopulating || _tagsToProcess == null ) {
                 EditorApplication.update -= ProcessTagBatch;
                 return;
@@ -308,7 +308,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        static Button CreateTagButton( NeatoTag tag ) {
+        Button CreateTagButton( NeatoTag tag ) {
             var button = _tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag.Comment != string.Empty ) {
                 button.tooltip = tag.Comment;
@@ -330,7 +330,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         //Checks if the tag name is valid and if the name doesn't already exist.
-        static bool CanRenameTag( string newName ) {
+        bool CanRenameTag( string newName ) {
             //Trim the name to remove any leading or trailing spaces.
             if ( newName == string.Empty ) {
                 Debug.LogWarning(
@@ -350,7 +350,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return true;
         }
 
-        static void DoRename() {
+        void DoRename() {
             var newName = _renameField.text.Trim();
             if ( !CanRenameTag( newName ) ) {
                 return;
@@ -366,7 +366,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             DisplayTag();
         }
 
-        static void UnDisplayTag() {
+        void UnDisplayTag() {
             _tagInfoBox.Remove( _selectedTagInfoElement );
             _renameField.style.visibility = Visibility.Hidden;
             _renameButton.style.visibility = Visibility.Hidden;
@@ -376,7 +376,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         //NOTE: Don't forget to unsubscribe from events before subscribing to them again.
-        static void DisplayTag() {
+        void DisplayTag() {
             var visualTree = AssetDatabase
                 .LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml )
                 .Instantiate();
@@ -460,17 +460,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         //Called the SelectedAllGameObjectsWithTaggerThatHasTag() function
         //Wrapper function to play nice with events/callbacks since they don't like functions with parameters.
-        static void SelectAllWithTag() {
+        void SelectAllWithTag() {
             NeatoTagTaggerTracker.SelectAllGameObjectsWithTaggerThatHasTag( _selectedTag.targetObject as NeatoTag );
         }
 
         //Selects and puts into focus the selected tag in the project view.
-        static void SelectedTagAssetInProjectView() {
+        void SelectedTagAssetInProjectView() {
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = _selectedTag.targetObject;
         }
 
-        static void AddNewTag() {
+        void AddNewTag() {
             var newTag = TagAssetCreation.CreateNewTag( "New Tag" );
             var newTagButton = CreateTagButton( newTag );
             _allTagsBox.Add( newTagButton );
@@ -484,12 +484,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
-        static void SetTagFolder() {
+        void SetTagFolder() {
             TagAssetCreation.SetTagFolder();
             UpdatePathLabel();
         }
 
-        static void UpdateTagColor( ChangeEvent<Color> evt ) {
+        void UpdateTagColor( ChangeEvent<Color> evt ) {
             _selectedTag.FindProperty( "color" ).colorValue = evt.newValue;
             _selectedTagButton.style.backgroundColor = _selectedTag.FindProperty( "color" ).colorValue;
             _selectedTagButton.style.color =
@@ -508,7 +508,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagAssetModificationProcessor.UpdateTaggers();
         }
 
-        static void UpdateTagComment( ChangeEvent<string> evt ) {
+        void UpdateTagComment( ChangeEvent<string> evt ) {
             _selectedTag.FindProperty( "comment" ).stringValue = evt.newValue;
             _selectedTag.ApplyModifiedProperties();
             NeatoTagAssetModificationProcessor.UpdateTaggers();

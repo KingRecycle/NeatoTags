@@ -193,7 +193,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( !_isEditTaggerMode ) {
                 if ( tagButton is Button button ) {
                     StyleButton( button, tag );
-                    button.clicked += () => { NeatoTagManager.ShowWindow( tag ); };
+                    button.clicked += () => {
+                        var window = EditorWindow.GetWindow<NeatoTagManager>();
+                        window.ShowWindow(tag); 
+                    };
                 }
             }
             else {
