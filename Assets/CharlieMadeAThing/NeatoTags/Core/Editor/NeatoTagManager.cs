@@ -436,7 +436,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             //Event when Enter/Return key is pressed when rename field is focused.
             _renameField.UnregisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
-            _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
+            _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown, TrickleDown.TrickleDown );
 
             //Event when Rename button is clicked
             _renameButton.clicked -= DoRename;
