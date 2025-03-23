@@ -131,6 +131,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             UnregisterCallbacks();
         }
 
+        void OnDestroy() {
+            UnregisterCallbacks();
+        }
+
+        //Register callbacks that can be registered immediately. This is called when the window is opened.
+        //EditorApplication.update should only be registered when needed and not when the window is opened.
         void RegisterCallbacks() {
             _addTagButton.clicked += AddNewTag;
             _setTagFolderButton.clicked += SetTagFolder;
@@ -140,6 +146,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField.RegisterCallback<KeyUpEvent>( OnKeyUp );
         }
 
+        //Unregister all callbacks. This is called when the window is closed.
         void UnregisterCallbacks() {
             _addTagButton.clicked -= AddNewTag;
             _setTagFolderButton.clicked -= SetTagFolder;
@@ -147,6 +154,29 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField.UnregisterValueChangedCallback( OnValueChanged );
             _tagSearchField.UnregisterCallback<KeyDownEvent>( OnKeyDown );
             _tagSearchField.UnregisterCallback<KeyUpEvent>( OnKeyUp );
+            EditorApplication.update -= ProcessTagBatch;
+            EditorApplication.update -= ProcessSearchDebounce;
+            UnregisterDisplayCallbacks();
+        }
+        
+        //Register tag-specific callbacks when tag is selected and displayed.
+        void RegisterDisplayCallbacks() {
+            _renameField.RegisterCallback<KeyDownEvent>(RenameFieldOnKeyDown, TrickleDown.TrickleDown);
+            _renameButton.clicked += DoRename;
+            _selectAllButton.clicked += SelectAllWithTag;
+            _selectedTagColorField?.RegisterValueChangedCallback(UpdateTagColor);
+            _selectedTagTextField?.RegisterValueChangedCallback(UpdateTagComment);
+            _selectedTagButton.clicked += SelectedTagAssetInProjectView;
+        }
+
+        //Unregister tag-specific callbacks when tag is unselected and hidden.
+        void UnregisterDisplayCallbacks() {
+            _renameField.UnregisterCallback<KeyDownEvent>(RenameFieldOnKeyDown);
+            _renameButton.clicked -= DoRename;
+            _selectAllButton.clicked -= SelectAllWithTag;
+            _selectedTagColorField?.UnregisterValueChangedCallback(UpdateTagColor);
+            _selectedTagTextField?.UnregisterValueChangedCallback(UpdateTagComment);
+            _selectedTagButton.clicked -= SelectedTagAssetInProjectView;
         }
 
         void OnSceneOpened( Scene scene, OpenSceneMode mode ) {
@@ -353,8 +383,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         bool CanRenameTag( string newName ) {
             //Trim the name to remove any leading or trailing spaces.
             if ( newName == string.Empty ) {
-                Debug.LogWarning(
-                    $"[Neato Tag Manager]: Tried to rename tag {_selectedTag.targetObject.name} but no name was entered." );
+                Debug.LogWarning("Tried to rename tag to an empty string.");
                 return false;
             }
 
@@ -375,21 +404,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( !CanRenameTag( newName ) ) {
                 return;
             }
-            
+
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
             AssetDatabase.RenameAsset( tagPath, newName );
             _selectedTag.targetObject.name = newName;
-            EditorUtility.SetDirty(_selectedTag.targetObject);
-            
+            EditorUtility.SetDirty( _selectedTag.targetObject );
+
             AssetDatabase.SaveAssets();
             _selectedTag.Update();
             _selectedTag.ApplyModifiedProperties();
-            
+
             TagAssetCreation.InvalidateTagCache();
             PopulateAllTagsBoxAsync();
             NeatoTagAssetModificationProcessor.UpdateTaggers();
             _renameField.value = string.Empty;
-            
+
             DisplayTag();
         }
 
@@ -400,6 +429,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void UnDisplayTag() {
+            UnregisterDisplayCallbacks();
             _tagInfoBox.Remove( _selectedTagInfoElement );
             _renameField.style.visibility = Visibility.Hidden;
             _renameButton.style.visibility = Visibility.Hidden;
@@ -429,37 +459,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTagColorField = _root.Q<ColorField>( "tagColor" );
             _selectedTagTextField = _root.Q<TextField>( "commentField" );
 
-            //Unregister callbacks
-            _selectedTagColorField?.UnregisterValueChangedCallback( UpdateTagColor );
-            _selectedTagTextField?.UnregisterValueChangedCallback( UpdateTagComment );
-
-
-            //Event when Enter/Return key is pressed when rename field is focused.
-            _renameField.UnregisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
-            _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown, TrickleDown.TrickleDown );
-
-            //Event when Rename button is clicked
-            _renameButton.clicked -= DoRename;
-            _renameButton.clicked += DoRename;
-
             _renameButton.style.visibility = Visibility.Visible;
             _renameButton.tooltip = $"Rename {_selectedTag.targetObject.name} tag.";
 
             _selectAllButton.style.visibility = Visibility.Visible;
             _selectAllButton.tooltip =
                 $"Select all gameobjects in scene with the {_selectedTag.targetObject.name} tag.";
-
-            _selectAllButton.clicked -= SelectAllWithTag;
-            _selectAllButton.clicked += SelectAllWithTag;
+            
+            RegisterDisplayCallbacks();
 
             if ( _selectedTagColorField != null ) {
                 _selectedTagColorField.value = _selectedTag.FindProperty( "color" ).colorValue;
-                _selectedTagColorField.RegisterValueChangedCallback( UpdateTagColor );
             }
 
             if ( _selectedTagTextField != null ) {
                 _selectedTagTextField.value = _selectedTag.FindProperty( "comment" ).stringValue;
-                _selectedTagTextField.RegisterValueChangedCallback( UpdateTagComment );
             }
 
 
@@ -472,9 +486,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectedTagButton.text = _selectedTag.targetObject.name;
             _selectedTagButton.style.color =
                 TaggerDrawer.GetTextColorBasedOnBackground( _selectedTag.FindProperty( "color" ).colorValue );
-
-            _selectedTagButton.clicked -= SelectedTagAssetInProjectView;
-            _selectedTagButton.clicked += SelectedTagAssetInProjectView;
 
             _deleteTagButton.style.visibility = Visibility.Visible;
         }
