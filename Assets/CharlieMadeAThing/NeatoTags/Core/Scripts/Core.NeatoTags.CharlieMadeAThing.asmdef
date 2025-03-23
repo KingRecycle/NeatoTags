@@ -1,6 +1,6 @@
 {
-    "name": "NeatoTags.CharlieMadeAThing",
-    "rootNamespace": "",
+    "name": "Core.NeatoTags.CharlieMadeAThing",
+    "rootNamespace": "CharlieMadeAThing.NeatoTags.Core",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

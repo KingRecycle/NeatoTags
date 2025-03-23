@@ -1,11 +1,11 @@
 {
-    "name": "PlayMode",
-    "rootNamespace": "",
+    "name": "Tests.NeatoTags.CharlieMadeAThing",
+    "rootNamespace": "CharlieMadeAThing.NeatoTags.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "NeatoTags.CharlieMadeAThing",
-        "Unity.PerformanceTesting"
+        "Unity.PerformanceTesting",
+        "Core.NeatoTags.CharlieMadeAThing"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

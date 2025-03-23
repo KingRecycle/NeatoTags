@@ -1,6 +1,6 @@
 {
     "name": "Editor.NeatoTags.CharlieMadeAThing",
-    "rootNamespace": "",
+    "rootNamespace": "CharlieMadeAThing.NeatoTags.Editor",
     "references": [
         "GUID:e92ff5d72ad73d64e88821eebb6986ef"
     ],
