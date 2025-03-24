@@ -22,7 +22,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
         static readonly HashSet<GameObject> _nonTaggedObjects = new();
-        
+
         //--------------------------------------------------------------------------------------------------------------
 
         // This tagger's tags for its gameobject.
@@ -57,18 +57,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             WantRepaint = null;
 #endif
         }
-        
+
         #region Cache Methods
-        
+
         void UpdateCache() {
             if ( !_isCacheDirty ) return;
             _cachedTagNames = _tags.Select( neatoTag => neatoTag.name ).ToHashSet();
             _isCacheDirty = false;
         }
+
         #endregion
 
         #region Query Methods
-        
+
         /// <summary>
         ///     All gameobjects in the scene with a tagger component.
         /// </summary>
@@ -163,34 +164,33 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         /// <summary>
         ///     Gets an existing tag with the given name or creates a new one if it doesn't exist.
-        ///     Tags created this way will not be saved to the project/game.
-        ///     You must implement your own way of saving tags to the project/game.
-        ///     Name is trimmed of whitespace.
+        ///     Tags created this way are not saved to disk.
         /// </summary>
         /// <param name="tagName">Name of the tag to get or create.</param>
         /// <returns>Returns existing or new tag if successful, otherwise returns null.</returns>
-        public NeatoTag GetOrCreate(string tagName) {
+        public NeatoTag GetOrCreate( string tagName ) {
             var trimmedName = tagName.Trim();
-            if (string.IsNullOrWhiteSpace(trimmedName)) {
-                Debug.LogWarning("A tag name can't be empty or whitespace.");
+            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
+                Debug.LogWarning( "A tag name can't be empty or whitespace." );
                 return null;
             }
-            
-            if (!IsValidTagName(trimmedName)) {
-                Debug.LogWarning($"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores.");
+
+            if ( !IsValidTagName( trimmedName ) ) {
+                Debug.LogWarning(
+                    $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
                 return null;
             }
 
             // Check if tag already exists
-            var existingTag = _taggedObjects.Keys.FirstOrDefault(t => t.name == trimmedName);
-            if (existingTag != null) {
+            var existingTag = _taggedObjects.Keys.FirstOrDefault( t => t.name == trimmedName );
+            if ( existingTag != null ) {
                 return existingTag;
             }
 
             // Create new tag if it doesn't exist
             var neatoTag = ScriptableObject.CreateInstance<NeatoTag>();
             neatoTag.name = trimmedName;
-            AddTag(neatoTag);
+            AddTag( neatoTag );
             return neatoTag;
         }
 
@@ -199,9 +199,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="name">Name of the tag to check.</param>
         /// <returns>True if the tag name is valid, otherwise false.</returns>
-        bool IsValidTagName( string name ) {
-            return System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
-        }
+        bool IsValidTagName( string name ) =>
+            System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
 
         /// <summary>
         ///     Add a tag to the tagger.
@@ -220,20 +219,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _nonTaggedObjects.Remove( gameObject );
             _isCacheDirty = true;
         }
-        
+
         /// <summary>
-        ///    Add a list of tags to the tagger.
+        ///     Add a list of tags to the tagger.
         /// </summary>
         /// <param name="neatoTagsToAdd">Tags to add.</param>
         public void AddTags( IEnumerable<NeatoTag> neatoTagsToAdd ) {
             if ( neatoTagsToAdd == null ) return;
-            
+
             var changed = false;
             foreach ( var neatoTag in neatoTagsToAdd ) {
                 if ( neatoTag == null || _tags.Contains( neatoTag ) ) {
-                    Debug.LogWarning( "[NeatoTags]: You are trying to add a tag that is either null or already exist on tagger." );
+                    Debug.LogWarning(
+                        "[NeatoTags]: You are trying to add a tag that is either null or already exist on tagger." );
                     continue;
                 }
+
                 _tags.Add( neatoTag );
                 _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
                 _taggedObjects[neatoTag].Add( gameObject );
