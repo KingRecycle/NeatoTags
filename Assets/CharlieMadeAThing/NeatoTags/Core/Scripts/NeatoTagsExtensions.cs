@@ -93,6 +93,16 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 tagger.RemoveTag( tagName );
             }
         }
+        
+        /// <summary>
+        /// Remove all tags from this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        public static void RemoveAllTags( this GameObject gameObject ) {
+            if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
+                tagger.RemoveAllTags();
+            }
+        }
 
         #endregion
 
