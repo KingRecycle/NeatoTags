@@ -31,6 +31,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         Tagger Target => target as Tagger;
 
         void OnEnable() {
+            InitializeUI();
+            NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
+            NeatoTagDrawer.RegisterTaggerDrawer( this );
+            PopulateButtons();
+            Target.WantRepaint += DoRepaint;
+            _tagger = new SerializedObject( Target );
+        }
+
+        void InitializeUI() {
             _root = new VisualElement();
 
             var visualTree =
@@ -43,38 +52,43 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagButtonWithXTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagWithXUxml );
 
+            FindUIElements();
+            ConfigureUIElements();
+        }
 
-            _tagViewerSelected = _root.Q<GroupBox>( "tagViewer" );
-            _tagViewerDeselected = _root.Q<GroupBox>( "allTagViewer" );
+        void FindUIElements() {
+            _tagViewerSelected = _root.Q<GroupBox>("tagViewer");
+            _tagViewerDeselected = _root.Q<GroupBox>("allTagViewer");
+            _searchField = _root.Q<ToolbarSearchField>("taggerSearch");
+            _searchLabel = _root.Q<Label>("searchLabel");
+            _taggerSearchAvailable = _root.Q<ToolbarSearchField>("taggerSearchAvailable");
+            _addTagButton = _root.Q<Button>("addTagButton");
+            _addTagTextField = _root.Q<TextField>("addTagTextField");
+            _allTagsBox = _root.Q<GroupBox>("allTagsBox");
+            _editTaggerButton = _root.Q<ToolbarButton>("editTaggerButton");
+        }
 
-            _searchField = _root.Q<ToolbarSearchField>( "taggerSearch" );
+        void ConfigureUIElements() {
             _searchField.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
             _searchField.tooltip =
                 $"Search through tags currently tagged to {target.name}. Use ^ at the beginning to search for exact matches.";
-            _searchLabel = _root.Q<Label>( "searchLabel" );
-
-            _taggerSearchAvailable = _root.Q<ToolbarSearchField>( "taggerSearchAvailable" );
+            
             _taggerSearchAvailable.RegisterValueChangedCallback( _ => { PopulateButtonsWithSearch(); } );
             _taggerSearchAvailable.tooltip =
                 $"Search through tags currently available to add to {target.name}. Use ^ at the beginning to search for exact matches.";
-
-            _addTagButton = _root.Q<Button>( "addTagButton" );
+            
             _addTagButton.tooltip = $"Create a new tag and add it to {target.name}";
             _addTagButton.clicked -= CreateNewTag;
             _addTagButton.clicked += CreateNewTag;
-            _addTagTextField = _root.Q<TextField>( "addTagTextField" );
+            
             _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
                 if ( evt.keyCode == KeyCode.Return ) {
                     CreateNewTag();
                 }
             } );
-
-            _allTagsBox = _root.Q<GroupBox>( "allTagsBox" );
-
-            _editTaggerButton = _root.Q<ToolbarButton>( "editTaggerButton" );
+            
             _editTaggerButton.tooltip = $"Edit Tags for {target.name}";
-
-
+            
             _searchField.style.display = DisplayStyle.None;
             _addTagButton.style.display = DisplayStyle.None;
             _addTagTextField.style.display = DisplayStyle.None;
@@ -82,13 +96,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _allTagsBox.style.display = DisplayStyle.None;
             _editTaggerButton.clicked -= ShowEditTagger;
             _editTaggerButton.clicked += ShowEditTagger;
-
-
-            NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
-            NeatoTagDrawer.RegisterTaggerDrawer( this );
-            PopulateButtons();
-            Target.WantRepaint += DoRepaint;
-            _tagger = new SerializedObject( Target );
         }
 
         void OnDisable() {
