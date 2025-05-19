@@ -89,3 +89,5 @@ crashlytics-build.properties
 # Cursor AI
 .cursor*
 
+# AI Guidelines file
+guidelines.*
