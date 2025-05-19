@@ -429,16 +429,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithAnyTags( params NeatoTag[] tags ) {
                 return WithAnyTags( tags.AsEnumerable() );
             }
-            
-            public GameObjectFilter InTagGroup( NeatoTagGroup tagGroup ) {
-                var tempMatches = new HashSet<GameObject>();
-                foreach ( var taggedObject in _taggedObjects.Where( taggedObject => taggedObject.Key.TagGroup == tagGroup ) ) {
-                    tempMatches.UnionWith( taggedObject.Value );
-                }
-
-                _matches.IntersectWith( tempMatches );
-                return this;
-            }
         }
 
         /// <summary>

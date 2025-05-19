@@ -20,7 +20,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         [UnitySetUp]
         public IEnumerator SetUp() {
             SceneManager.LoadScene( "TestScene" );
-            yield return null; // Wait for scene to load
+            yield return null; // Wait for a scene to load
 
             TagRefsForTests = GameObject.Find( "TagRefs" ).GetComponent<TagRefsForTests>();
             Cube = GameObject.Find( "Cube" ); //Has two tags (Cube and Platonic Solid)
@@ -293,126 +293,6 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
 
             Assert.That( filteredShapes.Count, Is.EqualTo( 0 ), "Should match None" );
 
-            yield return null;
-        }
-    }
-    //Tag group tests
-    [TestFixture]
-    public class TagGroupTests : NeatoTagTestBase {
-        NeatoTagGroup _testGroup;
-        NeatoTagGroup _secondGroup;
-        NeatoTag _testTag;
-    
-        [UnitySetUp]
-        public new IEnumerator SetUp() {
-            yield return base.SetUp();
-    
-            // Create test tag groups
-            _testGroup = ScriptableObject.CreateInstance<NeatoTagGroup>();
-            _testGroup.GroupName = "Test Group";
-            _testGroup.GroupColor = Color.red;
-    
-            _secondGroup = ScriptableObject.CreateInstance<NeatoTagGroup>();
-            _secondGroup.GroupName = "Second Group";
-            _secondGroup.GroupColor = Color.blue;
-    
-            // Create a test tag for group testing
-            _testTag = ScriptableObject.CreateInstance<NeatoTag>();
-            _testTag.name = "TestGroupTag";
-        }
-    
-        [UnityTearDown]
-        public IEnumerator TearDown() {
-            Object.Destroy( _testGroup );
-            Object.Destroy( _secondGroup );
-            Object.Destroy( _testTag );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator UncategorizedGroup_Exists_ReturnsTrue() {
-            Assert.That( NeatoTagGroup.Uncategorized, Is.Not.Null, "Uncategorized group should be available" );
-            Assert.That( NeatoTagGroup.Uncategorized.GroupName, Is.EqualTo( "Uncategorized" ),
-                "Uncategorized group should have correct name" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator TagWithoutGroup_UsesUncategorized_ReturnsTrue() {
-            Assert.That( _testTag.TagGroup, Is.EqualTo( NeatoTagGroup.Uncategorized ),
-                "Tag without assigned group should use Uncategorized" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator AddTagToGroup_TagIsInGroup_ReturnsTrue() {
-            _testGroup.AddTag( _testTag );
-            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.True, "Group should contain added tag" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator RemoveTagFromGroup_TagIsRemoved_ReturnsTrue() {
-            _testGroup.AddTag( _testTag );
-            _testGroup.RemoveTag( _testTag );
-            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.False, "Group should not contain removed tag" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator AddTagToGroup_SetTagGroup_BothReferencesMatch() {
-            // Test bidirectional relationship
-            _testTag.TagGroup = _testGroup;
-            _testGroup.AddTag( _testTag );
-    
-            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.True, "Group should contain the tag" );
-            Assert.That( _testTag.TagGroup, Is.EqualTo( _testGroup ), "Tag should reference the group" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator ChangeTagGroup_TagMovesToNewGroup() {
-            // Set initial group
-            _testTag.TagGroup = _testGroup;
-            _testGroup.AddTag( _testTag );
-    
-            // Change to new group
-            _testTag.TagGroup = _secondGroup;
-            _secondGroup.AddTag( _testTag );
-            _testGroup.RemoveTag( _testTag );
-    
-            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.False, "Old group should not contain the tag" );
-            Assert.That( _secondGroup.Tags.Contains( _testTag ), Is.True, "New group should contain the tag" );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator FilterByTagGroup_MatchesTags_ReturnsTrue() {
-            // Setup - create a tag in our test group and add to cube
-            var groupTag = ScriptableObject.CreateInstance<NeatoTag>();
-            groupTag.name = "GroupTestTag";
-            groupTag.TagGroup = _testGroup;
-            _testGroup.AddTag( groupTag );
-    
-            Cube.AddTag( groupTag );
-    
-            // Test - can we filter objects by tag group?
-            var filteredObjects = Tagger.FilterGameObjects( Shapes ).InTagGroup( _testGroup )
-                .GetMatches();
-    
-            Assert.AreEqual( 1, filteredObjects.Count, "Should match exactly one object" );
-            Assert.IsTrue( filteredObjects.Contains( Cube ), "Matched object should be the cube" );
-    
-            Object.Destroy( groupTag );
-            yield return null;
-        }
-    
-        [UnityTest]
-        public IEnumerator UncategorizedGroup_IsUncategorized_ReturnsTrue() {
-            Assert.IsTrue( NeatoTagGroup.Uncategorized.IsUncategorized(),
-                "Uncategorized group should be identified as uncategorized" );
-            Assert.IsFalse( _testGroup.IsUncategorized(),
-                "Custom group should not be identified as uncategorized" );
             yield return null;
         }
     }
