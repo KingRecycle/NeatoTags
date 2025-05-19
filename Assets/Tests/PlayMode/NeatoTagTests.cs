@@ -1,15 +1,14 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
-using Unity.PerformanceTesting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
-namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode 
-{
-    public abstract class NeatoTagTestBase 
-    {
+namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
+    public abstract class NeatoTagTestBase {
         protected GameObject Cube;
         protected GameObject Cylinder;
         protected GameObject Sphere;
@@ -19,232 +18,223 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode
         protected TagRefsForTests TagRefsForTests;
 
         [UnitySetUp]
-        public IEnumerator SetUp()
-        {
-            SceneManager.LoadScene("TestScene");
+        public IEnumerator SetUp() {
+            SceneManager.LoadScene( "TestScene" );
             yield return null; // Wait for scene to load
 
-            TagRefsForTests = GameObject.Find("TagRefs").GetComponent<TagRefsForTests>();
-            Cube = GameObject.Find("Cube");
-            Cylinder = GameObject.Find("Cylinder");
-            Sphere = GameObject.Find("Sphere");
-            Capsule = GameObject.Find("Capsule");
-            Plane = GameObject.Find("Plane");
+            TagRefsForTests = GameObject.Find( "TagRefs" ).GetComponent<TagRefsForTests>();
+            Cube = GameObject.Find( "Cube" ); //Has two tags (Cube and Platonic Solid)
+            Cylinder = GameObject.Find( "Cylinder" ); //Has two tags (Cylinder and Cornerless)
+            Sphere = GameObject.Find( "Sphere" ); //Has two tags (Sphere and Cornerless)
+            Capsule = GameObject.Find( "Capsule" ); //Has two tags (Capsule and Cornerless)
+            Plane = GameObject.Find( "Plane" ); //Does not have a tagger
             Shapes = new[] { Cube, Cylinder, Sphere, Capsule, Plane };
+            
         }
     }
 
     [TestFixture]
-    public class TaggerBasicTests : NeatoTagTestBase
-    {
+    public class TaggerBasicTests : NeatoTagTestBase {
         [UnityTest]
-        public IEnumerator HasTagger_ObjectWithTagger_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasTagger(), "Cube should have a Tagger component");
+        public IEnumerator HasTagger_CubeWithTagger_ReturnsTrue() {
+            Assert.That( Cube.HasTagger(), Is.True, "HasTagger() should return true if a Tagger component is on the GameObject." );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator HasTagger_ObjectWithoutTagger_ReturnsFalse()
-        {
-            Assert.IsFalse(Plane.HasTagger(), "Plane should not have a Tagger component");
-            yield return null;
-        }
-    }
-
-    [TestFixture]
-    public class TagExistenceTests : NeatoTagTestBase
-    {
-        [UnityTest]
-        public IEnumerator HasTag_ObjectHasTag_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasTag(TagRefsForTests.cubeTag), "Cube should have the 'Cube' tag");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasTag_ObjectDoesNotHaveTag_ReturnsFalse()
-        {
-            Assert.IsFalse(Cube.HasTag(TagRefsForTests.sphereTag), "Cube should not have the 'Sphere' tag");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasTag_ByString_ObjectHasTag_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasTag("Cube"), "Cube should have the 'Cube' tag by string reference");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasTag_NullTag_ReturnsFalse()
-        {
-            Cube.AddTag(null);
-            Assert.IsFalse(Cube.HasTag((NeatoTag)null), "Null tag should not be found");
+        public IEnumerator HasTagger_PlaneWithoutTagger_ReturnsFalse() {
+            Assert.That( Plane.HasTagger(), Is.False, "HasTagger() should return false if a Tagger component is not on the GameObject." );
             yield return null;
         }
     }
 
     [TestFixture]
-    public class TagModificationTests : NeatoTagTestBase
-    {
+    public class TagExistenceTests : NeatoTagTestBase {
         [UnityTest]
-        public IEnumerator AddTag_NewTag_TagIsAdded()
-        {
-            Cube.AddTag(TagRefsForTests.planeTag);
-            Assert.IsTrue(Cube.HasTag(TagRefsForTests.planeTag), "Plane tag should be added to cube");
+        public IEnumerator HasTag_CubeHasCubeTag_ReturnsTrue() {
+            Assert.That( Cube.HasTag( TagRefsForTests.cubeTag ), Is.True, "Cube should have the 'Cube' tag" );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator AddTags_MultipleTags_AllTagsAreAdded()
-        {
-            Cube.AddTags(TagRefsForTests.planeTag, TagRefsForTests.sphereTag);
-            Assert.IsTrue(Cube.HasTag(TagRefsForTests.planeTag) && Cube.HasTag(TagRefsForTests.sphereTag), 
-                "Both tags should be added to cube");
+        public IEnumerator HasTag_CubeDoesNotHaveSphereTag_ReturnsFalse() {
+            Assert.That( Cube.HasTag( TagRefsForTests.sphereTag ), Is.False, "Cube should not have the 'Sphere' tag" );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator RemoveTag_ExistingTag_TagIsRemoved()
-        {
-            Cube.AddTag(TagRefsForTests.planeTag);
-            Cube.RemoveTag(TagRefsForTests.planeTag);
-            Assert.IsFalse(Cube.HasTag(TagRefsForTests.planeTag), "Plane tag should be removed from cube");
+        public IEnumerator HasTag_ByString_CubeHasCubeTag_ReturnsTrue() {
+            const string tagString = "Cube";
+            Assert.That( Cube.HasTag( tagString ), Is.True, $"Cube should have the 'Cube' tag. String used: {tagString}" );
             yield return null;
         }
-        
+
         [UnityTest]
-        public IEnumerator RemoveAllTags_AllTagsRemoved()
-        {
-            Cube.AddTags(TagRefsForTests.planeTag, TagRefsForTests.sphereTag);
+        public IEnumerator HasTag_ByString_CubeDoesNotHaveSphereTag_ReturnsFalse() {
+            const string tagString = "Sphere";
+            Assert.That( Cube.HasTag( tagString ), Is.False, $"Cube should not have the 'Sphere' tag. String used: {tagString}" );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasTag_NullTag_ReturnsFalse() {
+            var tagger = Cube.GetComponent<Tagger>();
+            Cube.AddTag( null );
+            Assert.That(  tagger.GetTags, Is.EquivalentTo( new[] {TagRefsForTests.cubeTag, TagRefsForTests.platonicTag} ), "Cube should have the 'Cube' tag and 'Platonic Solid' tag." );
+            Assert.That( tagger.GetTags.Contains( null ), Is.False, "Cube should not have a null value in it's tag collection." );
+            yield return null;
+        }
+    }
+
+    [TestFixture]
+    public class TagModificationTests : NeatoTagTestBase {
+        [UnityTest]
+        public IEnumerator AddTag_PlaneTagAddedToCube_TagWasAdded() {
+            Cube.AddTag( TagRefsForTests.planeTag );
+            Assert.That( Cube.HasTag( TagRefsForTests.planeTag ), Is.True, "Plane tag should be added to cube." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator AddTags_PlaneTagAndSphereTagAddedToCube_AllTagsWereAdded() {
+            Cube.AddTags( TagRefsForTests.planeTag, TagRefsForTests.sphereTag );
+            Assert.That( Cube.HasTag( TagRefsForTests.planeTag ) && Cube.HasTag( TagRefsForTests.sphereTag ), Is.True,
+                "Both tags should be added to cube." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator RemoveTag_AddPlaneTagThenRemovePlaneTag_TagWasAddedAndThenRemoved() {
+            Cube.AddTag( TagRefsForTests.planeTag );
+            Assert.That( Cube.HasTag( TagRefsForTests.planeTag ), Is.True, "Plane tag should be added to cube." );
+            Cube.RemoveTag( TagRefsForTests.planeTag );
+            Assert.That( Cube.HasTag( TagRefsForTests.planeTag ), Is.False, "Plane tag should be removed from cube." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator RemoveAllTags_AllTagsRemoved() {
+            Assert.That ( Cube.GetComponent<Tagger>().GetTags.Count, Is.GreaterThan( 0 ),
+                "Tagger should have at least one tag before removing all tags." );
             Cube.RemoveAllTags();
-            Assert.IsFalse(Cube.HasTag(TagRefsForTests.planeTag) && Cube.HasTag(TagRefsForTests.sphereTag), 
-                "All tags should be removed from cube");
-            Assert.AreEqual(0, Cube.GetComponent<Tagger>().GetTags.Count, 
-                "Tagger should have 0 tags after removing all tags");
+            Assert.That( Cube.GetComponent<Tagger>().GetTags.Count, Is.EqualTo( 0 ),
+                "Tagger should have 0 tags after removing all tags." );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator AddTag_DuplicateTag_OnlyOneInstanceExists()
-        {
-            Cylinder.AddTag(TagRefsForTests.cylinderTag);
-            Cylinder.AddTag(TagRefsForTests.cylinderTag);
-            Assert.AreEqual(1, Cylinder.GetComponent<Tagger>().GetTags.Count, 
-                "Tagger should not add duplicate tags");
+        public IEnumerator AddTag_AddCylinderTagTwice_OnlyOneInstanceExists() {
+            Cylinder.AddTag( TagRefsForTests.cylinderTag );
+            Cylinder.AddTag( TagRefsForTests.cylinderTag );
+            Assert.That( Cylinder.GetComponent<Tagger>().GetTags.Count, Is.EqualTo( Cylinder.GetComponent<Tagger>().GetTags.Distinct().Count() ),
+                "Tagger should not add duplicate tags." );
             yield return null;
         }
     }
 
     [TestFixture]
-    public class RuntimeTagCreationTests : NeatoTagTestBase
-    {
+    public class RuntimeTagCreationTests : NeatoTagTestBase {
         [UnityTest]
-        public IEnumerator GetOrCreateTag_NewTag_TagCreatedAndAdded()
-        {
-            Cube.GetOrCreateTag("Very Sharp");
-            Assert.IsTrue(Cube.HasTag("Very Sharp"), "New runtime tag should be created and added");
+        public IEnumerator GetOrCreateTag_VerySharpTagWasCreatedAndAdded_ReturnsTrue() {
+            Cube.GetOrCreateTag( "Very Sharp" );
+            Assert.That( Cube.HasTag( "Very Sharp" ), Is.True, "New runtime tag should be created and added." );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator GetOrCreateTag_EmptyName_TagNotCreated()
-        {
-            Cube.GetOrCreateTag(" ");
-            Assert.IsFalse(Cube.HasTag(" "), "Empty tag should not be created");
-            Assert.IsFalse(Cube.HasTag(""), "Empty tag should not be created");
+        public IEnumerator GetOrCreateTag_TagNameWithJustASpaceOrEmptyCreated_ReturnFalse() {
+            Cube.GetOrCreateTag( " " );
+            //Tag names are trimmed, so checking for empty string too.
+            Assert.That( Cube.HasTag( string.Empty ), Is.False, "Tag with empty string for it's name should not be created." );
+            Assert.That( Cube.HasTag( " " ), Is.False, "Tag with just a space for it's name should not be created." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GetOrCreateTag_GetCubeTag_TagIsReturned() {
+            var tag = Cube.GetOrCreateTag( "Cube" );
+            Assert.That( tag, Is.EqualTo( TagRefsForTests.cubeTag ), "Should return existing Cube tag." );
+            yield return null;
+        }
+    }
+
+    [TestFixture]
+    public class TagGroupMatchingTests : NeatoTagTestBase {
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_CubeHasAnyGivenTagOfCubeSphereOrPlane_ReturnsTrue() {
+            Assert.That( Cube.HasAnyTagsMatching(
+                    TagRefsForTests.cubeTag, TagRefsForTests.sphereTag, TagRefsForTests.planeTag ), Is.True,
+                "Cube should match at least one of the tags, specifically the Cube Tag." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasAnyTagsMatching_CubeHasAnyGivenTagOfCapsuleSphereOrPlane_ReturnsFalse() {
+            Assert.That( Cube.HasAnyTagsMatching(
+                    TagRefsForTests.capsuleTag, TagRefsForTests.sphereTag, TagRefsForTests.planeTag ), Is.False,
+                "Cube should not match any of the given tags of Capsule, Sphere, and Plane." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasAllTagsMatching_CubeHasAllTagsOfCubeAndPlatonic_ReturnsTrue() {
+            Assert.That( Cube.HasAllTagsMatching(
+                    TagRefsForTests.cubeTag, TagRefsForTests.platonicTag ), Is.True,
+                "Cube should have both Cube and Platonic tags." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasAllTagsMatching_CubeHasAllTagsOfCubePlatonicAndSphere_ReturnsFalse() {
+            Assert.That( Cube.HasAllTagsMatching(
+                    TagRefsForTests.cubeTag, TagRefsForTests.platonicTag, TagRefsForTests.sphereTag ), Is.False,
+                "Cube should not have all these tags, specifically should not have the Sphere tag." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasNoTagsMatching_CubeHasNoneOfTheGivenTagsOfSpherePlaneAndCapsule_ReturnsTrue() {
+            Assert.That( Cube.HasNoTagsMatching(
+                    TagRefsForTests.sphereTag, TagRefsForTests.planeTag, TagRefsForTests.capsuleTag ), Is.True,
+                "Cube should have none of the given tags of Sphere, Plane, and Capsule." );
             yield return null;
         }
         
         [UnityTest]
-        public IEnumerator GetOrCreateTag_GetTag_TagIsReturned()
-        {
-            var tag = Cube.GetOrCreateTag("Cube");
-            Assert.AreEqual(TagRefsForTests.cubeTag, tag, "Should return existing tag");
+        public IEnumerator HasNoTagsMatching_CubeHasNoneOfTheGivenTagsOfCubeAndPlatonic_ReturnsFalse() {
+            Assert.That( Cube.HasNoTagsMatching(
+                    TagRefsForTests.cubeTag, TagRefsForTests.platonicTag ), Is.False,
+                "Cube should have the given tags of Cube and Platonic. HasNoTagsMatching should return false." );
             yield return null;
         }
     }
 
     [TestFixture]
-    public class TagGroupMatchingTests : NeatoTagTestBase
-    {
+    public class TagFilterTests : NeatoTagTestBase {
         [UnityTest]
-        public IEnumerator HasAnyTagsMatching_ObjectHasOneTag_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasAnyTagsMatching(
-                TagRefsForTests.cubeTag, TagRefsForTests.sphereTag, TagRefsForTests.planeTag),
-                "Cube should match at least one of the tags");
+        public IEnumerator FilterTags_WithMatchingTag_ReturnsTrue() {
+            Assert.That( Cube.FilterTags().WithTag( TagRefsForTests.cubeTag ).IsMatch(), Is.True,
+                "Cube should have the Cube tag." );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator HasAnyTagsMatching_ObjectHasNoMatchingTags_ReturnsFalse()
-        {
-            Assert.IsFalse(Cube.HasAnyTagsMatching(
-                TagRefsForTests.capsuleTag, TagRefsForTests.sphereTag, TagRefsForTests.planeTag),
-                "Cube should not match any of these tags");
+        public IEnumerator FilterTags_ChainedMatchingConditionsWithTagCubeWithTagPlatonic_ReturnsTrue() {
+            Assert.That( Cube.FilterTags()
+                    .WithTag( TagRefsForTests.cubeTag )
+                    .WithTag( TagRefsForTests.platonicTag )
+                    .IsMatch(), Is.True,
+                "Cube should match chained filter conditions." );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator HasAllTagsMatching_ObjectHasAllTags_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasAllTagsMatching(
-                TagRefsForTests.cubeTag, TagRefsForTests.platonicTag),
-                "Cube should have both Cube and Platonic tags");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasAllTagsMatching_ObjectMissingSomeTag_ReturnsFalse()
-        {
-            Assert.IsFalse(Cube.HasAllTagsMatching(
-                TagRefsForTests.cubeTag, TagRefsForTests.platonicTag, TagRefsForTests.sphereTag),
-                "Cube should not have all these tags");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasNoTagsMatching_ObjectHasNoneOfTheTags_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.HasNoTagsMatching(
-                TagRefsForTests.sphereTag, TagRefsForTests.planeTag, TagRefsForTests.capsuleTag),
-                "Cube should have none of these tags");
-            yield return null;
-        }
-    }
-
-    [TestFixture]
-    public class TagFilterTests : NeatoTagTestBase
-    {
-        [UnityTest]
-        public IEnumerator FilterTags_WithMatchingTag_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.FilterTags().WithTag(TagRefsForTests.cubeTag).IsMatch(),
-                "Cube should match its own tag");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator FilterTags_ChainedMatchingConditions_ReturnsTrue()
-        {
-            Assert.IsTrue(Cube.FilterTags()
-                .WithTag(TagRefsForTests.cubeTag)
-                .WithTag(TagRefsForTests.platonicTag)
-                .IsMatch(),
-                "Cube should match chained filter conditions");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator FilterTags_ChainedNonMatchingConditions_ReturnsFalse()
-        {
-            Assert.IsFalse(Cube.FilterTags()
-                .WithTag(TagRefsForTests.cubeTag)
-                .WithTag(TagRefsForTests.sphereTag)
-                .IsMatch(),
-                "Cube should not match chained filter with sphere tag");
+        public IEnumerator FilterTags_ChainedNonMatchingConditionsWithTagCubeWithTagSphere_ReturnsFalse() {
+            Assert.That( Cube.FilterTags()
+                    .WithTag( TagRefsForTests.cubeTag )
+                    .WithTag( TagRefsForTests.sphereTag )
+                    .IsMatch(), Is.False,
+                "Cube should not match chained filter with sphere tag" );
             yield return null;
         }
     }
@@ -259,8 +249,8 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode
                 .WithTag( TagRefsForTests.cubeTag )
                 .GetMatches();
 
-            Assert.AreEqual( 1, filteredShapes.Count, "Should match exactly one object" );
-            Assert.IsTrue( filteredShapes.Contains( Cube ), "Matched object should be the cube" );
+            Assert.That( filteredShapes.Count, Is.EqualTo( 1 ), "Should match exactly one object" );
+            Assert.That( filteredShapes.Contains( Cube ), Is.True, "Matched object should be the cube" );
 
             yield return null;
         }
@@ -271,11 +261,12 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode
                 .WithTag( TagRefsForTests.cornerlessTag )
                 .WithoutTag( TagRefsForTests.sphereTag )
                 .GetMatches();
-
-            Assert.AreEqual( 1, filteredShapes.Count, "Should match only capsule" );
-            Assert.IsTrue( filteredShapes.Contains( Capsule ), "Should match capsule" );
-            Assert.IsFalse( filteredShapes.Contains( Sphere ), "Should not match sphere" );
-
+            int expected = 2;
+            int actual = filteredShapes.Count;
+            Assert.That( actual, Is.EqualTo( expected ), "Should match only capsule and Cylinder" );
+            Assert.That( filteredShapes.Contains( Capsule ), Is.True, "Should match capsule" );
+            Assert.That( filteredShapes.Contains( Cylinder ), Is.True, "Should match Cylinder" );
+            Assert.That( filteredShapes.Contains( Sphere ), Is.False, "Should not match sphere" );
             yield return null;
         }
 
@@ -285,12 +276,143 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode
                 .WithAnyTags( TagRefsForTests.cubeTag, TagRefsForTests.sphereTag, TagRefsForTests.capsuleTag )
                 .GetMatches();
 
-            Assert.AreEqual( 3, filteredShapes.Count, "Should match cube, sphere, and capsule" );
-            Assert.IsTrue( filteredShapes.Contains( Cube ) &&
+            Assert.That( filteredShapes.Count, Is.EqualTo( 3 ), "Should match cube, sphere, and capsule" );
+            Assert.That( filteredShapes.Contains( Cube ) &&
                            filteredShapes.Contains( Sphere ) &&
-                           filteredShapes.Contains( Capsule ),
+                           filteredShapes.Contains( Capsule ), Is.True,
                 "Should match cube, sphere, and capsule" );
 
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator FilterGameObjects_WithAnyTags_DoesNotRaiseOnUnusedTags() {
+            var filteredShapes = Tagger.FilterGameObjects( new List<GameObject>() )
+                .WithAnyTags( TagRefsForTests.planeTag )
+                .GetMatches();
+
+            Assert.That( filteredShapes.Count, Is.EqualTo( 0 ), "Should match None" );
+
+            yield return null;
+        }
+    }
+    //Tag group tests
+    [TestFixture]
+    public class TagGroupTests : NeatoTagTestBase {
+        NeatoTagGroup _testGroup;
+        NeatoTagGroup _secondGroup;
+        NeatoTag _testTag;
+    
+        [UnitySetUp]
+        public new IEnumerator SetUp() {
+            yield return base.SetUp();
+    
+            // Create test tag groups
+            _testGroup = ScriptableObject.CreateInstance<NeatoTagGroup>();
+            _testGroup.GroupName = "Test Group";
+            _testGroup.GroupColor = Color.red;
+    
+            _secondGroup = ScriptableObject.CreateInstance<NeatoTagGroup>();
+            _secondGroup.GroupName = "Second Group";
+            _secondGroup.GroupColor = Color.blue;
+    
+            // Create a test tag for group testing
+            _testTag = ScriptableObject.CreateInstance<NeatoTag>();
+            _testTag.name = "TestGroupTag";
+        }
+    
+        [UnityTearDown]
+        public IEnumerator TearDown() {
+            Object.Destroy( _testGroup );
+            Object.Destroy( _secondGroup );
+            Object.Destroy( _testTag );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator UncategorizedGroup_Exists_ReturnsTrue() {
+            Assert.That( NeatoTagGroup.Uncategorized, Is.Not.Null, "Uncategorized group should be available" );
+            Assert.That( NeatoTagGroup.Uncategorized.GroupName, Is.EqualTo( "Uncategorized" ),
+                "Uncategorized group should have correct name" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator TagWithoutGroup_UsesUncategorized_ReturnsTrue() {
+            Assert.That( _testTag.TagGroup, Is.EqualTo( NeatoTagGroup.Uncategorized ),
+                "Tag without assigned group should use Uncategorized" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator AddTagToGroup_TagIsInGroup_ReturnsTrue() {
+            _testGroup.AddTag( _testTag );
+            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.True, "Group should contain added tag" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator RemoveTagFromGroup_TagIsRemoved_ReturnsTrue() {
+            _testGroup.AddTag( _testTag );
+            _testGroup.RemoveTag( _testTag );
+            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.False, "Group should not contain removed tag" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator AddTagToGroup_SetTagGroup_BothReferencesMatch() {
+            // Test bidirectional relationship
+            _testTag.TagGroup = _testGroup;
+            _testGroup.AddTag( _testTag );
+    
+            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.True, "Group should contain the tag" );
+            Assert.That( _testTag.TagGroup, Is.EqualTo( _testGroup ), "Tag should reference the group" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator ChangeTagGroup_TagMovesToNewGroup() {
+            // Set initial group
+            _testTag.TagGroup = _testGroup;
+            _testGroup.AddTag( _testTag );
+    
+            // Change to new group
+            _testTag.TagGroup = _secondGroup;
+            _secondGroup.AddTag( _testTag );
+            _testGroup.RemoveTag( _testTag );
+    
+            Assert.That( _testGroup.Tags.Contains( _testTag ), Is.False, "Old group should not contain the tag" );
+            Assert.That( _secondGroup.Tags.Contains( _testTag ), Is.True, "New group should contain the tag" );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator FilterByTagGroup_MatchesTags_ReturnsTrue() {
+            // Setup - create a tag in our test group and add to cube
+            var groupTag = ScriptableObject.CreateInstance<NeatoTag>();
+            groupTag.name = "GroupTestTag";
+            groupTag.TagGroup = _testGroup;
+            _testGroup.AddTag( groupTag );
+    
+            Cube.AddTag( groupTag );
+    
+            // Test - can we filter objects by tag group?
+            var filteredObjects = Tagger.FilterGameObjects( Shapes ).InTagGroup( _testGroup )
+                .GetMatches();
+    
+            Assert.AreEqual( 1, filteredObjects.Count, "Should match exactly one object" );
+            Assert.IsTrue( filteredObjects.Contains( Cube ), "Matched object should be the cube" );
+    
+            Object.Destroy( groupTag );
+            yield return null;
+        }
+    
+        [UnityTest]
+        public IEnumerator UncategorizedGroup_IsUncategorized_ReturnsTrue() {
+            Assert.IsTrue( NeatoTagGroup.Uncategorized.IsUncategorized(),
+                "Uncategorized group should be identified as uncategorized" );
+            Assert.IsFalse( _testGroup.IsUncategorized(),
+                "Custom group should not be identified as uncategorized" );
             yield return null;
         }
     }
