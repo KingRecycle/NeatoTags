@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.unity.feature.2d": "2.0.1",
-    "com.unity.ide.rider": "3.0.35",
+    "com.unity.ide.rider": "3.0.36",
     "com.unity.ide.vscode": "1.2.5",
     "com.unity.render-pipelines.universal": "12.1.15",
     "com.unity.test-framework": "1.1.33",
