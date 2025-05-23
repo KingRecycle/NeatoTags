@@ -374,7 +374,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
             public GameObjectFilter WithTags( params NeatoTag[] tags ) {
-                return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
+                return WithTags( tags.AsEnumerable() );
             }
 
             /// <summary>
@@ -402,7 +402,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <param name="tags">IEnumerable of NeatoTag.</param>
             /// <returns></returns>
             public GameObjectFilter WithoutTags( params NeatoTag[] tags ) {
-                return tags.Aggregate( this, ( current, neatoTag ) => current.WithoutTag( neatoTag ) );
+                return WithoutTags( tags.AsEnumerable() );
             }
 
             /// <summary>

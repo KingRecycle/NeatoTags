@@ -925,6 +925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _tags:
   - {fileID: 11400000, guid: d85817d8ba3492748b42ffee8d64ffac, type: 2}
+  - {fileID: 11400000, guid: 08661c9d61077774089a7fe851235b86, type: 2}
 --- !u!136 &1609294122
 CapsuleCollider:
   m_ObjectHideFlags: 0
