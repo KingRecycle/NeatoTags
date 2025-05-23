@@ -35,7 +35,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         void Awake() {
             //Cleanup and setup tagger. Nulls can be left behind, so we need to remove those.
-            _tags.RemoveAll( nTag => nTag == null );
+            _tags.RemoveAll( nTag => !nTag );
             _taggers.Add( gameObject, this );
             _nonTaggedObjects.Add( gameObject );
             foreach ( var neatoTagAsset in _tags ) {
@@ -185,7 +185,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             // Check if the tag already exists
             var existingTag = _taggedObjects.Keys.FirstOrDefault( t => t.name == trimmedName );
-            if ( existingTag != null ) {
+            if ( existingTag ) {
                 return existingTag;
             }
 
@@ -209,7 +209,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTag">Tag to add.</param>
         public void AddTag( NeatoTag neatoTag ) {
-            if ( neatoTag == null || _tags.Contains( neatoTag ) ) {
+            if ( !neatoTag || _tags.Contains( neatoTag ) ) {
                 Debug.LogWarning( "You are trying to add a tag that is either null or already exist on tagger." );
                 return;
             }
@@ -231,7 +231,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             var changed = false;
             foreach ( var neatoTag in neatoTagsToAdd ) {
-                if ( neatoTag == null || _tags.Contains( neatoTag ) ) {
+                if ( !neatoTag || _tags.Contains( neatoTag ) ) {
                     Debug.LogWarning(
                         "[NeatoTags]: You are trying to add a tag that is either null or already exist on tagger." );
                     continue;
@@ -255,7 +255,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTag">Tag to remove.</param>
         public void RemoveTag( NeatoTag neatoTag ) {
-            if ( neatoTag == null ) {
+            if ( !neatoTag ) {
                 Debug.LogWarning( "You are trying to remove a tag that is null." );
                 return;
             }
@@ -278,7 +278,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagName"></param>
         public void RemoveTag( string tagName ) {
             var neatoTag = _tags.FirstOrDefault( t => t.name == tagName );
-            if ( neatoTag == null ) {
+            if ( !neatoTag ) {
                 Debug.LogWarning( $"You are trying to remove a tag with the name {tagName} that doesn't exist." );
                 return;
             }
@@ -568,7 +568,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         void OnValidate() {
             NeatoTagTaggerTracker.RegisterTagger( this );
-            _tags.RemoveAll( neatoTag => neatoTag == null );
+            _tags.RemoveAll( neatoTag => !neatoTag );
         }
 #endif
     }
