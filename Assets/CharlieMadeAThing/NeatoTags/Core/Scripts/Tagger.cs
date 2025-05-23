@@ -199,10 +199,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         ///     Checks if a tag name is valid.
         /// </summary>
-        /// <param name="nameToCheck">Name of the tag to check.</param>
+        /// <param name="tagName">Name of the tag to check.</param>
         /// <returns>True if the tag name is valid, otherwise false.</returns>
-        bool IsValidTagName( string name ) =>
-            System.Text.RegularExpressions.Regex.IsMatch( name, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
+        bool IsValidTagName( string tagName ) =>
+            System.Text.RegularExpressions.Regex.IsMatch( tagName, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
 
         /// <summary>
         ///     Add a tag to the tagger.

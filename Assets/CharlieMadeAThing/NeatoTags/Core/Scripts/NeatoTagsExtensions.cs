@@ -45,14 +45,21 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tag">Tag to add</param>
-        public static void AddTag( this GameObject gameObject, NeatoTag tag ) {
-            if ( tag == null ) {
+        /// <param name="addTaggerComponentIfNone"> Add a Tagger component if there is none then add tag.</param>
+        public static void AddTag( this GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone = false ) {
+            if ( !tag ) {
                 Debug.LogWarning($"Attempting to add tag to {gameObject} but tag argument is null!");
                 return;
             }
-
+            
             if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
                 tagger.AddTag( tag );
+            } else if ( addTaggerComponentIfNone ) {
+                tagger = gameObject.AddComponent<Tagger>();
+                tagger.AddTag( tag );
+            }
+            else {
+                Debug.LogWarning($"Attempting to add tag to {gameObject} but no Tagger component found!");
             }
         }
         
