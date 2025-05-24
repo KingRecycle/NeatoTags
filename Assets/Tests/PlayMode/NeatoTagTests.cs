@@ -337,6 +337,30 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         }
         
         [UnityTest]
+        public IEnumerator FilterGameObjects_WithAnyTagsNullOrEmpty_ReturnsNoMatches() {
+            // Setup initial objects with tags
+            var initialShapes = Tagger.FilterGameObjects(Shapes)
+                .WithAnyTags(TagRefsForTests.cubeTag, TagRefsForTests.sphereTag)
+                .GetMatches();
+            Assert.That(initialShapes.Count, Is.GreaterThan(0), "Should have some objects with tags initially");
+
+            // Test with null tags
+            var nullTagResult = Tagger.FilterGameObjects(Shapes)
+                .WithAnyTags((NeatoTag[])null)
+                .GetMatches();
+            Assert.That(nullTagResult.Count, Is.EqualTo(0), "Should return no matches when tags array is null");
+
+            // Test with empty tags array
+            var emptyTagResult = Tagger.FilterGameObjects(Shapes)
+                .WithAnyTags(new NeatoTag[0])
+                .GetMatches();
+            Assert.That(emptyTagResult.Count, Is.EqualTo(0), "Should return no matches when tags array is empty");
+
+            yield return null;
+        }
+
+        
+        [UnityTest]
         public IEnumerator FilterGameObjects_EmptyList_ReturnsEmptyResult() {
             var result = Tagger.FilterGameObjects(new List<GameObject>())
                 .WithTag(TagRefsForTests.cubeTag)

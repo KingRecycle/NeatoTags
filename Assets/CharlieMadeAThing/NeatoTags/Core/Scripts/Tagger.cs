@@ -366,7 +366,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithTags( IEnumerable<NeatoTag> tags ) {
                 return tags.Aggregate( this, ( current, neatoTag ) => current.WithTag( neatoTag ) );
             }
-            
 
             /// <summary>
             ///     Filters for GameObjects that have all the tags.
@@ -376,7 +375,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             public GameObjectFilter WithTags( params NeatoTag[] tags ) {
                 return WithTags( tags.AsEnumerable() );
             }
-
+            
             /// <summary>
             ///     FilterGameObjects for GameObjects that don't have the tag.
             /// </summary>
@@ -411,9 +410,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <param name="tags">IEnumerable of NeatTagAsset</param>
             /// <returns></returns>
             public GameObjectFilter WithAnyTags( IEnumerable<NeatoTag> tags ) {
+                if ( tags == null ) {
+                    _matches.Clear();
+                    return this;
+                }
+                var neatoTags = tags as NeatoTag[] ?? tags.ToArray();
+                if ( !neatoTags.Any() ) {
+                    _matches.Clear();
+                    return this;
+                }
                 var tempMatches = new HashSet<GameObject>();
                 
-                foreach ( var neatoTag in tags ) {
+                foreach ( var neatoTag in neatoTags ) {
                     if ( !_taggedObjects.TryGetValue( neatoTag, out var taggedObjects ) ) continue;
                     tempMatches.UnionWith( taggedObjects );
                 }

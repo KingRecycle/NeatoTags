@@ -1,11 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using CharlieMadeAThing.NeatoTags.Tests.PlayMode;
 using NUnit.Framework;
 using Unity.PerformanceTesting;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
 
 namespace CharlieMadeAThing.NeatoTags.Tests {
     [TestFixture]
@@ -101,6 +104,8 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
                 if ( i % 7 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
                 if ( i % 11 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
                 if ( i % 13 == 0 ) tagger.AddTag( TagRefsForTests.cornerlessTag );
+                if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
+                if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
 
                 result.Add( obj );
             }
@@ -218,5 +223,97 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
 
             yield return null;
         }
+    }
+    
+    [TestFixture]
+public class MemoryPerformanceTests : NeatoTagTestBase {
+    const int WarmupCount = 5;
+    const int MeasurementCount = 100;
+    List<GameObject> _testObjects1000;
+    
+    [UnitySetUp]
+    public new IEnumerator SetUp() {
+        yield return base.SetUp();
+        _testObjects1000 = CreateTaggedObjects(1000);
+    }
+
+    List<GameObject> CreateTaggedObjects( int amount ) {
+        var result = new List<GameObject>( amount );
+        for ( var i = 0; i < amount; i++ ) {
+            var obj = new GameObject( $"TestObject_{amount}_{i}" );
+            var tagger = obj.AddComponent<Tagger>();
+            if ( i % 2 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
+            if ( i % 3 == 0 ) tagger.AddTag( TagRefsForTests.sphereTag );
+            if ( i % 5 == 0 ) tagger.AddTag( TagRefsForTests.cylinderTag );
+            if ( i % 7 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
+            if ( i % 11 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
+            if ( i % 13 == 0 ) tagger.AddTag( TagRefsForTests.cornerlessTag );
+            if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
+            if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
+            if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
+            if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.cylinderTag );
+            result.Add( obj );
+        }
+        return result;
+    }
+
+    [UnityTearDown]
+    public IEnumerator TearDown() {
+        DestroyTaggedObjects(_testObjects1000);
+        yield return null;
+    }
+
+    void DestroyTaggedObjects( List<GameObject> objectsToDestroy ) {
+        foreach ( var obj in objectsToDestroy.Where( obj => obj ) ) {
+            Object.Destroy( obj );
+        }
+    }
+
+    [UnityTest, Performance]
+    public IEnumerator CompareOptimizations() {
+        var tags = new[] {
+            TagRefsForTests.cubeTag,
+            TagRefsForTests.platonicTag,
+            TagRefsForTests.sphereTag
+        };
+    
+        var filter = Tagger.FilterGameObjects(_testObjects1000);
+    
+        // Current implementation
+        Measure.Method(() => {
+                filter.WithTags(tags).GetMatches();
+            })
+            .WarmupCount(WarmupCount)
+            .MeasurementCount(MeasurementCount)
+            .SampleGroup("Current")
+            .Run();
+        
+        yield return null;
+    }
+    
+    [UnityTest, Performance]
+    public IEnumerator Compare_WithAnyTags_Implementation() {
+        var tags = new[] {
+            TagRefsForTests.cubeTag,
+            TagRefsForTests.platonicTag,
+            TagRefsForTests.sphereTag
+        };
+    
+        var filter = Tagger.FilterGameObjects(_testObjects1000);
+    
+        // Current WithAnyTags implementation
+        Measure.Method(() => {
+                filter.WithAnyTags(tags).GetMatches();
+            })
+            .WarmupCount(WarmupCount)
+            .MeasurementCount(MeasurementCount)
+            .SampleGroup("Current")
+            .Run();
+        
+
+        yield return null;
+    }
+
+
     }
 }
