@@ -245,7 +245,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             if ( changed ) {
-                _nonTaggedObjects.Remove( gameObject );
                 _isCacheDirty = true;
             }
         }
