@@ -103,28 +103,28 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Assert.That( Cube.HasTag( TagRefsForTests.planeTag ), Is.True, "Plane tag should be added to cube." );
             yield return null;
         }
-
+        
         [UnityTest]
-        public IEnumerator AddTags_PlaneTagAndSphereTagAddedToCube_AllTagsWereAdded() {
-            Cube.AddTags( TagRefsForTests.planeTag, TagRefsForTests.sphereTag );
+        public IEnumerator AddTagsByList_PlaneTagAndSphereTagAddedToCube_AllTagsWereAdded() {
+            Cube.AddTags( new List<NeatoTag>() { TagRefsForTests.planeTag, TagRefsForTests.sphereTag } );
             Assert.That( Cube.HasTag( TagRefsForTests.planeTag ) && Cube.HasTag( TagRefsForTests.sphereTag ), Is.True,
                 "Both tags should be added to cube." );
             yield return null;
         }
         
         [UnityTest]
-        public IEnumerator AddTag_ToObjectWithoutTaggerAddComponentFlagSetToTrue_CreatesComponent() {
+        public IEnumerator AddTagWithForce_AddTaggerComponentIfThereIsNone_CreatesComponent() {
             // Tests if AddTag creates a Tagger component if one doesn't exist
             GameObject newObj = new GameObject("NewObject");
             Assert.That(newObj.HasTagger(), Is.False, "Object should not have a Tagger initially");
-            newObj.AddTag(TagRefsForTests.cubeTag, true);
+            newObj.AddTagWithForce(TagRefsForTests.cubeTag);
             Assert.That(newObj.HasTagger(), Is.True, "AddTag should add a Tagger component if needed");
             Assert.That(newObj.HasTag(TagRefsForTests.cubeTag), Is.True, "The tag should be added correctly");
             yield return null;
         }
         
         [UnityTest]
-        public IEnumerator AddTag_ToObjectWithoutTaggerAddComponentFlagSetToFalse_NoTaggerWasAdded() {
+        public IEnumerator AddTag_ToObjectWithoutTaggerAddComponent_NoTaggerWasAdded() {
             // Tests if AddTag creates a Tagger component if one doesn't exist
             GameObject newObj = new GameObject("NewObject");
             Assert.That(newObj.HasTagger(), Is.False, "Object should not have a Tagger initially");

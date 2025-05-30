@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -14,7 +15,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Starts a tag filter.
         ///     Starts a filter for chaining filter functions.
         ///     WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()
-        ///     To get result call .IsMatch() on the returned filter.
+        ///     To get the result, call .IsMatch() on the returned filter.
         ///     Can be null!
         /// </summary>
         /// <param name="gameObject"></param>
@@ -39,14 +40,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         #region AddRemoveTags
-
-        /// <summary>
-        ///     Adds a tag to this gameobject.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="tag">Tag to add</param>
-        /// <param name="addTaggerComponentIfNone"> Add a Tagger component if there is none then add tag.</param>
-        public static void AddTag( this GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone = false ) {
+        
+        static void AddTag( GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone ) {
             if ( !tag ) {
                 Debug.LogWarning($"Attempting to add tag to {gameObject} but tag argument is null!");
                 return;
@@ -62,22 +57,81 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 Debug.LogWarning($"Attempting to add tag to {gameObject} but no Tagger component found!");
             }
         }
-        
+
         /// <summary>
-        ///     Adds all tags from a list to this gameobject's Tagger component.
+        ///     Adds a tag to this gameobject.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="tags">List of tags to add.</param>
-        public static void AddTags( this GameObject gameObject, params NeatoTag[] tags ) {
+        /// <param name="tag">Tag to add</param>
+        public static void AddTag( this GameObject gameObject, NeatoTag tag ) {
+            AddTag( gameObject, tag, false );
+        }
+
+        /// <summary>
+        ///     Adds a tag to this gameobject.
+        ///     Will add a Tagger component if none is found.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tag">Tag to add</param>
+        public static void AddTagWithForce( this GameObject gameObject, NeatoTag tag ) {
+            AddTag( gameObject, tag, true  );
+        }
+        
+        static void AddTags( this GameObject gameObject, IEnumerable<NeatoTag> tags, bool addTaggerComponentIfNone ) {
             if ( tags == null ) {
                 Debug.LogWarning($"Attempting to add tags to {gameObject} but tags argument is null!");
                 return;
             }
-
             if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
                 tagger.AddTags( tags );
+            } else if ( addTaggerComponentIfNone ) {
+                tagger = gameObject.AddComponent<Tagger>();
+                tagger.AddTags( tags );
+            }
+            else {
+                Debug.LogWarning($"Attempting to add tags to {gameObject} but no Tagger component found!");
             }
         }
+
+        /// <summary>
+        /// Adds a list of tags to this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tags">List of tags to add.</param>
+        public static void AddTags( this GameObject gameObject, IEnumerable<NeatoTag> tags ) {
+            AddTags( gameObject, tags, false );
+        }
+        
+        /// <summary>
+        /// Adds a list of tags to this gameobject.
+        /// Will add a Tagger component if none is found.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tags">List of tags to add.</param>
+        public static void AddTagsWithForce( this GameObject gameObject, IEnumerable<NeatoTag> tags ) {
+            AddTags( gameObject, tags, true );
+        }
+        
+        /// <summary>
+        /// Adds the given tags to this gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tags">Given tags to add.</param>
+        public static void AddTags( this GameObject gameObject, params NeatoTag[] tags ) {
+            AddTags( gameObject, tags.AsEnumerable(), false );
+        }
+
+        /// <summary>
+        /// Adds the given tags to this gameobject.
+        /// Will add a Tagger component if none is found.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tags">Given tags to add.</param>
+        public static void AddTagsWithForce( this GameObject gameObject, params NeatoTag[] tags ) {
+            AddTags( gameObject, tags.AsEnumerable(), true );
+        }
+        
+
 
         /// <summary>
         ///     Removes a tag from this gameobject.
@@ -120,7 +174,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tag">Tag to check for.</param>
-        /// <returns>True if it has matching tag, otherwise false.</returns>
+        /// <returns>True if it has a matching tag, otherwise false.</returns>
         public static bool HasTag( this GameObject gameObject, NeatoTag tag ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tag );
 
@@ -129,7 +183,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagName">Tag to check for</param>
-        /// <returns>True if it has matching tag, otherwise false.</returns>
+        /// <returns>True if it has a matching tag, otherwise false.</returns>
         public static bool HasTag( this GameObject gameObject, string tagName ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.HasTag( tagName );
 
