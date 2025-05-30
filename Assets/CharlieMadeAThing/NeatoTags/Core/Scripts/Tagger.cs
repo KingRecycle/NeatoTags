@@ -23,7 +23,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
         static readonly HashSet<GameObject> _nonTaggedObjects = new();
-
+        
         //--------------------------------------------------------------------------------------------------------------
         
         
@@ -69,6 +69,29 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         #endregion
+
+        /// <summary>
+        /// Try to get a NeatoTag by name.
+        /// </summary>
+        /// <param name="tagName">NeatoTag name.</param>
+        /// <param name="tag">The NeatoTag if found.</param>
+        /// <returns>Whether the NeatoTag was found.</returns>
+        public static bool TryGetTag( string tagName, out NeatoTag tag ) {
+            var trimmedName = tagName.Trim();
+            tag = null;
+            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
+                Debug.LogWarning( "A tag name can't be empty or whitespace." );
+                return false;
+            }
+
+            if ( !IsValidTagName( trimmedName ) ) {
+                Debug.LogWarning(
+                    $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
+                return false;
+            }
+            tag = _taggedObjects.Keys.FirstOrDefault( t => t.name == trimmedName );
+            return tag;
+        }
 
         #region Query Methods
 
@@ -116,6 +139,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public bool HasTag( string neatoTag ) {
             UpdateCache();
             return _cachedTagNames.Contains( neatoTag );
+        }
+
+        /// <summary>
+        /// Gets the tag on the tagger by name.
+        /// </summary>
+        /// <param name="neatoTag">NeatoTag name.</param>
+        /// <returns>
+        /// Returns the NeatoTag object if it exists.
+        /// Returns null if it doesn't exist.
+        /// </returns>
+        public NeatoTag GetTag( string neatoTag ) {
+            return _tags.FirstOrDefault( t => t.name == neatoTag );
         }
 
         /// <summary>
@@ -201,7 +236,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagName">Name of the tag to check.</param>
         /// <returns>True if the tag name is valid, otherwise false.</returns>
-        bool IsValidTagName( string tagName ) =>
+        static bool IsValidTagName( string tagName ) =>
             System.Text.RegularExpressions.Regex.IsMatch( tagName, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
 
         /// <summary>

@@ -93,6 +93,22 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             yield return null;
         }
 
+        [UnityTest]
+        public IEnumerator GetTag_OnObjectWithTag_ReturnsTrueAndReturnsTag() {
+            var exist = Tagger.TryGetTag( "Cube", out var tag );
+            Assert.That( exist, Is.True, "Should return true." );
+            Assert.That( tag, Is.EqualTo( TagRefsForTests.cubeTag ), "Should return the correct tag." );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator GetTag_OnObjectWithoutTag_ReturnsFalseAndNull() {
+            var exist = Tagger.TryGetTag( "NonExistentTag", out var tag );
+            Assert.That( exist, Is.False, "Should return false." );
+            Assert.That( tag, Is.Null, "Should return null." );
+            yield return null;
+        }
+
     }
 
     [TestFixture]
