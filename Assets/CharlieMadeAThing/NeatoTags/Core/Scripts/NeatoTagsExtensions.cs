@@ -9,7 +9,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>bool</returns>
-        public static bool HasTagger( this GameObject gameObject ) => Tagger.HasTagger( gameObject );
+        public static bool HasTagger( this GameObject gameObject ) => 
+            gameObject && Tagger.HasTagger( gameObject );
 
         /// <summary>
         ///     Starts a tag filter.
