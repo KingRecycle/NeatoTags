@@ -254,7 +254,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagList">IEnumerable of tags</param>
-        /// <returns>True if any tags match, otherwise false.</returns>
+        /// <returns>True if all tags match, otherwise false.</returns>
         public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<NeatoTag> tagList ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagList );
 
@@ -263,7 +263,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="tagNameList">IEnumerable of tag names</param>
-        /// <returns>True if any tags match, otherwise false.</returns>
+        /// <returns>True if all tags match, otherwise false.</returns>
         public static bool HasAllTagsMatching( this GameObject gameObject, IEnumerable<string> tagNameList ) =>
             Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.AllTagsMatch( tagNameList );
 
