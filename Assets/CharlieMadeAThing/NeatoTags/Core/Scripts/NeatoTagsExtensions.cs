@@ -22,7 +22,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="gameObject"></param>
         /// <returns>FilterTags or null</returns>
         public static Tagger.TagFilter FilterTags( this GameObject gameObject ) =>
-            Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
+            gameObject && Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
 
         /// <summary>
         ///     Gets or creates a tag and adds it to the gameobject.
@@ -34,10 +34,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="newTagName">Name of the tag to get or create.</param>
         /// <returns>Returns tag if successful, otherwise returns new tag with given name.</returns>
         public static NeatoTag GetOrCreateTag( this GameObject gameObject, string newTagName ) {
-            if ( Tagger.TryGetTagger( gameObject, out var tagger ) ) {
-                return tagger.GetOrCreate( newTagName );
-            }
-            return null;
+            if ( !gameObject && string.IsNullOrWhiteSpace( newTagName ) ) return null;
+            return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.GetOrCreate( newTagName ) : null;
         }
 
         #region AddRemoveTags
