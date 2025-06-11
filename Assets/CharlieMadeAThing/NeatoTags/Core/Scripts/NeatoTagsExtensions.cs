@@ -38,6 +38,22 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.GetOrCreate( newTagName ) : null;
         }
 
+        /// <summary>
+        ///     Tries to get a tag by name from the gameobject's Tagger component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="tagName">Name of tag.</param>
+        /// <param name="foundTag">The NeatoTag if found.</param>
+        /// <returns>True if found, otherwise false.</returns>
+        public static bool TryGetTag( this GameObject gameObject, string tagName, out NeatoTag foundTag ) {
+            foundTag = null;
+            if ( !gameObject && string.IsNullOrWhiteSpace( tagName ) ) return false;
+            if ( !Tagger.TryGetTagger( gameObject, out var tagger ) ) return false;
+            if ( !tagger.TryGetTag( tagName, out var tag ) ) return false;
+            foundTag = tag;
+            return true;
+        }
+
         #region AddRemoveTags
         
         static void AddTag( GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone ) {

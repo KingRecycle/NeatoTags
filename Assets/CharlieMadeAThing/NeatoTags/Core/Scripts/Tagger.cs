@@ -156,7 +156,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// Returns true if the tag was found, otherwise false.
         /// </returns>
         public bool TryGetTag( string tagName, out NeatoTag? neatoTag ) {
-            var found = GetTags.First( t => t.name == tagName );
+            var found = GetTags.FirstOrDefault( t => t.name == tagName );
             if ( found ) {
                 neatoTag = found;
                 return true;
