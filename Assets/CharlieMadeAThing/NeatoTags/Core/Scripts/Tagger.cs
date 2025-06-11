@@ -223,9 +223,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             // Check if the tag already exists
-            var existingTag = _taggedObjects.Keys.FirstOrDefault( t => t.name == tagName );
-            if ( existingTag ) {
-                return existingTag;
+            var exist = TryGetTag( tagName, out var nTag );
+            if ( exist ) {
+                return nTag;
             }
 
             // Create a new tag if it doesn't exist
