@@ -23,6 +23,7 @@ I don't know about you but I'd say that's pretty neat!
 
 ## Getting Started
 This is currently where I keep my whole project for Neato Tags but I assume you are here for just Neato Tags itself then:
+- I now do releases -> https://github.com/KingRecycle/NeatoTags/releases
 - Just grab the CharlieMadeAThing folder `Assets/CharlieMadeAThing` -> https://github.com/KingRecycle/NeatoTags/tree/master/Assets/CharlieMadeAThing
 - Grab Neato Tags from the Asset Store -> https://assetstore.unity.com/packages/tools/utilities/neato-tags-229829
 
