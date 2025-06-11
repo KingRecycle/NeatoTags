@@ -94,16 +94,16 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         }
 
         [UnityTest]
-        public IEnumerator GetTag_OnObjectWithTag_ReturnsTrueAndReturnsTag() {
-            var exist = Tagger.TryGetTag( "Cube", out var tag );
+        public IEnumerator GetNeatoTag_OnObjectWithTag_ReturnsTrueAndReturnsTag() {
+            var exist = Tagger.TryGetNeatoTag( "Cube", out var tag );
             Assert.That( exist, Is.True, "Should return true." );
             Assert.That( tag, Is.EqualTo( TagRefsForTests.cubeTag ), "Should return the correct tag." );
             yield return null;
         }
         
         [UnityTest]
-        public IEnumerator GetTag_OnObjectWithoutTag_ReturnsFalseAndNull() {
-            var exist = Tagger.TryGetTag( "NonExistentTag", out var tag );
+        public IEnumerator GetNeatoTag_OnObjectWithoutTag_ReturnsFalseAndNull() {
+            var exist = Tagger.TryGetNeatoTag( "NonExistentTag", out var tag );
             Assert.That( exist, Is.False, "Should return false." );
             Assert.That( tag, Is.Null, "Should return null." );
             yield return null;
@@ -271,6 +271,15 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         public IEnumerator FilterTags_WithMatchingTag_ReturnsTrue() {
             Assert.That( Cube.FilterTags().WithTag( TagRefsForTests.cubeTag ).IsMatch(), Is.True,
                 "Cube should have the Cube tag." );
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator FilterTags_WithTagWhenNull_ReturnsFalse() {
+            Assert.That( Cube.FilterTags().WithTag( null ).IsMatch(), Is.False,
+                "Cube should not have the null object as a tag." );
+            Assert.That( Cube.FilterTags().WithTag( TagRefsForTests.cubeTag  ).WithTag( null ).IsMatch(), Is.False,
+                "No match should be found as no gameobject should have a null object tag." );
             yield return null;
         }
 

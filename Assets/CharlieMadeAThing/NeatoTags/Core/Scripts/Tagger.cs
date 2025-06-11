@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CharlieMadeAThing.NeatoTags.Core.Editor;
 using UnityEngine;
-using UnityEngine.Serialization;
-
+#nullable enable
 namespace CharlieMadeAThing.NeatoTags.Core {
     /// <summary>
     ///     Stores and tracks attached gameobject and its tags.
@@ -30,21 +30,28 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         // This tagger's tags for its gameobject.
         [SerializeField] List<NeatoTag> _tags = new();
 		HashSet<NeatoTag> _tagsSet = new();
-        HashSet<string> _cachedTagNames;
+        HashSet<string> _cachedTagNames = new();
         bool _isCacheDirty = true;
         public IReadOnlyList<NeatoTag> GetTags => _tags;
+        static readonly Regex s_tagNameRegex = new("^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$", RegexOptions.Compiled);
+
 
         void Awake() {
             //Cleanup and setup tagger. Nulls can be left behind, so we need to remove those.
-            _tags.RemoveAll( nTag => !nTag );
-            _tagsSet.RemoveWhere( nTag => !nTag );
-            _taggers.Add( gameObject, this );
-            _nonTaggedObjects.Add( gameObject );
-            foreach ( var neatoTagAsset in _tags ) {
-                _taggedObjects.TryAdd( neatoTagAsset, new HashSet<GameObject>() );
-                _taggedObjects[neatoTagAsset].Add( gameObject );
-                _nonTaggedObjects.Remove( gameObject );
-                _tagsSet.Add( neatoTagAsset );
+            try {
+                _tags.RemoveAll( nTag => !nTag );
+                _tagsSet.RemoveWhere( nTag => !nTag );
+                _taggers.Add( gameObject, this );
+                _nonTaggedObjects.Add( gameObject );
+                foreach ( var neatoTagAsset in _tags ) {
+                    _taggedObjects.TryAdd( neatoTagAsset, new HashSet<GameObject>() );
+                    _taggedObjects[neatoTagAsset].Add( gameObject );
+                    _nonTaggedObjects.Remove( gameObject );
+                    _tagsSet.Add( neatoTagAsset );
+                }
+            }
+            catch ( Exception e ) {
+                Debug.LogWarning($"Failed to initialize Tagger: {e.Message}");
             }
         }
 
@@ -59,17 +66,21 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
 #if UNITY_EDITOR
             NeatoTagTaggerTracker.UnregisterTagger( this );
-            WantRepaint = null;
+            OnWantRepaint = null;
 #endif
         }
 
         #region Cache Methods
 
         void UpdateCache() {
-            if ( !_isCacheDirty ) return;
-            _cachedTagNames = _tags.Select( neatoTag => neatoTag.name ).ToHashSet();
+            if (!_isCacheDirty) return;
+            _cachedTagNames.Clear();
+            foreach ( var nTag in _tags.Where( nTag => nTag ) ) {
+                _cachedTagNames.Add(nTag.name);
+            }
             _isCacheDirty = false;
         }
+
 
         #endregion
 
@@ -79,20 +90,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagName">NeatoTag name.</param>
         /// <param name="tag">The NeatoTag if found.</param>
         /// <returns>Whether the NeatoTag was found.</returns>
-        public static bool TryGetTag( string tagName, out NeatoTag tag ) {
-            var trimmedName = tagName.Trim();
+        public static bool TryGetNeatoTag( string tagName, out NeatoTag? tag ) {
             tag = null;
-            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
-                Debug.LogWarning( "A tag name can't be empty or whitespace." );
+            if ( !IsValidTagName( tagName ) ) {
                 return false;
             }
-
-            if ( !IsValidTagName( trimmedName ) ) {
-                Debug.LogWarning(
-                    $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
-                return false;
-            }
-            tag = _taggedObjects.Keys.FirstOrDefault( t => t.name == trimmedName );
+            tag = _taggedObjects.Keys.FirstOrDefault( t => t.name == tagName );
             return tag;
         }
 
@@ -147,15 +150,21 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         /// Gets the tag on the tagger by name.
         /// </summary>
-        /// <param name="neatoTag">NeatoTag name.</param>
+        /// <param name="tagName">NeatoTag name.</param>
+        /// <param name="neatoTag">The NeatoTag if found.</param>
         /// <returns>
-        /// Returns the NeatoTag object if it exists.
-        /// Returns null if it doesn't exist.
+        /// Returns true if the tag was found, otherwise false.
         /// </returns>
-        public NeatoTag GetTag( string neatoTag ) {
-            return _tagsSet.FirstOrDefault( t => t.name == neatoTag );
+        public bool TryGetTag( string tagName, out NeatoTag? neatoTag ) {
+            var found = GetTags.First( t => t.name == tagName );
+            if ( found ) {
+                neatoTag = found;
+                return true;
+            }
+            neatoTag = null;
+            return false;
         }
-
+        
         /// <summary>
         ///     Checks if Tagger has any of the tags in the list.
         /// </summary>
@@ -208,28 +217,20 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagName">Name of the tag to get or create.</param>
         /// <returns>Returns existing or new tag if successful, otherwise returns null.</returns>
-        public NeatoTag GetOrCreate( string tagName ) {
-            var trimmedName = tagName.Trim();
-            if ( string.IsNullOrWhiteSpace( trimmedName ) ) {
-                Debug.LogWarning( "A tag name can't be empty or whitespace." );
-                return null;
-            }
-
-            if ( !IsValidTagName( trimmedName ) ) {
-                Debug.LogWarning(
-                    $"Invalid tag name: {trimmedName}. Tag names can only contain letters, numbers, and underscores." );
+        public NeatoTag? GetOrCreate( string tagName ) {
+            if ( !IsValidTagName( tagName ) ) {
                 return null;
             }
 
             // Check if the tag already exists
-            var existingTag = _taggedObjects.Keys.FirstOrDefault( t => t.name == trimmedName );
+            var existingTag = _taggedObjects.Keys.FirstOrDefault( t => t.name == tagName );
             if ( existingTag ) {
                 return existingTag;
             }
 
             // Create a new tag if it doesn't exist
             var neatoTag = ScriptableObject.CreateInstance<NeatoTag>();
-            neatoTag.name = trimmedName;
+            neatoTag.name = tagName;
             AddTag( neatoTag );
             return neatoTag;
         }
@@ -239,8 +240,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagName">Name of the tag to check.</param>
         /// <returns>True if the tag name is valid, otherwise false.</returns>
-        static bool IsValidTagName( string tagName ) =>
-            System.Text.RegularExpressions.Regex.IsMatch( tagName, "^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$" );
+        static bool IsValidTagName( string tagName ) {
+            if ( string.IsNullOrWhiteSpace( tagName ) ) {
+                Debug.LogWarning( "A tag name can't be empty or whitespace." );
+                return false;
+            }
+
+            if ( !s_tagNameRegex.IsMatch( tagName ) ) {
+                Debug.LogWarning(
+                    $"Invalid tag name: {tagName}." );
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         ///     Add a tag to the tagger.
@@ -266,8 +278,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTagsToAdd">Tags to add.</param>
         public void AddTags( IEnumerable<NeatoTag> neatoTagsToAdd ) {
-            if ( neatoTagsToAdd == null ) return;
-
             var changed = false;
             foreach ( var neatoTag in neatoTagsToAdd ) {
                 if ( !neatoTag || _tagsSet.Contains( neatoTag ) ) {
@@ -301,7 +311,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             _tags.Remove( neatoTag );
             _tagsSet.Remove( neatoTag );
-
+            _isCacheDirty = true;
             if ( !_taggedObjects.TryGetValue( neatoTag, out var taggedGameObject ) ) {
                 return;
             }
@@ -323,7 +333,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            RemoveTag( neatoTag );
+            RemoveTag( neatoTag! );
         }
 
         /// <summary>
@@ -600,13 +610,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 #if UNITY_EDITOR
         public delegate void RepaintAction();
 
-        public event RepaintAction WantRepaint;
+        public event RepaintAction? OnWantRepaint;
 #endif
 
 
 #if UNITY_EDITOR
         void RepaintInspector() {
-            WantRepaint?.Invoke();
+            OnWantRepaint?.Invoke();
         }
 
         void Reset() {

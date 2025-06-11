@@ -35,7 +35,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             NeatoTagAssetModificationProcessor.RegisterTaggerDrawer( this );
             NeatoTagDrawer.RegisterTaggerDrawer( this );
             PopulateButtons();
-            Target.WantRepaint += DoRepaint;
+            Target.OnWantRepaint += DoRepaint;
             _tagger = new SerializedObject( Target );
         }
 
@@ -99,7 +99,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void OnDisable() {
-            Target.WantRepaint -= DoRepaint;
+            Target.OnWantRepaint -= DoRepaint;
             if ( Target == null ) {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger.targetObject as Tagger );
             }
