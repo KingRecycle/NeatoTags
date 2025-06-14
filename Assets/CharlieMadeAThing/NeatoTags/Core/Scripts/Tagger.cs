@@ -86,6 +86,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         /// <summary>
         /// Try to get a NeatoTag by name.
+        /// NeatoTag must exist in the scene.
         /// </summary>
         /// <param name="tagName">NeatoTag name.</param>
         /// <param name="tag">The NeatoTag if found.</param>
@@ -212,7 +213,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #region Add and Remove Methods
 
         /// <summary>
-        ///     Gets an existing tag with the given name or creates a new one if it doesn't exist.
+        ///     Gets an existing tag on the tagger with the given name or creates a new one if it doesn't exist.
         ///     Tags created this way are not saved to disk.
         /// </summary>
         /// <param name="tagName">Name of the tag to get or create.</param>

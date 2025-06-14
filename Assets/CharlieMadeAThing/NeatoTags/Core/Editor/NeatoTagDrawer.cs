@@ -82,6 +82,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _button.style.backgroundColor = PropertyColor.colorValue;
             _button.style.color = TaggerDrawer.GetTextColorBasedOnBackground( PropertyColor.colorValue );
             foreach ( var taggerDrawer in TaggerDrawers ) {
+                if ( !taggerDrawer ) continue;
                 taggerDrawer.PopulateButtons();
             }
         }

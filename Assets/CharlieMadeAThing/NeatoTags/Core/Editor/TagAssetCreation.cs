@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEditor;
@@ -9,6 +10,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static HashSet<NeatoTag> _cachedTags;
         static Dictionary<string, NeatoTag> _tagNameLookup;
         static bool _tagCacheDirty = true;
+        const uint MaxNameCounter = 1000;
 
         public static void SetTagFolder() {
             var path = EditorUtility.OpenFolderPanel( "Tag Folder Location", "Assets", "" );
@@ -92,12 +94,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 tagName = "New Tag";
             }
 
-            var counter = 0;
+            uint counter = 0;
             var uniqueName = tagName;
             while ( _tagNameLookup != null && _tagNameLookup.ContainsKey( uniqueName ) ) {
                 counter++;
                 uniqueName = $"{trimmedName} {counter}";
-                if ( counter <= 1000 ) continue;
+                if ( counter <= MaxNameCounter ) continue;
                 Debug.LogError( "[TagAssetCreation]: Could not create tag. Hard limit reached. Try a different name." );
                 return null;
             }
