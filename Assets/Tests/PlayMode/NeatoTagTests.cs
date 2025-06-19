@@ -86,6 +86,25 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         }
         
         [UnityTest]
+        public IEnumerator AddTag_WithNullGameObject_HandlesGracefully() {
+            GameObject nullObj = null;
+            Assert.DoesNotThrow(() => nullObj.AddTag(TagRefsForTests.cubeTag));
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasTag_WithDestroyedGameObject_ReturnsFalse() {
+            var tempObj = new GameObject("Temp");
+            tempObj.AddTagWithForce(TagRefsForTests.cubeTag);
+            Object.Destroy(tempObj);
+            yield return null; // Wait for destruction
+    
+            Assert.That(tempObj.HasTag(TagRefsForTests.cubeTag), Is.False);
+            yield return null;
+        }
+
+        
+        [UnityTest]
         public IEnumerator HasTag_OnObjectWithoutTagger_ReturnsFalse() {
             // Testing extension method behavior on objects without a Tagger component
             GameObject newObj = new GameObject("ObjectWithoutTagger");

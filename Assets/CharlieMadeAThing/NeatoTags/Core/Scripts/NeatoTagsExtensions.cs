@@ -57,6 +57,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #region AddRemoveTags
         
         static void AddTag( GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone ) {
+            if ( !gameObject ) {
+                Debug.LogWarning($"Gameobject is null! Cannot add tag {tag.name} to a null GameObject.");
+                return;           
+            }
             if ( !tag ) {
                 Debug.LogWarning($"Attempting to add tag to {gameObject} but tag argument is null!");
                 return;
