@@ -511,7 +511,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void SetTagFolder() {
-            TagAssetCreation.SetTagFolder();
+            TagAssetCreation.OpenFolderDialogAndSelectFolder();
             UpdatePathLabel();
         }
 
