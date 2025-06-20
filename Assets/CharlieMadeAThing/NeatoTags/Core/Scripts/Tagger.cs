@@ -33,7 +33,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         HashSet<string> _cachedTagNames = new();
         bool _isCacheDirty = true;
         public IReadOnlyList<NeatoTag> GetTags => _tags;
-        static readonly Regex s_tagNameRegex = new("^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$", RegexOptions.Compiled);
+        //old regex: ^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$
+        public static readonly Regex s_tagNameRegex = new("^(?!\\s*$)[^<>]+$", RegexOptions.Compiled);
 
 
         void Awake() {

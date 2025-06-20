@@ -380,28 +380,22 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         //Checks if the tag name is valid and if the name doesn't already exist.
-        bool CanRenameTag( string newName ) {
-            //Trim the name to remove any leading or trailing spaces.
-            if ( newName == string.Empty ) {
-                Debug.LogWarning("Tried to rename tag to an empty string.");
+        bool IsValidTagName( string newName ) {
+            if ( string.IsNullOrEmpty( newName ) ) return false;
+            if ( !Tagger.s_tagNameRegex.IsMatch( newName ) ) return false;
+            
+            if ( (from element in _allTagsBox.Children() select element.Q<Button>()).Any( button => button.text.Equals( newName ) ) ) {
+                Debug.LogWarning(
+                    $"Tried to rename tag {_selectedTag.targetObject.name} to {newName} but a tag with that name already exists." );
                 return false;
-            }
-
-            foreach ( var element in _allTagsBox.Children() ) {
-                var button = element.Q<Button>();
-                if ( button.text.Equals( newName ) ) {
-                    Debug.LogWarning(
-                        $"Tried to rename tag {_selectedTag.targetObject.name} to {newName} but a tag with that name already exists." );
-                    return false;
-                }
             }
 
             return true;
         }
 
         void DoRename() {
-            var newName = _renameField.text.Trim();
-            if ( !CanRenameTag( newName ) ) {
+            var newName = _renameField.text;
+            if ( !IsValidTagName( newName ) ) {
                 return;
             }
 
@@ -438,7 +432,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectAllButton.style.visibility = Visibility.Hidden;
         }
 
-        //NOTE: Don't forget to unsubscribe from events before subscribing to them again.
+        //NOTE: Remember to unsubscribe from events before subscribing to them again.
         void DisplayTag() {
             var visualTree = AssetDatabase
                 .LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml )

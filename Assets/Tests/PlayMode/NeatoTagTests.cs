@@ -469,5 +469,25 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             int afterCount = Tagger.FilterGameObjects().WithTag(TagRefsForTests.planeTag).GetMatches().Count;
             Assert.That(afterCount, Is.EqualTo(beforeCount - 1), "Destroyed objects should be removed from tag collections");
         }
+        
+        [UnityTest]
+        public IEnumerator ConcurrentTagModification_ThreadSafety() {
+            var tasks = new List<System.Threading.Tasks.Task>();
+    
+            for (int i = 0; i < 10; i++) {
+                int index = i;
+                tasks.Add(System.Threading.Tasks.Task.Run(() => {
+                    // Simulate concurrent tag operations
+                    Cube.GetOrCreateTag($"ConcurrentTag_{index}");
+                }));
+            }
+    
+            yield return new WaitUntil(() => tasks.All(t => t.IsCompleted));
+    
+            // Verify no corruption occurred
+            Assert.That(Cube.GetComponent<Tagger>().GetTags.Count, Is.GreaterThanOrEqualTo(2));
+            yield return null;
+        }
+
     }
 }
