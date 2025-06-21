@@ -14,12 +14,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     /// - Registered taggers associated with specific GameObjects.
     /// - GameObjects registered under specific tags.
     /// - GameObjects that are not associated with any tags.
-    /// The TaggerRegistry class provides methods for initialization,
-    /// registration, and removal of taggers, tags, and GameObjects, ensuring
-    /// efficient overall management of tagged entities. It also allows retrieval
-    /// of internal data structures for debugging or advanced operations.
-    /// Use this class in conjunction with the Tagger component
-    /// and NeatoTag ScriptableObjects to implement complex tagging systems.
     /// </remarks>
     public static class TaggerRegistry {
         // Static collections for tracking tagged objects and taggers in the scene.
