@@ -4,30 +4,14 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CharlieMadeAThing.NeatoTags.Core.Editor;
 using UnityEngine;
-#nullable enable
+
 namespace CharlieMadeAThing.NeatoTags.Core {
     /// <summary>
-    ///     Stores and tracks attached gameobject and its tags.
-    ///     Also tracks all tagged gameobjects in the scene using static collections.
-    ///     Provides methods for querying the gameobject tags.
+    /// Tagger class for managing and querying tags on GameObjects.
+    /// This class provides functionalities for adding, removing, and filtering tags.
     /// </summary>
     [Serializable]
     public class Tagger : MonoBehaviour {
-        // Static collections for tracking tagged objects and taggers in the scene.
-
-        // All taggers in the scene (@runtime).
-        static readonly Dictionary<GameObject, Tagger> _taggers = new();
-
-        // All tagged objects in the scene by tag (@runtime).
-        static readonly Dictionary<NeatoTag, HashSet<GameObject>> _taggedObjects = new();
-
-        // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
-        static readonly HashSet<GameObject> _nonTaggedObjects = new();
-        
-        //--------------------------------------------------------------------------------------------------------------
-        
-        
-        // This tagger's tags for its gameobject.
         [SerializeField] List<NeatoTag> _tags = new();
 		HashSet<NeatoTag> _tagsSet = new();
         HashSet<string> _cachedTagNames = new();
@@ -42,14 +26,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             try {
                 _tags.RemoveAll( nTag => !nTag );
                 _tagsSet.RemoveWhere( nTag => !nTag );
-                _taggers.Add( gameObject, this );
-                _nonTaggedObjects.Add( gameObject );
-                foreach ( var neatoTagAsset in _tags ) {
-                    _taggedObjects.TryAdd( neatoTagAsset, new HashSet<GameObject>() );
-                    _taggedObjects[neatoTagAsset].Add( gameObject );
-                    _nonTaggedObjects.Remove( gameObject );
-                    _tagsSet.Add( neatoTagAsset );
-                }
+                _tagsSet = _tags.ToHashSet();
+                TaggerRegistry.InitializeNewTagger( gameObject, this );
             }
             catch ( Exception e ) {
                 Debug.LogWarning($"Failed to initialize Tagger: {e.Message}");
@@ -58,12 +36,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         void OnDestroy() {
             //Remove this tagger from everything
-            foreach ( var neatoTag in _tags ) {
-                _taggedObjects[neatoTag].Remove( gameObject );
-            }
-
-            _taggers.Remove( gameObject );
-            _nonTaggedObjects.Remove( gameObject );
+            TaggerRegistry.RemoveTaggerFromRegistry( gameObject, this );
 
 #if UNITY_EDITOR
             NeatoTagTaggerTracker.UnregisterTagger( this );
@@ -97,7 +70,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             if ( !IsValidTagName( tagName ) ) {
                 return false;
             }
-            tag = _taggedObjects.Keys.FirstOrDefault( t => t.name == tagName );
+            tag = TaggerRegistry.GetRegisteredTag( tagName );
             return tag;
         }
 
@@ -107,15 +80,14 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     All gameobjects in the scene with a tagger component.
         /// </summary>
         /// <returns>List of gameobjects in the scene with a tagger component.</returns>
-        public static List<GameObject> GetAllGameObjectsWithTagger() => _taggers.Keys.ToList();
-
+        public static List<GameObject> GetAllGameObjectsWithTagger() => TaggerRegistry.GetStaticTaggersDictionary().Keys.ToList();
 
         /// <summary>
         ///     Checks if a gameobject has a Tagger component.
         /// </summary>
         /// <param name="gameObject">Gameobject to check</param>
         /// <returns>True if the Gameobject has a Tagger component, false if not.</returns>
-        public static bool HasTagger( GameObject gameObject ) => _taggers.ContainsKey( gameObject );
+        public static bool HasTagger( GameObject gameObject ) => TaggerRegistry.GetStaticTaggersDictionary().ContainsKey( gameObject );
 
         /// <summary>
         ///     Checks if a gameobject has a Tagger component and if true, will out the tagger.
@@ -124,13 +96,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagger">Gameobject's Tagger component</param>
         /// <returns>True if the Gameobject has a Tagger component, otherwise false.</returns>
         public static bool TryGetTagger( GameObject gameObject, out Tagger tagger ) =>
-            _taggers.TryGetValue( gameObject, out tagger );
+            TaggerRegistry.GetStaticTaggersDictionary().TryGetValue( gameObject, out tagger );
 
         /// <summary>
         ///     Gets a Dictionary of all the gameobjects that have a Tagger component.
         /// </summary>
         /// <returns>A Dictionary where the keys are Gameobjects and Values are the respective Tagger component.</returns>
-        public static Dictionary<GameObject, Tagger> GetGameobjectsWithTagger() => _taggers;
+        public static Dictionary<GameObject, Tagger> GetGameobjectsWithTagger() => TaggerRegistry.GetStaticTaggersDictionary();
 
         /// <summary>
         ///     Checks if Tagger has a specific tag.
@@ -149,6 +121,18 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             return _cachedTagNames.Contains( neatoTag );
         }
 
+        /// <summary>
+        /// Gets the number of tags on the Tagger.
+        /// </summary>
+        /// <returns>Number of tags on Tagger.</returns>
+        public int GetTagCount() => _tags.Count;
+        
+        /// <summary>
+        /// Gets whether Tagger has any tags or not.
+        /// </summary>
+        /// <returns>Returns true if Tagger has more than 0 tags.</returns>
+        public bool IsTagged() => GetTagCount() > 0;
+        
         /// <summary>
         /// Gets the tag on the tagger by name.
         /// </summary>
@@ -268,10 +252,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             _tags.Add( neatoTag );
             _tagsSet.Add( neatoTag );
-            //Doesn't matter if the TryAdd was successful or not just that it was added if it didn't exist.
-            _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
-            _taggedObjects[neatoTag].Add( gameObject );
-            _nonTaggedObjects.Remove( gameObject );
+            TaggerRegistry.RegisterTag( neatoTag );
+            TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
             _isCacheDirty = true;
         }
 
@@ -290,9 +272,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
                 _tags.Add( neatoTag );
                 _tagsSet.Add( neatoTag );
-                _taggedObjects.TryAdd( neatoTag, new HashSet<GameObject>() );
-                _taggedObjects[neatoTag].Add( gameObject );
-                _nonTaggedObjects.Remove( gameObject );
+                TaggerRegistry.RegisterTag( neatoTag );
+                TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
                 changed = true;
             }
 
@@ -314,13 +295,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _tags.Remove( neatoTag );
             _tagsSet.Remove( neatoTag );
             _isCacheDirty = true;
-            if ( !_taggedObjects.TryGetValue( neatoTag, out var taggedGameObject ) ) {
+            if ( !TaggerRegistry.GetStaticTaggedObjectsDictionary().TryGetValue( neatoTag, out var taggedGameObject ) ) {
                 return;
             }
 
             taggedGameObject.Remove( gameObject );
             if ( _tags.Count == 0 ) {
-                _nonTaggedObjects.Add( gameObject );
+                TaggerRegistry.RegisterNonTaggedGameObject( gameObject );
             }
         }
 
@@ -373,7 +354,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     If nothing is passed in, it will check against ALL tagged GameObjects.
         /// </summary>
         /// <returns>FilterTags for chaining filter functions</returns>
-        public static GameObjectFilter FilterGameObjects() => new( _taggers.Keys );
+        public static GameObjectFilter FilterGameObjects() => new( TaggerRegistry.GetStaticTaggersDictionary().Keys );
 
 
         /// <summary>
@@ -385,7 +366,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
             public GameObjectFilter( IEnumerable<GameObject> gameObjects ) {
                 _matches = new HashSet<GameObject>();
-                var gameObjectsToFilter = gameObjects == null ? _taggers.Keys : gameObjects.Where( x => x.HasTagger() );
+                if ( gameObjects == null ) {
+                    Debug.LogWarning( "You are trying to filter a null list of gameobjects. Defaulting to all tagged gameobjects." );
+                }
+                var gameObjectsToFilter = gameObjects == null ? TaggerRegistry.GetStaticTaggersDictionary().Keys : gameObjects.Where( x => x.HasTagger() );
                 _matches.UnionWith( gameObjectsToFilter );
             }
 
@@ -403,7 +387,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             /// <param name="tag">Tag to check for.</param>
             /// <returns></returns>
             public GameObjectFilter WithTag( NeatoTag tag ) {
-                _taggedObjects.TryGetValue( tag, out var tempMatches );
+                TaggerRegistry.GetStaticTaggedObjectsDictionary().TryGetValue( tag, out var tempMatches );
                 tempMatches ??= new HashSet<GameObject>();
 
                 _matches.IntersectWith( tempMatches );
@@ -472,9 +456,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                     return this;
                 }
                 var tempMatches = new HashSet<GameObject>();
-                
+                var taggedObjectsMap = TaggerRegistry.GetStaticTaggedObjectsDictionary();
                 foreach ( var neatoTag in neatoTags ) {
-                    if ( !_taggedObjects.TryGetValue( neatoTag, out var taggedObjects ) ) continue;
+                    if ( !taggedObjectsMap.TryGetValue( neatoTag, out var taggedObjects ) ) continue;
                     tempMatches.UnionWith( taggedObjects );
                 }
                 _matches.IntersectWith( tempMatches );

@@ -13,6 +13,26 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             gameObject && Tagger.HasTagger( gameObject );
 
         /// <summary>
+        ///     Returns the number of tags on the gameobject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>Number of tags on the gameobject's tagger component.</returns>
+        public static int GetTagCount( this GameObject gameObject ) {
+            if ( !gameObject ) return 0;
+            return !Tagger.TryGetTagger( gameObject, out var tagger ) ? 0 : tagger.GetTagCount();
+        }
+
+        /// <summary>
+        /// Determines if the specified GameObject has any tags assigned to it.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>True if the GameObject is tagged; otherwise, false.</returns>
+        public static bool IsTagged( this GameObject gameObject ) {
+            if ( !gameObject ) return false;
+            return Tagger.TryGetTagger( gameObject, out var tagger ) && tagger.IsTagged();       
+        }
+
+        /// <summary>
         ///     Starts a tag filter.
         ///     Starts a filter for chaining filter functions.
         ///     WithTag(), WithTags(), WithoutTag(), WithoutTags(), WithAnyTags()

@@ -127,22 +127,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public static EditorDataHolder GetEditorDataContainer() {
-            var holdersGuids = AssetDatabase.FindAssets( "EditorDataContainer" );
-
-            switch ( holdersGuids.Length ) {
-                case > 1: {
-                    Debug.LogWarning(
-                        "[TagAssetCreation]: Found more than one EditorDataHolder. This is not supported. Only the first one will be used." );
-                    var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
-                    return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
-                }
-                case 1: {
-                    var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
-                    return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
-                }
-                default:
-                    return null;
+            var holdersGuids = AssetDatabase.FindAssets("EditorDataContainer");
+    
+            if (holdersGuids.Length == 0) return null;
+    
+            if (holdersGuids.Length > 1) {
+                Debug.LogWarning("[TagAssetCreation]: Found multiple EditorDataHolders. Using the first one.");
             }
+    
+            var holderPath = AssetDatabase.GUIDToAssetPath(holdersGuids[0]);
+            return AssetDatabase.LoadAssetAtPath<EditorDataHolder>(holderPath);
         }
 
         //Non menu version of NewTag function
