@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     [CustomPropertyDrawer( typeof(NeatoTag) )]
     public class NeatoTagPropertyDrawer : PropertyDrawer {
-        static Texture2D _buttonTexture;
+        static Texture2D s_buttonTexture;
         Label _label;
         PropertyField _propertyField;
         VisualElement _root;
@@ -122,8 +122,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var buttonPlaceRect = new Rect( position.x, position.y, 150, position.height );
             var objPlaceRect = new Rect( position.x + buttonPlaceRect.width, position.y,
                 position.width - buttonPlaceRect.width, position.height );
-            if ( !_buttonTexture ) {
-                _buttonTexture =
+            if ( !s_buttonTexture ) {
+                s_buttonTexture =
                     AssetDatabase.LoadAssetAtPath<Texture2D>(
                         "Assets/CharlieMadeAThing/NeatoTags/Core/Sprites/button_unitystyle.png" );
             }
@@ -131,12 +131,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var buttonStyle = new GUIStyle( GUI.skin.button ) {
                 border = new RectOffset( 4, 4, 4, 4 ),
                 normal = {
-                    background = _buttonTexture
+                    background = s_buttonTexture
                 }
             };
 
 
-            // Draw fields - pass GUIContent.none to each so they are drawn without labels
+            // Draw fields - pass GUIContent.none to each, so they are drawn without labels
 
             //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTag), false );
             EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
