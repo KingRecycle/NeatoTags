@@ -8,8 +8,8 @@ using UnityEngine.UIElements;
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     [CustomEditor( typeof(Tagger) ), CanEditMultipleObjects]
     public class TaggerDrawer : UnityEditor.Editor {
-        static VisualTreeAsset _tagButtonTemplate;
-        static VisualTreeAsset _tagButtonWithXTemplate;
+        static VisualTreeAsset s_tagButtonTemplate;
+        static VisualTreeAsset s_tagButtonWithXTemplate;
         Button _addTagButton;
         TextField _addTagTextField;
         GroupBox _allTagsBox;
@@ -46,10 +46,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.TaggerUxml );
             visualTree.CloneTree( _root );
 
-            _tagButtonTemplate =
+            s_tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
 
-            _tagButtonWithXTemplate =
+            s_tagButtonWithXTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagWithXUxml );
 
             FindUIElements();
@@ -81,11 +81,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _addTagButton.clicked -= CreateNewTag;
             _addTagButton.clicked += CreateNewTag;
             
-            _addTagTextField.RegisterCallback<KeyDownEvent>( evt => {
-                if ( evt.keyCode == KeyCode.Return ) {
-                    CreateNewTag();
-                }
-            } );
+            _addTagTextField.RegisterCallback<KeyDownEvent>( OnAddTagKeyDown );
             
             _editTaggerButton.tooltip = $"Edit Tags for {target.name}";
             
@@ -96,6 +92,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _allTagsBox.style.display = DisplayStyle.None;
             _editTaggerButton.clicked -= ShowEditTagger;
             _editTaggerButton.clicked += ShowEditTagger;
+        }
+
+        void OnAddTagKeyDown( KeyDownEvent evt ) {
+            if ( evt.keyCode == KeyCode.Return ) {
+                CreateNewTag();
+            }
         }
 
         void OnDisable() {
@@ -158,7 +160,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
         Button CreateDeselectedButton( NeatoTag tag ) {
-            var button = _tagButtonTemplate.Instantiate().Q<Button>();
+            var button = s_tagButtonTemplate.Instantiate().Q<Button>();
             if ( tag.Comment != string.Empty ) {
                 button.tooltip = tag.Comment;
             }
@@ -190,8 +192,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         VisualElement CreateSelectedButton( NeatoTag tag ) {
             var tagButton = _isEditTaggerMode
-                ? _tagButtonWithXTemplate.Instantiate().Q<VisualElement>()
-                : _tagButtonTemplate.Instantiate().Q<Button>();
+                ? s_tagButtonWithXTemplate.Instantiate().Q<VisualElement>()
+                : s_tagButtonTemplate.Instantiate().Q<Button>();
 
             if ( tag.Comment != string.Empty ) {
                 tagButton.tooltip = tag.Comment;
