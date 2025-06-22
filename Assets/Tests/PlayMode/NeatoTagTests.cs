@@ -87,8 +87,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         
         [UnityTest]
         public IEnumerator AddTag_WithNullGameObject_HandlesGracefully() {
-            GameObject nullObj = null;
-            Assert.DoesNotThrow(() => nullObj.AddTag(TagRefsForTests.cubeTag));
+            Assert.DoesNotThrow(() => ((GameObject)null).AddTag(TagRefsForTests.cubeTag));
             yield return null;
         }
 
@@ -398,7 +397,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         
         [UnityTest]
         public IEnumerator FilterGameObjects_WithAnyTagsNullOrEmpty_ReturnsNoMatches() {
-            // Setup initial objects with tags
+            // Set up initial objects with tags
             var initialShapes = Tagger.FilterGameObjects(Shapes)
                 .WithAnyTags(TagRefsForTests.cubeTag, TagRefsForTests.sphereTag)
                 .GetMatches();
@@ -406,13 +405,13 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
 
             // Test with null tags
             var nullTagResult = Tagger.FilterGameObjects(Shapes)
-                .WithAnyTags((NeatoTag[])null)
+                .WithAnyTags(null)
                 .GetMatches();
             Assert.That(nullTagResult.Count, Is.EqualTo(0), "Should return no matches when tags array is null");
 
-            // Test with empty tags array
+            // Test with an empty tags params.
             var emptyTagResult = Tagger.FilterGameObjects(Shapes)
-                .WithAnyTags(new NeatoTag[0])
+                .WithAnyTags()
                 .GetMatches();
             Assert.That(emptyTagResult.Count, Is.EqualTo(0), "Should return no matches when tags array is empty");
 
