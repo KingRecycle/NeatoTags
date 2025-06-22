@@ -54,7 +54,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="newTagName">Name of the tag to get or create.</param>
         /// <returns>Returns tag if successful, otherwise returns new tag with given name.</returns>
         public static NeatoTag GetOrCreateTag( this GameObject gameObject, string newTagName ) {
-            if ( !gameObject && string.IsNullOrWhiteSpace( newTagName ) ) return null;
+            if ( !gameObject || string.IsNullOrWhiteSpace( newTagName ) ) return null;
             return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.GetOrCreate( newTagName ) : null;
         }
 
