@@ -41,7 +41,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>FilterTags or null</returns>
-        public static Tagger.TagFilter FilterTags( this GameObject gameObject ) =>
+        public static TagFilter FilterTags( this GameObject gameObject ) =>
             gameObject && Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.FilterTags() : null;
 
         /// <summary>
@@ -58,6 +58,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             return Tagger.TryGetTagger( gameObject, out var tagger ) ? tagger.GetOrCreate( newTagName ) : null;
         }
 
+        
         /// <summary>
         ///     Tries to get a tag by name from the gameobject's Tagger component.
         /// </summary>
