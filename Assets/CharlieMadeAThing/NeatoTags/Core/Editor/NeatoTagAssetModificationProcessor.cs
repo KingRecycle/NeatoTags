@@ -7,8 +7,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     ///     from the project.
     /// </summary>
     public class NeatoTagAssetModificationProcessor : AssetPostprocessor {
-        static readonly List<TaggerDrawer> TaggerDrawers = new();
-        static readonly List<NeatoTagDrawer> NeatoTagDrawers = new();
+        static readonly List<TaggerDrawer> s_taggerDrawers = new();
+        static readonly List<NeatoTagDrawer> s_neatoTagDrawers = new();
 
 
         //When an asset is created, deleted, or renamed, this method is called.
@@ -23,12 +23,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //Loop through all TaggerDrawers and NeatoTagDrawers and update them.
         //Without this custom inspector/windows won't update until the editor needs to redraw them, and I find it not as cool unless they update automatically.
         public static void UpdateTaggers() {
-            foreach ( var taggerDrawer in TaggerDrawers ) {
+            foreach ( var taggerDrawer in s_taggerDrawers ) {
                 if ( !taggerDrawer ) continue;
                 taggerDrawer.PopulateButtons();
             }
 
-            foreach ( var neatoTagDrawer in NeatoTagDrawers ) {
+            foreach ( var neatoTagDrawer in s_neatoTagDrawers ) {
                 if ( !neatoTagDrawer ) continue;
                 neatoTagDrawer.UpdateTagButtonText();
             }
@@ -38,35 +38,35 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //Grabs the TaggerDrawer. Doesn't work if not a list for some reason...
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
-            TaggerDrawers.RemoveAll( drawer => !drawer );
-            if ( TaggerDrawers.Contains( taggerDrawer ) ) {
+            s_taggerDrawers.RemoveAll( drawer => !drawer );
+            if ( s_taggerDrawers.Contains( taggerDrawer ) ) {
                 return;
             }
 
-            TaggerDrawers.Add( taggerDrawer );
+            s_taggerDrawers.Add( taggerDrawer );
         }
 
         public static void UnregisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
-            TaggerDrawers.RemoveAll( drawer => !drawer );
-            TaggerDrawers.Remove( taggerDrawer );
+            s_taggerDrawers.RemoveAll( drawer => !drawer );
+            s_taggerDrawers.Remove( taggerDrawer );
         }
 
         //Grabs the NeatoTagDrawer. Doesn't work if not a list for some reason...
         public static void RegisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
-            NeatoTagDrawers.RemoveAll( drawer => !drawer );
-            if ( NeatoTagDrawers.Contains( neatoTagDrawer ) ) {
+            s_neatoTagDrawers.RemoveAll( drawer => !drawer );
+            if ( s_neatoTagDrawers.Contains( neatoTagDrawer ) ) {
                 return;
             }
 
-            NeatoTagDrawers.Add( neatoTagDrawer );
+            s_neatoTagDrawers.Add( neatoTagDrawer );
         }
 
         public static void UnregisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
-            NeatoTagDrawers.RemoveAll( drawer => !drawer );
-            NeatoTagDrawers.Remove( neatoTagDrawer );
+            s_neatoTagDrawers.RemoveAll( drawer => !drawer );
+            s_neatoTagDrawers.Remove( neatoTagDrawer );
         }
     }
 }
