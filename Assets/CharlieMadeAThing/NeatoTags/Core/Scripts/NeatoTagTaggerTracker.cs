@@ -6,25 +6,27 @@ using UnityEngine.SceneManagement;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
-    ///     Tracks all <see cref="Tagger" />s in the scene.
+    ///     Tracks all <see cref="Tagger" />s in the scene @ editor time.
     ///     Allows for selecting all <see cref="Tagger" />s that have a specific <see cref="NeatoTag" />.
+    ///     This needs to be part of Core asmdef, but it's just necessary in the editor.
+    ///     Is there a better way? Let me know.
     /// </summary>
     public static class NeatoTagTaggerTracker {
 #if UNITY_EDITOR
-        static readonly HashSet<Tagger> Taggers = new();
+        static readonly HashSet<Tagger> s_taggers = new();
 
         public static void RegisterTagger( Tagger tagger ) {
             CleanUpNulls();
-            Taggers.Add( tagger );
+            s_taggers.Add( tagger );
         }
 
         public static void UnregisterTagger( Tagger tagger ) {
             CleanUpNulls();
-            Taggers.Remove( tagger );
+            s_taggers.Remove( tagger );
         }
 
         public static void RegisterTaggersInScene() {
-            Taggers.Clear();
+            s_taggers.Clear();
             var taggers = GetAllObjectsOnlyInScene();
             foreach ( var tagger in taggers ) {
                 RegisterTagger( tagger );
@@ -32,14 +34,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public static void SelectAllGameObjectsWithTaggerThatHasTag( NeatoTag tag ) {
-            Selection.objects = Taggers
+            Selection.objects = s_taggers
                 .Where( tagger => tagger.HasTag( tag ) )
                 .Select( tagger => tagger.gameObject as Object )
                 .ToArray();
         }
 
         static void CleanUpNulls() {
-            Taggers.RemoveWhere( tagger => tagger == null );
+            s_taggers.RemoveWhere( tagger => tagger == null );
         }
 
         static IEnumerable<Tagger> GetAllObjectsOnlyInScene() {

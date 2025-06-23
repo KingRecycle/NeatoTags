@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CharlieMadeAThing.NeatoTags.Core.Editor;
 using UnityEngine;
+using CharlieMadeAThing.NeatoTags.Core.Editor;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
     /// <summary>
