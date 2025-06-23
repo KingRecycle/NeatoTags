@@ -117,7 +117,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         bool _isDirty = true;
 
         void OnEnable() {
-            //Keeping track of Tagger components in the scene so got to do an initial grab of all the components on editor scene load.
+            //Keeping track of Tagger components in the scene,
+            //so got to do an initial grab of all the components when the editor loads the scene.
             //Afterward, they are registered as they are created and unregistered as the component is removed from gameobjects.
             if ( _isDirty ) {
                 EditorSceneManager.sceneOpened -= OnSceneOpened;
@@ -158,24 +159,24 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             EditorApplication.update -= ProcessSearchDebounce;
             UnregisterDisplayCallbacks();
         }
-        
-        //Register tag-specific callbacks when tag is selected and displayed.
+
+        //Register tag-specific callbacks when the tag is selected and displayed.
         void RegisterDisplayCallbacks() {
-            _renameField.RegisterCallback<KeyDownEvent>(RenameFieldOnKeyDown, TrickleDown.TrickleDown);
+            _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown, TrickleDown.TrickleDown );
             _renameButton.clicked += DoRename;
             _selectAllButton.clicked += SelectAllWithTag;
-            _selectedTagColorField?.RegisterValueChangedCallback(UpdateTagColor);
-            _selectedTagTextField?.RegisterValueChangedCallback(UpdateTagComment);
+            _selectedTagColorField?.RegisterValueChangedCallback( UpdateTagColor );
+            _selectedTagTextField?.RegisterValueChangedCallback( UpdateTagComment );
             _selectedTagButton.clicked += SelectedTagAssetInProjectView;
         }
 
-        //Unregister tag-specific callbacks when tag is unselected and hidden.
+        //Unregister tag-specific callbacks when the tag is unselected and hidden.
         void UnregisterDisplayCallbacks() {
-            _renameField.UnregisterCallback<KeyDownEvent>(RenameFieldOnKeyDown);
+            _renameField.UnregisterCallback<KeyDownEvent>( RenameFieldOnKeyDown );
             _renameButton.clicked -= DoRename;
             _selectAllButton.clicked -= SelectAllWithTag;
-            _selectedTagColorField?.UnregisterValueChangedCallback(UpdateTagColor);
-            _selectedTagTextField?.UnregisterValueChangedCallback(UpdateTagComment);
+            _selectedTagColorField?.UnregisterValueChangedCallback( UpdateTagColor );
+            _selectedTagTextField?.UnregisterValueChangedCallback( UpdateTagComment );
             _selectedTagButton.clicked -= SelectedTagAssetInProjectView;
         }
 
@@ -259,7 +260,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _pendingSearchText = evt.newValue;
             _lastSearchTime = EditorApplication.timeSinceStartup;
 
-            // Don't trigger immediate search for backspace
+            // Don't trigger an immediate search for backspace
             if ( _isBackspaceHeld ) {
                 // Stop any current population
                 if ( _isPopulating ) {
@@ -270,7 +271,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return;
             }
 
-            // For non-backspace changes, schedule search with debounce
+            // For non-backspace changes, schedule search with debouncing
             if ( !_searchPending ) {
                 _searchPending = true;
                 EditorApplication.update += ProcessSearchDebounce;
@@ -286,7 +287,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             var debounceTime = string.IsNullOrEmpty( _pendingSearchText ) ? 0.1f : _searchWaitTime;
 
-            // Wait for the debounce time to elapse
+            // Wait for the debouncing time to elapse
             if ( EditorApplication.timeSinceStartup - _lastSearchTime < debounceTime ) {
                 return;
             }
@@ -310,7 +311,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             TagAssetCreation.DeleteTag( _selectedTag.targetObject as NeatoTag );
-            //Remove tag button from tag manager window.
+            //Remove the tag button from the tag manager window.
             foreach ( var ele in _allTagsBox.Children() ) {
                 if ( ele is not Button { userData: NeatoTag tag } || tag != _selectedTag.targetObject ) continue;
                 _allTagsBox.Remove( ele );
@@ -383,8 +384,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         bool IsValidTagName( string newName ) {
             if ( string.IsNullOrEmpty( newName ) ) return false;
             if ( !Tagger.s_tagNameRegex.IsMatch( newName ) ) return false;
-            
-            if ( (from element in _allTagsBox.Children() select element.Q<Button>()).Any( button => button.text.Equals( newName ) ) ) {
+
+            if ( (from element in _allTagsBox.Children() select element.Q<Button>()).Any( button =>
+                    button.text.Equals( newName ) ) ) {
                 Debug.LogWarning(
                     $"Tried to rename tag {_selectedTag.targetObject.name} to {newName} but a tag with that name already exists." );
                 return false;
@@ -459,7 +461,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _selectAllButton.style.visibility = Visibility.Visible;
             _selectAllButton.tooltip =
                 $"Select all gameobjects in scene with the {_selectedTag.targetObject.name} tag.";
-            
+
             RegisterDisplayCallbacks();
 
             if ( _selectedTagColorField != null ) {
