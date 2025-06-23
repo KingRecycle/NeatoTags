@@ -7,32 +7,32 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     public class TagAssetCreation : EditorWindow {
-        static HashSet<NeatoTag> _cachedTags;
-        static Dictionary<string, NeatoTag> _tagNameLookup;
-        static bool _tagCacheDirty = true;
+        static HashSet<NeatoTag> s_cachedTags;
+        static Dictionary<string, NeatoTag> s_tagNameLookup;
+        static bool s_tagCacheDirty = true;
         const int MaxNameCounter = 1000; //Max attempts to add a number to the end of the tag name. Arbitrary amount.
-        const int MaxCachedTags = 1000; //Max number of tags to cache. Arbitrary amount. Don't tell me you need more than 1000!?
+        const int MaxCachedTags = 1000; //Max number of tags to cache. Don't tell me you need more than 1000!?
 
         public static void OpenFolderDialogAndSelectFolder() {
             var path = EditorUtility.OpenFolderPanel( "Tag Folder Location", "Assets", "" );
             var tagPath = GetTagFolderLocation();
 
             if ( string.IsNullOrEmpty( path ) ) return;
-            
+
             // Validate the path is within the project
-            var projectPath = Path.GetFullPath(Application.dataPath);
-            var selectedPath = Path.GetFullPath(path);
-    
-            if (!selectedPath.StartsWith(projectPath, StringComparison.OrdinalIgnoreCase)) {
-                EditorUtility.DisplayDialog("Error", 
-                    "Selected folder must be within the Unity project.", "OK");
+            var projectPath = Path.GetFullPath( Application.dataPath );
+            var selectedPath = Path.GetFullPath( path );
+
+            if ( !selectedPath.StartsWith( projectPath, StringComparison.OrdinalIgnoreCase ) ) {
+                EditorUtility.DisplayDialog( "Error",
+                    "Selected folder must be within the Unity project.", "OK" );
                 return;
             }
-            
+
             var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
-            if (selectedFolder.Contains("..")) {
-                EditorUtility.DisplayDialog("Error", 
-                    "Invalid folder selection.", "OK");
+            if ( selectedFolder.Contains( ".." ) ) {
+                EditorUtility.DisplayDialog( "Error",
+                    "Invalid folder selection.", "OK" );
                 return;
             }
 
@@ -57,30 +57,30 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         static string GetNeatoTagsDirectory() {
             try {
-                var dirs = Directory.GetDirectories($"{Application.dataPath}", "NeatoTags", SearchOption.AllDirectories);
-                if (dirs.Length == 0) {
-                    Debug.LogError("[TagAssetCreation]: Could not find NeatoTags directory.");
+                var dirs = Directory.GetDirectories( $"{Application.dataPath}", "NeatoTags",
+                    SearchOption.AllDirectories );
+                if ( dirs.Length == 0 ) {
+                    Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags directory." );
                     return "";
                 }
-        
+
                 var selectedDir = dirs[0];
                 // Verify the directory still exists before using it
-                if (!Directory.Exists(selectedDir)) {
-                    Debug.LogWarning("[TagAssetCreation]: NeatoTags directory was removed during operation.");
+                if ( !Directory.Exists( selectedDir ) ) {
+                    Debug.LogWarning( "[TagAssetCreation]: NeatoTags directory was removed during operation." );
                     return "";
                 }
-        
-                return Path.Join("Assets", Path.GetRelativePath(Application.dataPath, selectedDir));
-            }
-            catch (DirectoryNotFoundException ex) {
-                Debug.LogError($"[TagAssetCreation]: Directory access failed: {ex.Message}");
-                return "";
-            }
-            catch (UnauthorizedAccessException ex) {
-                Debug.LogError($"[TagAssetCreation]: Access denied: {ex.Message}");
-                return "";
-            }
 
+                return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, selectedDir ) );
+            }
+            catch ( DirectoryNotFoundException ex ) {
+                Debug.LogError( $"[TagAssetCreation]: Directory access failed: {ex.Message}" );
+                return "";
+            }
+            catch ( UnauthorizedAccessException ex ) {
+                Debug.LogError( $"[TagAssetCreation]: Access denied: {ex.Message}" );
+                return "";
+            }
         }
 
         static string GetNeatoTagsEditorDirectory() {
@@ -92,21 +92,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags Editor directory." );
                     return "";
                 }
-            
+
                 var selectedDir = dirs[0];
                 if ( !Directory.Exists( selectedDir ) ) {
                     Debug.LogWarning( "[TagAssetCreation]: NeatoTags Editor directory was removed during operation." );
                     return "";
                 }
-            
+
                 return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
             }
             catch ( DirectoryNotFoundException ex ) {
-                Debug.LogError($"[TagAssetCreation]: Directory access failed: {ex.Message}");
+                Debug.LogError( $"[TagAssetCreation]: Directory access failed: {ex.Message}" );
                 return "";
             }
-            catch (UnauthorizedAccessException ex) {
-                Debug.LogError($"[TagAssetCreation]: Access denied: {ex.Message}");
+            catch ( UnauthorizedAccessException ex ) {
+                Debug.LogError( $"[TagAssetCreation]: Access denied: {ex.Message}" );
                 return "";
             }
         }
@@ -127,16 +127,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public static EditorDataHolder GetEditorDataContainer() {
-            var holdersGuids = AssetDatabase.FindAssets("EditorDataContainer");
-    
-            if (holdersGuids.Length == 0) return null;
-    
-            if (holdersGuids.Length > 1) {
-                Debug.LogWarning("[TagAssetCreation]: Found multiple EditorDataHolders. Using the first one.");
+            var holdersGuids = AssetDatabase.FindAssets( "EditorDataContainer" );
+
+            if ( holdersGuids.Length == 0 ) return null;
+
+            if ( holdersGuids.Length > 1 ) {
+                Debug.LogWarning( "[TagAssetCreation]: Found multiple EditorDataHolders. Using the first one." );
             }
-    
-            var holderPath = AssetDatabase.GUIDToAssetPath(holdersGuids[0]);
-            return AssetDatabase.LoadAssetAtPath<EditorDataHolder>(holderPath);
+
+            var holderPath = AssetDatabase.GUIDToAssetPath( holdersGuids[0] );
+            return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
         }
 
         //Non menu version of NewTag function
@@ -147,7 +147,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             uint counter = 0;
             var uniqueName = tagName;
-            while ( _tagNameLookup != null && _tagNameLookup.ContainsKey( uniqueName ) ) {
+            while ( s_tagNameLookup != null && s_tagNameLookup.ContainsKey( uniqueName ) ) {
                 counter++;
                 uniqueName = $"{tagName} {counter}";
                 if ( counter <= MaxNameCounter ) continue;
@@ -160,9 +160,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             AssetDatabase.CreateAsset( newTag, assetPath );
             AssetDatabase.SaveAssets();
 
-            if ( _cachedTags != null && _tagNameLookup != null ) {
-                _cachedTags.Add( newTag );
-                _tagNameLookup[uniqueName] = newTag;
+            if ( s_cachedTags != null && s_tagNameLookup != null ) {
+                s_cachedTags.Add( newTag );
+                s_tagNameLookup[uniqueName] = newTag;
             }
             else {
                 InvalidateTagCache();
@@ -205,9 +205,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         public static void DeleteTag( NeatoTag selectedTag ) {
             if ( !selectedTag ) return;
-            if ( _cachedTags != null && _tagNameLookup != null ) {
-                _cachedTags.Remove( selectedTag );
-                _tagNameLookup.Remove( selectedTag.name );
+            if ( s_cachedTags != null && s_tagNameLookup != null ) {
+                s_cachedTags.Remove( selectedTag );
+                s_tagNameLookup.Remove( selectedTag.name );
                 AssetDatabase.DeleteAsset( AssetDatabase.GetAssetPath( selectedTag ) );
             }
             else {
@@ -219,36 +219,35 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public static void InvalidateTagCache() {
-            _tagCacheDirty = true;
+            s_tagCacheDirty = true;
         }
 
         static void RefreshTagCache() {
-            _cachedTags = new HashSet<NeatoTag>();
-            _tagNameLookup = new Dictionary<string, NeatoTag>();
+            s_cachedTags = new HashSet<NeatoTag>();
+            s_tagNameLookup = new Dictionary<string, NeatoTag>();
 
             var guids = AssetDatabase.FindAssets( "t:NeatoTag" );
             if ( guids.Length > MaxCachedTags ) {
                 Debug.LogWarning(
                     $"[TagAssetCreation]: Found more than {MaxCachedTags} tags. Only the first {MaxCachedTags} will be used." );
-                Array.Resize(ref guids, MaxCachedTags);
-
+                Array.Resize( ref guids, MaxCachedTags );
             }
+
             foreach ( var guid in guids ) {
                 try {
-                    var path = AssetDatabase.GUIDToAssetPath(guid);
-                    var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>(path);
+                    var path = AssetDatabase.GUIDToAssetPath( guid );
+                    var tagAsset = AssetDatabase.LoadAssetAtPath<NeatoTag>( path );
 
                     if ( !tagAsset ) continue;
-                    _cachedTags.Add(tagAsset);
-                    _tagNameLookup[tagAsset.name] = tagAsset;
+                    s_cachedTags.Add( tagAsset );
+                    s_tagNameLookup[tagAsset.name] = tagAsset;
                 }
-                catch (Exception ex) {
-                    Debug.LogWarning($"[TagAssetCreation]: Failed to load tag {guid}: {ex.Message}");
+                catch ( Exception ex ) {
+                    Debug.LogWarning( $"[TagAssetCreation]: Failed to load tag {guid}: {ex.Message}" );
                 }
-
             }
 
-            _tagCacheDirty = false;
+            s_tagCacheDirty = false;
         }
 
         /// <summary>
@@ -256,11 +255,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         /// </summary>
         /// <returns>Hashset of all tags in the project.</returns>
         public static HashSet<NeatoTag> GetAllTags() {
-            if ( _tagCacheDirty || _cachedTags == null ) {
+            if ( s_tagCacheDirty || s_cachedTags == null ) {
                 RefreshTagCache();
             }
 
-            return _cachedTags;
+            return s_cachedTags;
         }
     }
 }
