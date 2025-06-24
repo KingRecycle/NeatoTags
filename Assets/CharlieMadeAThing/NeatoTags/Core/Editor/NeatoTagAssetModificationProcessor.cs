@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
@@ -21,7 +22,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         //Loop through all TaggerDrawers and NeatoTagDrawers and update them.
-        //Without this custom inspector/windows won't update until the editor needs to redraw them, and I find it not as cool unless they update automatically.
+        //Without this custom inspector/windows won't update until the editor needs to redraw them,
+        //and I find it not as cool unless they update automatically.
         public static void UpdateTaggers() {
             foreach ( var taggerDrawer in s_taggerDrawers ) {
                 if ( !taggerDrawer ) continue;
@@ -35,7 +37,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
 
-        //Grabs the TaggerDrawer. Doesn't work if not a list for some reason...
+        //Grabs the TaggerDrawers that are currently being displayed in the Editor.
+        //This is in most cases just 1 because most people just have 1 inspector window open,
+        //but it's possible to have multiple inspectors open at once so this can be more than 1.
         public static void RegisterTaggerDrawer( TaggerDrawer taggerDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
             s_taggerDrawers.RemoveAll( drawer => !drawer );
@@ -52,7 +56,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             s_taggerDrawers.Remove( taggerDrawer );
         }
 
-        //Grabs the NeatoTagDrawer. Doesn't work if not a list for some reason...
+        //Grabs the NeatoTagDrawer that are currently being displayed in the Editor.
+        //This is in most cases just 1 because most people just have 1 inspector window open,
+        //but it's possible to have multiple inspectors open at once so this can be more than 1.
         public static void RegisterNeatoTagDrawer( NeatoTagDrawer neatoTagDrawer ) {
             //static lists can hold null values, so let's just remove them if any while we are here.
             s_neatoTagDrawers.RemoveAll( drawer => !drawer );
