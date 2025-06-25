@@ -16,7 +16,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
 #if UNITY_2022_2_OR_NEWER && !ODIN_INSPECTOR
-
         public override VisualElement CreatePropertyGUI( SerializedProperty property ) {
             _root = new VisualElement {
                 style = {
@@ -38,6 +37,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
+            if ( !_tagButtonTemplate ) {
+                Debug.LogError( "Failed to load tag button template." );
+            }
 
 
             _propertyField = new PropertyField( property ) {
@@ -76,6 +78,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var tag = evt.changedProperty.objectReferenceValue as NeatoTag;
             if ( _labelButtonContainer.Contains( _tagButton ) ) {
                 _labelButtonContainer.Remove( _tagButton );
+                _tagButton = null;
             }
 
             _tagButton = _tagButtonTemplate.Instantiate().Q<Button>();
@@ -106,7 +109,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
 #else
-    public override void OnGUI( Rect position, SerializedProperty property, GUIContent label ) {
+        public override void OnGUI( Rect position, SerializedProperty property, GUIContent label ) {
             // Using BeginProperty / EndProperty on the parent property means that
             // prefab override logic works on the entire property.
             EditorGUI.BeginProperty( position, label, property );
@@ -126,13 +129,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 s_buttonTexture =
                     AssetDatabase.LoadAssetAtPath<Texture2D>(
                         "Assets/CharlieMadeAThing/NeatoTags/Core/Sprites/button_unitystyle.png" );
+                if ( !s_buttonTexture ) {
+                    Debug.LogError( "Failed to load button texture." );
+                }
             }
 
             var buttonStyle = new GUIStyle( GUI.skin.button ) {
                 border = new RectOffset( 4, 4, 4, 4 ),
                 normal = {
-                    background = s_buttonTexture
-                }
+                    background = s_buttonTexture,
+                },
             };
 
 
@@ -140,7 +146,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             //var obj = EditorGUI.ObjectField( amountRect, property.objectReferenceValue, typeof(NeatoTag), false );
             EditorGUI.PropertyField( objPlaceRect, property, GUIContent.none );
-            
+
             var oldColor = GUI.backgroundColor;
             var p = property.objectReferenceValue as NeatoTag;
             if ( p ) {
