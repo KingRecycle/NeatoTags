@@ -12,12 +12,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     [CustomEditor( typeof(NeatoTag) )]
     public class NeatoTagDrawer : UnityEditor.Editor {
         static readonly List<TaggerDrawer> s_taggerDrawers = new();
+        const string TagButtonBoxName = "tagButtonBox";
+        const string TagColorName = "tagColor";
+        const string CommentFieldName = "commentField";
         Button _button;
         ColorField _colorField;
         TextField _commentField;
         NeatoTag _neatoTag;
 
-        //UI
         VisualElement _root;
         VisualElement _tagButtonBox;
         VisualTreeAsset _tagButtonTemplate;
@@ -28,11 +30,14 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         void OnEnable() {
             _root = new VisualElement();
 
-            var visualTree =
-                AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml );
+            var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatoTagUxml );
             visualTree.CloneTree( _root );
+            if ( !visualTree ) {
+                Debug.LogError( "Failed to load tag UXML template." );
+                return;
+            }
 
-            _tagButtonBox = _root.Q<VisualElement>( "tagButtonBox" );
+            _tagButtonBox = _root.Q<VisualElement>( TagButtonBoxName );
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
             NeatoTagAssetModificationProcessor.RegisterNeatoTagDrawer( this );
@@ -40,16 +45,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void OnDisable() {
             NeatoTagAssetModificationProcessor.UnregisterNeatoTagDrawer( this );
+            _colorField.UnregisterValueChangedCallback( UpdateTagIconVisual );
         }
 
         public override VisualElement CreateInspectorGUI() {
             _neatoTag = target as NeatoTag;
             FindProperties();
-            _colorField = _root.Q<ColorField>( "tagColor" );
+            _colorField = _root.Q<ColorField>( TagColorName );
             _colorField.BindProperty( PropertyColor );
             _colorField.RegisterValueChangedCallback( UpdateTagIconVisual );
             _colorField.showAlpha = false;
-            PropertyColor.colorValue = Color.gray;
             PropertyColor.colorValue = _colorField.value;
 
             _button = _tagButtonTemplate.Instantiate().Q<Button>();
@@ -58,7 +63,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _button.name = "tagIcon";
             _tagButtonBox.Add( _button );
 
-            _commentField = _root.Q<TextField>( "commentField" );
+            _commentField = _root.Q<TextField>( CommentFieldName );
             _commentField.BindProperty( PropertyComment );
 
             return _root;
@@ -71,7 +76,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public void UpdateTagButtonText() {
-            if ( target != null && _button != null ) {
+            if ( _neatoTag != null && _button != null ) {
                 _button.text = _neatoTag.name;
             }
         }
