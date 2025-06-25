@@ -13,6 +13,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         const int MaxNameCounter = 1000; //Max attempts to add a number to the end of the tag name. Arbitrary amount.
         const int MaxCachedTags = 1000; //Max number of tags to cache. Don't tell me you need more than 1000!?
 
+        /// <summary>
+        ///     Opens a folder selection dialog, allowing the user to choose a folder within the Unity project.
+        ///     Validates that the chosen folder resides within the project structure. Updates or creates the
+        ///     folder location in the associated editor data container. Displays error dialogs for invalid selections.
+        /// </summary>
         public static void OpenFolderDialogAndSelectFolder() {
             var path = EditorUtility.OpenFolderPanel( "Tag Folder Location", "Assets", "" );
             var tagPath = GetTagFolderLocation();
@@ -29,7 +34,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return;
             }
 
-            var selectedFolder = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, path ) );
+            var selectedFolder = FileUtil.GetProjectRelativePath( path );
             if ( selectedFolder.Contains( ".." ) ) {
                 EditorUtility.DisplayDialog( "Error",
                     "Invalid folder selection.", "OK" );
@@ -99,7 +104,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                     return "";
                 }
 
-                return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
+                return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, selectedDir ) );
             }
             catch ( DirectoryNotFoundException ex ) {
                 Debug.LogError( $"[TagAssetCreation]: Directory access failed: {ex.Message}" );
@@ -111,6 +116,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
         }
 
+
+        /// <summary>
+        ///     Retrieves the directory path of the UXML folder within the NeatoTags directory.
+        ///     Searches for a directory named "UXML" within all subdirectories of the NeatoTags directory.
+        ///     Logs an error if the directory is not found and returns an empty string in such cases.
+        /// </summary>
+        /// <returns>
+        ///     Returns the relative path to the UXML folder as a string, or an empty string if the directory cannot be
+        ///     located.
+        /// </returns>
         public static string GetUxmlDirectory() {
             var neatTagsDirectory = GetNeatoTagsDirectory();
             var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "UXML",
@@ -121,11 +136,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return "";
         }
 
+        /// <summary>
+        ///     Retrieves the folder location specified for storing tags within the project.
+        ///     If no location has been set, returns an empty string.
+        /// </summary>
+        /// <returns>Returns the tag folder location as a string, or an empty string if no folder location exists.</returns>
         public static string GetTagFolderLocation() {
             var dataHolder = GetEditorDataContainer();
             return dataHolder == null ? "" : dataHolder.tagFolderLocation;
         }
 
+        /// <summary>
+        ///     Retrieves the existing EditorDataHolder asset used to store editor preferences and configurations for NeatoTags.
+        ///     If multiple EditorDataHolder assets are found, logs a warning and returns the first one located.
+        /// </summary>
+        /// <returns>Returns an <see cref="EditorDataHolder" /> instance if one exists, or null if no asset is found.</returns>
         public static EditorDataHolder GetEditorDataContainer() {
             var holdersGuids = AssetDatabase.FindAssets( "EditorDataContainer" );
 
@@ -139,7 +164,17 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
         }
 
-        //Non menu version of NewTag function
+        /// <summary>
+        ///     Creates a new tag with the specified name, assigns it a unique identifier if necessary,
+        ///     adds it to the asset database, updates the tag cache, and optionally focuses on the created tag in the Project
+        ///     window.
+        /// </summary>
+        /// <param name="tagName">The name of the tag to be created. If empty or null, a default name "New Tag" will be used.</param>
+        /// <param name="shouldFocusInProjectWindow">
+        ///     A flag indicating whether the created tag should be focused in the Project
+        ///     window. Default is true.
+        /// </param>
+        /// <returns>Returns the newly created <see cref="NeatoTag" /> instance, or null if creation fails.</returns>
         public static NeatoTag CreateNewTag( string tagName, bool shouldFocusInProjectWindow = true ) {
             if ( string.IsNullOrEmpty( tagName ) ) {
                 tagName = "New Tag";
@@ -157,6 +192,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             var newTag = CreateInstance<NeatoTag>();
             var assetPath = GetTagAssetPath( uniqueName );
+            if ( string.IsNullOrEmpty( assetPath ) ) {
+                Debug.LogError( "[TagAssetCreation]: Could not create tag. Invalid path." );
+                return null;
+            }
+
             AssetDatabase.CreateAsset( newTag, assetPath );
             AssetDatabase.SaveAssets();
 
@@ -188,7 +228,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             EditorUtility.DisplayDialog( "Error",
                 "Please set the tag folder location first or have a project folder selected.", "OK" );
-            return null;
+            return "";
         }
 
         //Try and get the folder path that is selected.
@@ -203,6 +243,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return found;
         }
 
+        /// <summary>
+        ///     Deletes the specified tag from the project, removes it from the cache,
+        ///     and refreshes the asset database.
+        /// </summary>
+        /// <param name="selectedTag">The tag to be deleted.</param>
         public static void DeleteTag( NeatoTag selectedTag ) {
             if ( !selectedTag ) return;
             if ( s_cachedTags != null && s_tagNameLookup != null ) {
@@ -218,6 +263,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        ///     Flags the tag cache as dirty, indicating that the cached tag data needs to be refreshed.
+        /// </summary>
         public static void InvalidateTagCache() {
             s_tagCacheDirty = true;
         }
