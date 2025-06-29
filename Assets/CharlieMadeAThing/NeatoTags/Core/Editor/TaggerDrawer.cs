@@ -362,16 +362,18 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public void PopulateButtons() {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
-            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
-
+            var allTags = TagSearchService.GetOrderedTags();
             var taggerTarget = (Tagger)target;
-            foreach ( var neatoTagAsset in allTags ) {
-                if ( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
-                    _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                }
-                else {
-                    _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
-                }
+            var (selectedTags, availableTags) = TagSearchService.FilterTagsByTaggerState(
+                allTags,
+                taggerTarget
+            );
+            foreach ( var tag in selectedTags ) {
+                _tagViewerSelected.Add( CreateSelectedButton( tag ) );
+            }
+
+            foreach ( var tag in availableTags ) {
+                _tagViewerDeselected.Add( CreateDeselectedButton( tag ) );
             }
         }
 
@@ -380,33 +382,22 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagViewerDeselected.Clear();
             _tagViewerSelected.Clear();
 
-            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
+            var allTags = TagSearchService.GetOrderedTags();
             var taggerTarget = (Tagger)target;
 
-            foreach ( var neatoTagAsset in allTags ) {
-                //Search for already selected tags
-                if ( taggerTarget.GetTags != null && taggerTarget.GetTags.Contains( neatoTagAsset ) ) {
-                    if ( !string.IsNullOrWhiteSpace( _searchField.value ) ) {
-                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_searchField.value}", RegexOptions.IgnoreCase ) ) {
-                            _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                        }
-                    }
-                    else {
-                        _tagViewerSelected.Add( CreateSelectedButton( neatoTagAsset ) );
-                    }
-                }
-                else {
-                    //Search for available tags
-                    if ( !string.IsNullOrWhiteSpace( _taggerSearchAvailable.value ) ) {
-                        if ( Regex.IsMatch( neatoTagAsset.name, $"{_taggerSearchAvailable.value}",
-                                RegexOptions.IgnoreCase ) ) {
-                            _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
-                        }
-                    }
-                    else {
-                        _tagViewerDeselected.Add( CreateDeselectedButton( neatoTagAsset ) );
-                    }
-                }
+            var (selectedTags, availableTags) = TagSearchService.FilterTagsByTaggerState(
+                allTags,
+                taggerTarget,
+                _searchField.value,
+                _taggerSearchAvailable.value
+            );
+
+            foreach ( var tag in selectedTags ) {
+                _tagViewerSelected.Add( CreateSelectedButton( tag ) );
+            }
+
+            foreach ( var tag in availableTags ) {
+                _tagViewerDeselected.Add( CreateDeselectedButton( tag ) );
             }
         }
 

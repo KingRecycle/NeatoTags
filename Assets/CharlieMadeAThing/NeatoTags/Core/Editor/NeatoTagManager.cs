@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
@@ -190,8 +189,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagDirectoryLabel.text = $"Default Tag Folder Location: {tagPath}";
         }
 
-        void PopulateButtonsWithSearchAsync( string evtNewValue ) {
-            if ( string.IsNullOrEmpty( evtNewValue ) ) {
+        void PopulateButtonsWithSearchAsync( string searchTerm ) {
+            if ( string.IsNullOrEmpty( searchTerm ) ) {
                 PopulateAllTagsBoxAsync();
                 return;
             }
@@ -202,12 +201,9 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             _allTagsBox.Clear();
-            var allTags = TagAssetCreation.GetAllTags().ToList()
-                .Where( t => Regex.IsMatch( t.name, $"{evtNewValue}", RegexOptions.IgnoreCase ) )
-                .OrderBy( tag => tag.name )
-                .ToList();
+            var filteredTags = TagSearchService.GetOrderedTags( searchTerm );
 
-            _tagsToProcess = allTags;
+            _tagsToProcess = filteredTags.ToList();
             _currentTagIndex = 0;
             _isPopulating = true;
 
@@ -330,7 +326,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             _allTagsBox.Clear();
-            var allTags = TagAssetCreation.GetAllTags().ToList().OrderBy( tag => tag.name );
+            var allTags = TagSearchService.GetOrderedTags();
+
             _tagsToProcess = allTags.ToList();
             _currentTagIndex = 0;
             _isPopulating = true;
