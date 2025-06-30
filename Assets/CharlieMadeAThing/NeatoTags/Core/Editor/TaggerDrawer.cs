@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -321,7 +319,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         /// <summary>
         ///     Applies styling to a button element based on the properties of a provided tag.
-        ///     This is for styling available tags.
+        ///     This is for styling-available tags.
         /// </summary>
         /// <param name="button">The button element to be styled.</param>
         /// <param name="tag">The tag associated with the button, containing properties such as name and color.</param>
