@@ -385,7 +385,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //Checks if the tag name is valid and if the name doesn't already exist.
         bool IsValidTagName( string newName ) {
             if ( string.IsNullOrEmpty( newName ) ) return false;
-            if ( !Tagger.s_tagNameRegex.IsMatch( newName ) ) return false;
+            if ( !Tagger.TagNameRegex.IsMatch( newName ) ) return false;
 
             if ( (from element in _allTagsBox.Children() select element.Q<Button>()).Any( button =>
                     button.text.Equals( newName ) ) ) {

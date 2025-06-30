@@ -20,7 +20,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public IReadOnlyList<NeatoTag> GetTags => _tags;
 
         //old regex: ^[a-zA-Z0-9]+([ '-][a-zA-Z0-9]+)*$
-        public static readonly Regex s_tagNameRegex = new( "^(?!\\s*$)[^<>]+$", RegexOptions.Compiled );
+        public static readonly Regex TagNameRegex = new( "^(?!\\s*$)[^<>]+$", RegexOptions.Compiled );
 
 
         void Awake() {
@@ -239,7 +239,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return false;
             }
 
-            if ( !s_tagNameRegex.IsMatch( tagName ) ) {
+            if ( !TagNameRegex.IsMatch( tagName ) ) {
                 Debug.LogWarning(
                     $"Invalid tag name: {tagName}." );
                 return false;
