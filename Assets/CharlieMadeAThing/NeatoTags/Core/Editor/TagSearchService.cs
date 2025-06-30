@@ -50,7 +50,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var firstIndex = tagNameLower.IndexOf( searchTermLower, StringComparison.InvariantCultureIgnoreCase );
             if ( firstIndex >= 0 ) {
                 // If the search term is close to the beginning of the tag name then it gets a lower score.
-                
+
                 return PriorityBase + firstIndex;
             }
 
@@ -70,20 +70,25 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         /// <param name="searchTerm">The search term</param>
         /// <returns>Fuzzy match score, or -1 if no match</returns>
         static int CalculateFuzzyMatchScore( string tagName, string searchTerm ) {
+            if ( string.IsNullOrEmpty( tagName ) || string.IsNullOrEmpty( searchTerm ) ) {
+                return -1; // No match possible
+            }
+
             var tagIndex = 0;
             var searchIndex = 0;
             var score = 0;
 
             while ( tagIndex < tagName.Length && searchIndex < searchTerm.Length ) {
-                if ( tagName[tagIndex] == searchTerm[searchIndex] ) {
+                if ( char.ToLowerInvariant( tagName[tagIndex] ) == char.ToLowerInvariant( searchTerm[searchIndex] ) ) {
+                    // Match found: Add index to score (earlier matches have lower scores)
+                    score += tagIndex;
                     searchIndex++;
-                    score += tagIndex; // Earlier matches get better scores
                 }
 
                 tagIndex++;
             }
 
-            // Return score only if all search characters were found
+            // If all searchTerm characters were matched, return the score; otherwise, no fuzzy match
             return searchIndex == searchTerm.Length ? score : -1;
         }
 
@@ -158,46 +163,57 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return (Enumerable.Empty<NeatoTag>(), Enumerable.Empty<NeatoTag>());
             }
 
-            var selectedResults = new List<SearchResult>();
-            var availableResults = new List<SearchResult>();
+            var neatoTags = allTags as NeatoTag[] ?? allTags.ToArray();
+            var selectedTags = FilterAndSortTags(
+                neatoTags,
+                tag => tagger.GetTags != null && tagger.GetTags.Contains( tag ),
+                selectedSearchTerm
+            );
 
-            foreach ( var tag in allTags ) {
+            var availableTags = FilterAndSortTags(
+                neatoTags,
+                tag => tagger.GetTags == null || !tagger.GetTags.Contains( tag ),
+                availableSearchTerm
+            );
+
+
+            return (selectedTags, availableTags);
+        }
+
+        /// <summary>
+        ///     Filters and sorts tags based on whether they're selected or not, applying relevance scoring.
+        /// </summary>
+        /// <param name="tags">All available tags</param>
+        /// <param name="isSelected">Predicate to determine if a tag is selected</param>
+        /// <param name="searchTerm">Search term to filter tags</param>
+        /// <returns>A sorted list of tags based on relevance and name</returns>
+        static IEnumerable<NeatoTag> FilterAndSortTags(
+            IEnumerable<NeatoTag> tags,
+            Func<NeatoTag, bool> isSelected,
+            string searchTerm ) {
+            var results = new List<SearchResult>();
+
+            foreach ( var tag in tags ) {
                 if ( tag == null ) {
                     Debug.LogWarning(
                         "[TagSearchService]: Null tag found in filter results. Null was skipped but this should not happen." );
                     continue;
                 }
 
-                if ( tagger.GetTags != null && tagger.GetTags.Contains( tag ) ) {
-                    // This tag is selected
-                    var selectedScore = CalculateRelevanceScore( tag.name, selectedSearchTerm ?? "" );
-                    if ( selectedScore < int.MaxValue || string.IsNullOrWhiteSpace( selectedSearchTerm ) ) {
-                        selectedResults.Add( new SearchResult { Tag = tag, RelevanceScore = selectedScore } );
-                    }
-                }
-                else {
-                    // This tag is available
-                    var availableScore = CalculateRelevanceScore( tag.name, availableSearchTerm ?? "" );
-                    if ( availableScore < int.MaxValue || string.IsNullOrWhiteSpace( availableSearchTerm ) ) {
-                        availableResults.Add( new SearchResult { Tag = tag, RelevanceScore = availableScore } );
-                    }
+                // Check if the tag matches the selected/available condition
+                if ( !isSelected( tag ) ) continue;
+                var score = CalculateRelevanceScore( tag.name, searchTerm ?? "" );
+                if ( score < int.MaxValue || string.IsNullOrWhiteSpace( searchTerm ) ) {
+                    results.Add( new SearchResult { Tag = tag, RelevanceScore = score } );
                 }
             }
 
-
-            // Sort by relevance
-            var selectedTags = selectedResults
+            return results
                 .OrderBy( r => r.RelevanceScore )
                 .ThenBy( r => r.Tag.name, StringComparer.InvariantCultureIgnoreCase )
                 .Select( r => r.Tag );
-
-            var availableTags = availableResults
-                .OrderBy( r => r.RelevanceScore )
-                .ThenBy( r => r.Tag.name, StringComparer.InvariantCultureIgnoreCase )
-                .Select( r => r.Tag );
-
-            return (selectedTags, availableTags);
         }
+
 
         /// <summary>
         ///     Gets all tags ordered by name and optionally filtered by search term with relevance sorting.
