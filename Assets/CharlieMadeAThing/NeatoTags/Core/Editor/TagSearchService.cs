@@ -33,8 +33,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 return int.MaxValue; // No search term means the lowest priority
             }
 
-            var tagNameLower = tagName.ToLowerInvariant();
-            var searchTermLower = searchTerm.ToLowerInvariant();
+            var tagNameLower = tagName.ToLower();
+            var searchTermLower = searchTerm.ToLower();
 
             // Exact match gets the highest priority (score 0)
             if ( tagNameLower == searchTermLower ) {
@@ -42,7 +42,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             // Starts with the search term gets the second-highest priority
-            if ( tagNameLower.StartsWith( searchTermLower, StringComparison.InvariantCultureIgnoreCase ) ) {
+            if ( tagNameLower.StartsWith( searchTermLower ) ) {
                 return 1;
             }
 
@@ -79,7 +79,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var score = 0;
 
             while ( tagIndex < tagName.Length && searchIndex < searchTerm.Length ) {
-                if ( char.ToLowerInvariant( tagName[tagIndex] ) == char.ToLowerInvariant( searchTerm[searchIndex] ) ) {
+                if ( char.ToLower( tagName[tagIndex] ) == char.ToLower( searchTerm[searchIndex] ) ) {
                     // Match found: Add index to score (earlier matches have lower scores)
                     score += tagIndex;
                     searchIndex++;
@@ -114,7 +114,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( useExactMatch || searchTerm.StartsWith( "^" ) ) {
                 var exactSearchTerm = searchTerm.StartsWith( "^" ) ? searchTerm[1..] : searchTerm;
                 return tags.Where( tag =>
-                    tag.name.StartsWith( exactSearchTerm, StringComparison.InvariantCultureIgnoreCase ) );
+                    tag.name.StartsWith( exactSearchTerm ) );
             }
 
             // Use relevance-based searching
@@ -138,7 +138,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             // Sort by relevance score (lower is better), then by name as a secondary sort
             return searchResults
                 .OrderBy( r => r.RelevanceScore )
-                .ThenBy( r => r.Tag.name, StringComparer.InvariantCultureIgnoreCase )
+                .ThenBy( r => r.Tag.name )
                 .Select( r => r.Tag );
         }
 
@@ -153,28 +153,39 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         public static (IEnumerable<NeatoTag> selectedTags, IEnumerable<NeatoTag> availableTags) FilterTagsByTaggerState(
             IEnumerable<NeatoTag> allTags, Tagger tagger, string selectedSearchTerm = null,
             string availableSearchTerm = null ) {
+            //If only 1 or the other is null then log error but continue since you can still display the other result.
             if ( !tagger ) {
                 Debug.LogError( "[TagSearchService]: Null tagger passed to FilterTagsByTaggerState." );
-                return (Enumerable.Empty<NeatoTag>(), Enumerable.Empty<NeatoTag>());
             }
 
             if ( allTags == null ) {
                 Debug.LogError( "[TagSearchService]: Null tags passed to FilterTagsByTaggerState." );
+            }
+
+            if ( !tagger && allTags == null ) {
                 return (Enumerable.Empty<NeatoTag>(), Enumerable.Empty<NeatoTag>());
             }
 
-            var neatoTags = allTags as NeatoTag[] ?? allTags.ToArray();
-            var selectedTags = FilterAndSortTags(
-                neatoTags,
-                tag => tagger.GetTags != null && tagger.GetTags.Contains( tag ),
-                selectedSearchTerm
-            );
+            var neatoTags = allTags == null ? Array.Empty<NeatoTag>() : allTags.ToArray();
+            var tagsOnTagger = tagger.GetTags;
+            var selectedTags = Enumerable.Empty<NeatoTag>();
+            var availableTags = Enumerable.Empty<NeatoTag>();
 
-            var availableTags = FilterAndSortTags(
-                neatoTags,
-                tag => tagger.GetTags == null || !tagger.GetTags.Contains( tag ),
-                availableSearchTerm
-            );
+            if ( tagsOnTagger != null ) {
+                selectedTags = FilterAndSortTags(
+                    neatoTags,
+                    tag => tagger.GetTags != null && tagger.GetTags.Contains( tag ),
+                    selectedSearchTerm
+                );
+            }
+
+            if ( neatoTags.Length > 0 ) {
+                availableTags = FilterAndSortTags(
+                    neatoTags,
+                    tag => tagger.GetTags == null || !tagger.GetTags.Contains( tag ),
+                    availableSearchTerm
+                );
+            }
 
 
             return (selectedTags, availableTags);
@@ -210,7 +221,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             return results
                 .OrderBy( r => r.RelevanceScore )
-                .ThenBy( r => r.Tag.name, StringComparer.InvariantCultureIgnoreCase )
+                .ThenBy( r => r.Tag.name )
                 .Select( r => r.Tag );
         }
 
@@ -224,7 +235,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var allTags = TagAssetCreation.GetAllTags();
 
             return string.IsNullOrWhiteSpace( searchTerm )
-                ? allTags.OrderBy( tag => tag.name, StringComparer.InvariantCultureIgnoreCase )
+                ? allTags.OrderBy( tag => tag.name )
                 : SearchTags( allTags, searchTerm );
         }
     }
