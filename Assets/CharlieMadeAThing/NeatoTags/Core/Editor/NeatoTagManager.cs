@@ -58,6 +58,10 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.NeatTagManagerUxml );
             visualTree.CloneTree( _root );
 
+            if ( visualTree == null ) {
+                Debug.LogError( "[NeatoTagManager]: Failed to load NeatTagManager UXML. Ensure the file exists." );
+                return;
+            }
 
             _tagButtonTemplate =
                 AssetDatabase.LoadAssetAtPath<VisualTreeAsset>( UxmlDataLookup.ButtonTagUxml );
