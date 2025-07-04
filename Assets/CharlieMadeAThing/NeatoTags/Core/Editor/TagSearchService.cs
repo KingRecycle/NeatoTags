@@ -6,8 +6,8 @@ using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
-    ///     Service class responsible for searching and filtering tags based on various criteria.
-    ///     Just used for searching boxes in the editor.
+    ///     Service class responsible for searching and filtering tags within search fields.
+    ///     Just used for search fields in the editor.
     /// </summary>
     public static class TagSearchService {
         const int PriorityBase = 10;
