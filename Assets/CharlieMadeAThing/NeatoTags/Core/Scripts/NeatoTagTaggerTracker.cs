@@ -17,11 +17,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         public static void RegisterTagger( Tagger tagger ) {
             CleanUpNulls();
+            if ( tagger == null ) {
+                Debug.LogWarning( "[NeatoTagTaggerTracker]: Attempting to register a null tagger!" );
+                return;
+            }
+
             s_taggers.Add( tagger );
         }
 
         public static void UnregisterTagger( Tagger tagger ) {
             CleanUpNulls();
+            if ( tagger == null ) {
+                Debug.LogWarning( "[NeatoTagTaggerTracker]: Attempting to unregister a null tagger!" );
+                return;
+            }
+
             s_taggers.Remove( tagger );
         }
 
@@ -34,6 +44,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         public static void SelectAllGameObjectsWithTaggerThatHasTag( NeatoTag tag ) {
+            if ( tag == null ) {
+                Debug.LogWarning( "[NeatoTagTaggerTracker]: Attempting to select all gameobjects with a null tag!" );
+                return;
+            }
+
             Selection.objects = s_taggers
                 .Where( tagger => tagger.HasTag( tag ) )
                 .Select( tagger => tagger.gameObject as Object )
