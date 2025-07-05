@@ -305,6 +305,24 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator AddTagsByList_AddSameTagsTwice_OnlyOneInstanceExists() {
+            Cylinder.AddTags( new List<NeatoTag> { TagRefsForTests.cornerlessTag, TagRefsForTests.cornerlessTag } );
+            Assert.That( Cylinder.GetComponent<Tagger>().GetTags.Count,
+                Is.EqualTo( Cylinder.GetComponent<Tagger>().GetTags.Distinct().Count() ),
+                "Tagger should not add duplicate tags." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator AddTagsByList_AddTagsWithNull_DoesNotAddNullsOrThrowException() {
+            // Should gracefully handle adding null tags
+            Cylinder.AddTags( new List<NeatoTag> { TagRefsForTests.cornerlessTag, null } );
+            Assert.That( Cylinder.GetComponent<Tagger>().GetTags.Count, Is.EqualTo( 1 ),
+                "Should only have 2 tags after adding null tags." );
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator AddTagWithForce_AddTaggerComponentIfThereIsNone_CreatesComponent() {
             // Tests if AddTag creates a Tagger component if one doesn't exist
             var newObj = new GameObject( "NewObject" );
