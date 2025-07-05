@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
     [TestFixture]
-    public class BasicPerformanceTests : NeatoTagTestBase {
+    public class BasicPerformanceTests : NeatoTagTests {
         const int MeasurementCount = 10000;
 
         [UnityTest, Performance]
@@ -42,7 +42,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         [UnityTest, Performance]
         public IEnumerator SimpleFilterGameObjects_Performance() {
             Measure.Method( () => {
-                    Tagger.FilterGameObjects( Shapes )
+                    Tagger.FilterGameObjects( ShapeTagsToFilter )
                         .WithTag( TagRefsForTests.cornerlessTag )
                         .WithoutTag( TagRefsForTests.sphereTag )
                         .GetMatches();
@@ -56,7 +56,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
     }
 
     [TestFixture]
-    public class FilterPerformanceTests : NeatoTagTestBase {
+    public class FilterPerformanceTests : NeatoTagTests {
         const int WarmupCount = 5;
         const int MeasurementCount = 100;
         List<GameObject> _testObjects1;
@@ -224,7 +224,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
     }
 
     [TestFixture]
-    public class MemoryPerformanceTests : NeatoTagTestBase {
+    public class MemoryPerformanceTests : NeatoTagTests {
         const int WarmupCount = 5;
         const int MeasurementCount = 100;
         List<GameObject> _testObjects1000;
