@@ -239,8 +239,8 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
 
         [UnityTest]
         public IEnumerator AddTag_AddCapsuleTagTwice_OnlyOneInstanceExists() {
-            Capsule.AddTag( TagRefsForTests.cylinderTag );
-            Capsule.AddTag( TagRefsForTests.cylinderTag );
+            Capsule.AddTag( TagRefsForTests.capsuleTag );
+            Capsule.AddTag( TagRefsForTests.capsuleTag );
             Assert.That( Capsule.GetComponent<Tagger>().GetTags.Count,
                 Is.EqualTo( Capsule.GetComponent<Tagger>().GetTags.Distinct().Count() ),
                 "Tagger should not add duplicate tags." );

@@ -5,7 +5,6 @@ namespace CharlieMadeAThing.NeatoTags.Tests {
     public class TagRefsForTests : MonoBehaviour {
         public NeatoTag cubeTag;
         public NeatoTag sphereTag;
-        public NeatoTag cylinderTag;
         public NeatoTag capsuleTag;
         public NeatoTag planeTag;
         public NeatoTag platonicTag;

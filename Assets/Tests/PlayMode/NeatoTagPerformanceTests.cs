@@ -98,7 +98,6 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
                 // Distribute tags with different patterns to create realistic filtering scenarios
                 if ( i % 2 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
                 if ( i % 3 == 0 ) tagger.AddTag( TagRefsForTests.sphereTag );
-                if ( i % 5 == 0 ) tagger.AddTag( TagRefsForTests.cylinderTag );
                 if ( i % 7 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
                 if ( i % 11 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
                 if ( i % 13 == 0 ) tagger.AddTag( TagRefsForTests.cornerlessTag );
@@ -242,14 +241,12 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
                 var tagger = obj.AddComponent<Tagger>();
                 if ( i % 2 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
                 if ( i % 3 == 0 ) tagger.AddTag( TagRefsForTests.sphereTag );
-                if ( i % 5 == 0 ) tagger.AddTag( TagRefsForTests.cylinderTag );
                 if ( i % 7 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
                 if ( i % 11 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
                 if ( i % 13 == 0 ) tagger.AddTag( TagRefsForTests.cornerlessTag );
                 if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.cubeTag );
                 if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.platonicTag );
                 if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.capsuleTag );
-                if ( i % 16 == 0 ) tagger.AddTag( TagRefsForTests.cylinderTag );
                 result.Add( obj );
             }
 
