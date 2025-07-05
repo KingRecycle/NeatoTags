@@ -13,6 +13,7 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         protected GameObject Sphere;
         protected GameObject Capsule;
         protected GameObject Plane;
+        protected GameObject Cylinder;
         protected GameObject[] ShapeTagsToFilter;
         protected TagRefsForTests TagRefsForTests;
 
@@ -22,47 +23,136 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             yield return null; // Wait for a scene to load
 
             TagRefsForTests = GameObject.Find( "TagRefs" ).GetComponent<TagRefsForTests>();
-            Cube = GameObject.Find( "Cube" ); //Has two tags (Cube and Platonic Solid)
-            Sphere = GameObject.Find( "Sphere" ); //Has two tags (Sphere and Cornerless)
-            Capsule = GameObject.Find( "Capsule" ); //Has two tags (Capsule and Cornerless)
-            Plane = GameObject.Find( "Plane" ); //Does not have a tagger
-            ShapeTagsToFilter = new[] { Cube, Sphere, Capsule, Plane };
+            Cube = GameObject.Find( "Cube" ); //Has two tags (Cube and Platonic Solid).
+            Sphere = GameObject.Find( "Sphere" ); //Has two tags (Sphere and Cornerless).
+            Capsule = GameObject.Find( "Capsule" ); //Has two tags (Capsule and Cornerless).
+            Plane = GameObject.Find( "Plane" ); //Does not have a tagger component.
+            Cylinder = GameObject.Find( "Cylinder" ); //Has Tagger but no tags.
+            ShapeTagsToFilter = new[] { Cube, Sphere, Capsule, Plane, Cylinder };
 
+            CheckIfTestSceneStateIsValid();
+        }
+
+        void CheckIfTestSceneStateIsValid() {
+            //Cube shouldn't be null and have just two tags (Cube and Platonic Sold).
             Assert.That( Cube, Is.Not.Null );
+            Assert.That( Cube.GetComponent<Tagger>(), Is.Not.Null );
+            Assert.That( Cube.GetComponent<Tagger>().GetTags,
+                Is.EquivalentTo( new[] { TagRefsForTests.cubeTag, TagRefsForTests.platonicTag } ) );
+
+            //Sphere shouldn't be null and have just two tags (Sphere and Cornerless).
             Assert.That( Sphere, Is.Not.Null );
+            Assert.That( Sphere.GetComponent<Tagger>(), Is.Not.Null );
+            Assert.That( Sphere.GetComponent<Tagger>().GetTags,
+                Is.EquivalentTo( new[] { TagRefsForTests.sphereTag, TagRefsForTests.cornerlessTag } ) );
+
+            //Capsule shouldn't be null and have just two tags (Capsule and Cornerless).
             Assert.That( Capsule, Is.Not.Null );
+            Assert.That( Capsule.GetComponent<Tagger>(), Is.Not.Null );
+            Assert.That( Capsule.GetComponent<Tagger>().GetTags,
+                Is.EquivalentTo( new[] { TagRefsForTests.capsuleTag, TagRefsForTests.cornerlessTag } ) );
+
+            //Plane shouldn't be null and not have a Tagger component.
             Assert.That( Plane, Is.Not.Null );
+            Assert.That( Plane.GetComponent<Tagger>(), Is.Null );
+
+            //Cylinder shouldn't be null and should have a tagger and 0 tags on it.
+            Assert.That( Cylinder, Is.Not.Null );
+            Assert.That( Cylinder.GetComponent<Tagger>(), Is.Not.Null );
+            Assert.That( Cylinder.GetComponent<Tagger>().GetTags, Is.Empty );
+
+            //Tag refs shouldn't be null.
             Assert.That( TagRefsForTests, Is.Not.Null );
         }
     }
 
     [TestFixture]
-    public class TaggerBasicTests : NeatoTagTests {
-        [UnityTest]
-        public IEnumerator HasTagger_CubeWithTagger_ReturnsTrue() {
-            Assert.That( Cube.HasTagger(), Is.True,
-                "HasTagger() should return true if a Tagger component is on the GameObject." );
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator HasTagger_PlaneWithoutTagger_ReturnsFalse() {
-            Assert.That( Plane.HasTagger(), Is.False,
-                "HasTagger() should return false if a Tagger component is not on the GameObject." );
-            yield return null;
-        }
-
+    public class TaggerStaticTests : NeatoTagTests {
         [UnityTest]
         public IEnumerator TryGetTagger_CubeWithTagger_ReturnsTrue() {
             //Tagger.TryGetTagger() should return true and out a valid tagger on the Cube and not just any tagger component.
             if ( Tagger.TryGetTagger( Cube, out var tagger ) ) {
-                Assert.That( tagger, Is.Not.Null, "TryGetTagger() out did give a non-null Tagger component." );
+                Assert.That( tagger, Is.Not.Null, "Should have outed a null Tagger." );
                 Assert.That( tagger.HasTag( TagRefsForTests.cubeTag ), Is.True,
-                    "TryGetTagger() did give the correct Cube Tagger component." );
+                    "Should have outed the Cube Neato Tag." );
             }
             else {
-                Assert.Fail( "TryGetTagger() should have returned true for this test." );
+                Assert.Fail( "Should have returned true for this test." );
             }
+
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TryGetTagger_PlaneWithoutTagger_ReturnsFalse() {
+            //Tagger.TryGetTagger() should return false and out a null tagger on the Plane and not just any tagger component.
+            //Tagger.TryGetTagger() can't find a tag that doesn't exist on a Tagger in the scene.
+            if ( Tagger.TryGetTagger( Plane, out var tagger ) ) {
+                Assert.Fail( "Should have returned false for this test." );
+            }
+            else {
+                Assert.That( tagger, Is.Null, "Should have outed a null tagger." );
+            }
+
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasTaggerStatic_WithCube_ReturnsTrue() {
+            Assert.That( Tagger.HasTagger( Cube ), Is.True, "Cube should have a Tagger component." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator HasTaggerStatic_WithPlane_ReturnsFalse() {
+            Assert.That( Tagger.HasTagger( Plane ), Is.False, "Plane should not have a Tagger component." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TryGetNeatoTag_GetCubeTag_ReturnsTrueAndReturnsTag() {
+            var exist = Tagger.TryGetNeatoTag( "Cube", out var tag );
+            Assert.That( exist, Is.True, "Should return true." );
+            Assert.That( tag, Is.EqualTo( TagRefsForTests.cubeTag ), "Should return the correct tag." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator TryGetNeatoTag_GetPlaneTag_ReturnsFalseAndNull() {
+            //TryGetNeatoTag only works if the tag is on a Tagger. Plane should not be in the scene on a tagger.
+            var exist = Tagger.TryGetNeatoTag( "Plane", out var tag );
+            Assert.That( exist, Is.False, "Should return false." );
+            Assert.That( tag, Is.Null, "Should return null." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GetAllGameObjectsWithTagger_ReturnsCubeCapsuleCylinderAndSphere() {
+            var gameObjects = Tagger.GetAllGameObjectsWithTagger();
+            Assert.That( gameObjects.Count, Is.EqualTo( 4 ), "Should return 4 game objects." );
+            Assert.That( gameObjects.Contains( Cube ), Is.True, "Should return the Cube." );
+            Assert.That( gameObjects.Contains( Capsule ), Is.True, "Should return the Capsule." );
+            Assert.That( gameObjects.Contains( Sphere ), Is.True, "Should return the Sphere." );
+            Assert.That( gameObjects.Contains( Cylinder ), Is.True, "Should return the Cylinder." );
+
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GetGameobjectsWithTagger_ReturnsCubeCapsuleCylinderAndSphereWithTheirTaggers() {
+            var gameObjectsDict = Tagger.GetGameobjectsWithTagger();
+            Assert.That( gameObjectsDict.Count, Is.EqualTo( 4 ), "Should return 4 game objects." );
+            Assert.That( gameObjectsDict.ContainsKey( Cube ), Is.True, "Should return the Cube." );
+            Assert.That( gameObjectsDict.ContainsKey( Capsule ), Is.True, "Should return the Capsule." );
+            Assert.That( gameObjectsDict.ContainsKey( Sphere ), Is.True, "Should return the Sphere." );
+            Assert.That( gameObjectsDict.ContainsKey( Plane ), Is.False, "Should not return the Plane." );
+            Assert.That( gameObjectsDict.ContainsKey( Cylinder ), Is.True, "Should return the Cylinder." );
+            Assert.That( gameObjectsDict[Cube].HasTag( TagRefsForTests.cubeTag ), Is.True,
+                "Should return true if the Cube has the Cube tag." );
+            Assert.That( gameObjectsDict[Capsule].HasTag( TagRefsForTests.capsuleTag ), Is.True,
+                "Should return true if the Capsule has the Capsule tag." );
+            Assert.That( gameObjectsDict[Sphere].HasTag( TagRefsForTests.sphereTag ), Is.True,
+                "Should return true if the Sphere has the Sphere tag." );
 
             yield return null;
         }
@@ -104,17 +194,12 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Cube.AddTag( null );
             Assert.That( tagger.GetTags,
                 Is.EquivalentTo( new[] { TagRefsForTests.cubeTag, TagRefsForTests.platonicTag } ),
-                "Cube should have the 'Cube' tag and 'Platonic Solid' tag." );
+                "Cube should just have the 'Cube' tag and 'Platonic Solid' tag." );
             Assert.That( tagger.GetTags.Contains( null ), Is.False,
                 "Cube should not have a null value in it's tag collection." );
             yield return null;
         }
 
-        [UnityTest]
-        public IEnumerator AddTag_WithNullGameObject_HandlesGracefully() {
-            Assert.DoesNotThrow( () => ((GameObject)null).AddTag( TagRefsForTests.cubeTag ) );
-            yield return null;
-        }
 
         [UnityTest]
         public IEnumerator HasTag_WithDestroyedGameObject_ReturnsFalse() {
@@ -134,6 +219,32 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             var newObj = new GameObject( "ObjectWithoutTagger" );
             Assert.That( newObj.HasTag( "AnyTag" ), Is.False,
                 "HasTag should return false for objects without a Tagger component" );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GetTagCount_OnObjectWithTwoTags_ReturnsTwo() {
+            Assert.That( Cube.GetTagCount(), Is.EqualTo( 2 ),
+                "Should return 2 because Cube has Cube tag and Platonic Solid tag." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GetTagCount_OnObjectWithZeroTags_ReturnsZero() {
+            Assert.That( Cylinder.GetTagCount(), Is.EqualTo( 0 ),
+                "Should return 0 because Cylinder has no tags." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator IsTagged_OnObjectWithTags_ReturnsTrue() {
+            Assert.That( Cube.IsTagged(), Is.True, "Should return true because Cube has tags." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator IsTagged_OnObjectWithoutTags_ReturnsFalse() {
+            Assert.That( Cylinder.IsTagged(), Is.False, "Should return false because Cylinder has no tags." );
             yield return null;
         }
 
@@ -172,6 +283,12 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
 
     [TestFixture]
     public class TagModificationTests : NeatoTagTests {
+        [UnityTest]
+        public IEnumerator AddTag_WithNullGameObject_HandlesGracefully() {
+            Assert.DoesNotThrow( () => ((GameObject)null).AddTag( TagRefsForTests.cubeTag ) );
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator AddTag_PlaneTagAddedToCube_TagWasAdded() {
             Cube.AddTag( TagRefsForTests.planeTag );

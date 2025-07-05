@@ -61,7 +61,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         /// <summary>
         ///     Try to get a NeatoTag by name.
-        ///     NeatoTag must exist in the scene.
+        ///     The Neato Tag must exist in the scene on any Tagger.
+        ///     Neato Tag can't be found otherwise with this method.
         /// </summary>
         /// <param name="tagName">NeatoTag name.</param>
         /// <param name="tag">The NeatoTag if found.</param>
