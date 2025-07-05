@@ -14,9 +14,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [Serializable]
     public class Tagger : MonoBehaviour {
         [SerializeField] List<NeatoTag> _tags = new();
-        HashSet<NeatoTag> _tagsSet = new();
         HashSet<string> _cachedTagNames = new();
         bool _isCacheDirty = true;
+        bool _useTagSet;
 
         public IReadOnlyList<NeatoTag> GetTags => _tags;
 
@@ -28,8 +28,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             //Cleanup and setup tagger. Nulls can be left behind, so we need to remove those.
             try {
                 _tags.RemoveAll( nTag => !nTag );
-                _tagsSet.RemoveWhere( nTag => !nTag );
-                _tagsSet = _tags.ToHashSet();
                 TaggerRegistry.InitializeNewTagger( gameObject, this );
             }
             catch ( Exception e ) {
@@ -116,7 +114,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTag">The tag to check for</param>
         /// <returns>True if Tagger has the tag, otherwise false.</returns>
-        public bool HasTag( NeatoTag neatoTag ) => _tagsSet.Contains( neatoTag );
+        public bool HasTag( NeatoTag neatoTag ) => _tags.Contains( neatoTag );
 
         /// <summary>
         ///     Checks if Tagger has a specific tag by tag name.
@@ -254,13 +252,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTag">Tag to add.</param>
         public void AddTag( NeatoTag neatoTag ) {
-            if ( !neatoTag || _tagsSet.Contains( neatoTag ) ) {
+            if ( !neatoTag || _tags.Contains( neatoTag ) ) {
                 Debug.LogWarning( "You are trying to add a tag that is either null or already exist on tagger." );
                 return;
             }
 
             _tags.Add( neatoTag );
-            _tagsSet.Add( neatoTag );
+            _tags.Add( neatoTag );
             TaggerRegistry.RegisterTag( neatoTag );
             TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
             _isCacheDirty = true;
@@ -273,14 +271,14 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         public void AddTags( IEnumerable<NeatoTag> neatoTagsToAdd ) {
             var changed = false;
             foreach ( var neatoTag in neatoTagsToAdd ) {
-                if ( !neatoTag || _tagsSet.Contains( neatoTag ) ) {
+                if ( !neatoTag || _tags.Contains( neatoTag ) ) {
                     Debug.LogWarning(
                         "[NeatoTags]: You are trying to add a tag that is either null or already exist on tagger." );
                     continue;
                 }
 
                 _tags.Add( neatoTag );
-                _tagsSet.Add( neatoTag );
+                _tags.Add( neatoTag );
                 TaggerRegistry.RegisterTag( neatoTag );
                 TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
                 changed = true;
@@ -302,7 +300,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             _tags.Remove( neatoTag );
-            _tagsSet.Remove( neatoTag );
+            _tags.Remove( neatoTag );
             _isCacheDirty = true;
             if ( !TaggerRegistry.GetStaticTaggedObjectsDictionary()
                     .TryGetValue( neatoTag, out var taggedGameObject ) ) {
@@ -390,14 +388,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         void OnValidate() {
             NeatoTagTaggerTracker.RegisterTagger( this );
             _tags.RemoveAll( neatoTag => !neatoTag );
-            _tagsSet.RemoveWhere( neatoTag => !neatoTag );
-
-            _tagsSet ??= new HashSet<NeatoTag>();
-
-            _tagsSet.Clear();
-            foreach ( var nTag in _tags.Where( t => t != null ) ) {
-                _tagsSet.Add( nTag );
-            }
         }
 #endif
     }
