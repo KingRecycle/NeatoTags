@@ -279,7 +279,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 }
 
                 _tags.Add( neatoTag );
-                _tags.Add( neatoTag );
                 TaggerRegistry.RegisterTag( neatoTag );
                 TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
                 changed = true;
