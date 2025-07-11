@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CharlieMadeAThing.NeatoTags.Core;
 using UnityEngine;
 using CharlieMadeAThing.NeatoTags.Core.Editor;
 
@@ -16,7 +15,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         [SerializeField] List<NeatoTag> _tags = new();
         HashSet<string> _cachedTagNames = new();
         bool _isCacheDirty = true;
-        bool _useTagSet;
 
         public IReadOnlyList<NeatoTag> GetTags => _tags;
 
@@ -257,8 +255,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 Debug.LogWarning( "You are trying to add a tag that is either null or already exist on tagger." );
                 return;
             }
-
-            _tags.Add( neatoTag );
+            
             _tags.Add( neatoTag );
             TaggerRegistry.RegisterTag( neatoTag );
             TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
@@ -298,8 +295,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 Debug.LogWarning( "You are trying to remove a tag that is null." );
                 return;
             }
-
-            _tags.Remove( neatoTag );
+            
             _tags.Remove( neatoTag );
             _isCacheDirty = true;
             if ( !TaggerRegistry.GetStaticTaggedObjectsDictionary()
