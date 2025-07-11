@@ -354,6 +354,21 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         }
 
         [UnityTest]
+        public IEnumerator RemoveTagByString_RemoveCubeTagFromCube_TagWasRemoved() {
+            Cube.RemoveTag( "Cube" );
+            Assert.That( Cube.HasTag( TagRefsForTests.cubeTag ), Is.False, "Cube tag should be removed from cube." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator RemoveTagByString_RemoveNonExistentTag_DoesNotThrowException() {
+            // Should gracefully handle removing a tag that doesn't exist
+            Cube.RemoveTag( "NonExistentTag" );
+            Assert.Pass( "Should not throw an exception when removing a non-existent tag" );
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator RemoveAllTags_AllTagsRemoved() {
             Assert.That( Cube.GetComponent<Tagger>().GetTags.Count, Is.GreaterThan( 0 ),
                 "Tagger should have at least one tag before removing all tags." );
