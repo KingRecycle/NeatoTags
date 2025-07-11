@@ -27,9 +27,17 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
         static readonly HashSet<GameObject> s_nonTaggedObjects = new();
 
-        public static Dictionary<GameObject, Tagger> GetStaticTaggersDictionary() => s_taggers;
-        public static Dictionary<NeatoTag, HashSet<GameObject>> GetStaticTaggedObjectsDictionary() => s_taggedObjects;
-        public static HashSet<GameObject> GetStaticNonTaggedGameObjects() => s_nonTaggedObjects;
+        public static Dictionary<GameObject, Tagger> GetStaticTaggersDictionary() {
+            return s_taggers;
+        }
+
+        public static Dictionary<NeatoTag, HashSet<GameObject>> GetStaticTaggedObjectsDictionary() {
+            return s_taggedObjects;
+        }
+
+        public static HashSet<GameObject> GetStaticNonTaggedGameObjects() {
+            return s_nonTaggedObjects;
+        }
 
         /// <summary>
         ///     Initializes a new <see cref="Tagger" /> instance by registering it with the tag registry
@@ -55,6 +63,24 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 RegisterGameObjectToTag( gameObject, neatoTag );
             }
         }
+
+        /// <summary>
+        ///     Resets the internal registries of the <see cref="TaggerRegistry" /> by clearing
+        ///     all taggers, tagged objects, and non-tagged objects stored in the registry.
+        /// </summary>
+        /// <remarks>
+        ///     This method will remove all data from the registry and log a message indicating
+        ///     that the registry has been reset. This can be useful for scenarios where a clean
+        ///     slate for the registry is required, such as during initialization or when the
+        ///     application needs to reconfigure its tagging system.
+        /// </remarks>
+        public static void ResetRegistry() {
+            s_taggers.Clear();
+            s_taggedObjects.Clear();
+            s_nonTaggedObjects.Clear();
+            Debug.Log( "[TaggerRegistry]: Registry has been reset." );
+        }
+
 
         /// <summary>
         ///     Removes a <see cref="Tagger" /> and its associated tags from
