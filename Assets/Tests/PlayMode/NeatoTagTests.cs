@@ -319,6 +319,16 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
                 "Both tags should be added to cube." );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator AddTag_AddSameTagsTwice_OnlyOneInstanceExists() {
+            Cylinder.AddTag( TagRefsForTests.cornerlessTag );
+            Cylinder.AddTag( TagRefsForTests.cornerlessTag );
+            Assert.That( Cylinder.GetComponent<Tagger>().GetTags.Count,
+                Is.EqualTo( Cylinder.GetComponent<Tagger>().GetTags.Distinct().Count() ),
+                "Tagger should not add duplicate tags." );
+            yield return null;
+        }
 
         [UnityTest]
         public IEnumerator AddTagsByList_AddSameTagsTwice_OnlyOneInstanceExists() {
