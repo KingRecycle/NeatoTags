@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
 using UnityEngine;
@@ -29,9 +30,11 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Plane = GameObject.Find( "Plane" ); //Does not have a tagger component.
             Cylinder = GameObject.Find( "Cylinder" ); //Has Tagger but no tags.
             ShapeTagsToFilter = new[] { Cube, Sphere, Capsule, Plane, Cylinder };
-
+            
             CheckIfTestSceneStateIsValid();
         }
+        
+
 
         void CheckIfTestSceneStateIsValid() {
             //Cube shouldn't be null and have just two tags (Cube and Platonic Sold).
@@ -279,21 +282,34 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Assert.That( tag, Is.Null, "Should return null." );
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator TaggerAccess_OnDestroyedGameObject_HandlesGracefully() {
+            var tempObj = new GameObject();
+            tempObj.AddComponent<Tagger>().AddTag( TagRefsForTests.cubeTag );
+            Object.Destroy( tempObj );
+
+            yield return null; // Ensures the GameObject is fully destroyed
+
+            Assert.DoesNotThrow( () => tempObj.GetTagCount(), "Should handle destroyed GameObject gracefully." );
+            yield return null;
+        }
     }
 
     [TestFixture]
     public class TagModificationTests : NeatoTagTests {
         [UnityTest]
         public IEnumerator AddTag_WithNullGameObject_HandlesGracefully() {
-            Assert.DoesNotThrow( () => ((GameObject)null).AddTag( TagRefsForTests.cubeTag ) );
+            Assert.DoesNotThrow( () => ( (GameObject)null ).AddTag( TagRefsForTests.cubeTag ) );
             yield return null;
         }
 
         [UnityTest]
-        public IEnumerator AddTag_PlaneTagAddedToCube_TagWasAdded() {
-            Cube.AddTag( TagRefsForTests.planeTag );
-            Assert.That( Cube.HasTag( TagRefsForTests.planeTag ), Is.True, "Plane tag should be added to cube." );
+        public IEnumerator AddTag_SphereTagAddedToCube_TagWasAdded() {
+            Cube.AddTag( TagRefsForTests.sphereTag );
+            Assert.That( Cube.HasTag( TagRefsForTests.sphereTag ), Is.True, "Sphere tag should be added to cube." );
             yield return null;
+            Cube.RemoveTag( TagRefsForTests.sphereTag );
         }
 
         [UnityTest]
@@ -394,6 +410,13 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Assert.That( Capsule.GetComponent<Tagger>().GetTags.Count,
                 Is.EqualTo( Capsule.GetComponent<Tagger>().GetTags.Distinct().Count() ),
                 "Tagger should not add duplicate tags." );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator AddTag_InvalidTagName_LogsWarningAndDoesNotAdd() {
+            Cube.GetOrCreateTag( "<InvalidTag>" );
+            Assert.That( Cube.HasTag( "<InvalidTag>" ), Is.False, "Tag with invalid characters should not be added." );
             yield return null;
         }
     }
@@ -602,6 +625,23 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Assert.That( result.Count, Is.EqualTo( 0 ), "Filtering an empty list should return an empty result" );
             yield return null;
         }
+
+        [UnityTest]
+        public IEnumerator FilterGameObjects_PerformanceWithLargeData() {
+            var largeNumberGameObjects = new List<GameObject>();
+            for ( var i = 0; i < 10000; i++ ) {
+                var obj = new GameObject( $"Obj{i}" );
+                obj.AddComponent<Tagger>().AddTag( TagRefsForTests.cubeTag );
+                largeNumberGameObjects.Add( obj );
+            }
+
+            var filteredShapes = Tagger.FilterGameObjects( largeNumberGameObjects ).WithTag( TagRefsForTests.cubeTag )
+                .GetMatches();
+
+            Assert.That( filteredShapes.Count, Is.EqualTo( 10000 ), "All objects with the tag should be matched." );
+
+            yield return null;
+        }
     }
 
     [TestFixture]
@@ -609,19 +649,19 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         [UnityTest]
         public IEnumerator StaticCollections_UpdatedCorrectly_WhenTagsModified() {
             // Test that the static collections are properly updated when tags are added/removed
-            var initialCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.planeTag ).GetMatches().Count;
+            var initialCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.cubeTag ).GetMatches().Count;
 
             // Create a new object with the cube tag
             var newObj = new GameObject( "NewCube" );
-            newObj.AddComponent<Tagger>().AddTag( TagRefsForTests.planeTag );
+            newObj.AddComponent<Tagger>().AddTag( TagRefsForTests.cubeTag );
 
-            var afterAddCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.planeTag ).GetMatches().Count;
+            var afterAddCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.cubeTag ).GetMatches().Count;
             Assert.That( afterAddCount, Is.EqualTo( initialCount + 1 ),
                 "Static collections should be updated when new tagged objects are created" );
 
             // Now remove the tag
-            newObj.RemoveTag( TagRefsForTests.planeTag );
-            var afterRemoveCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.planeTag ).GetMatches().Count;
+            newObj.RemoveTag( TagRefsForTests.cubeTag );
+            var afterRemoveCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.cubeTag ).GetMatches().Count;
             Assert.That( afterRemoveCount, Is.EqualTo( initialCount ),
                 "Static collections should be updated when tags are removed" );
 
@@ -632,26 +672,26 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
         public IEnumerator ObjectDestruction_UpdatesTaggedCollections() {
             // Test that when objects are destroyed, they're removed from tag collections
             var tempObj = new GameObject( "TempObject" );
-            tempObj.AddComponent<Tagger>().AddTag( TagRefsForTests.planeTag );
+            tempObj.AddComponent<Tagger>().AddTag( TagRefsForTests.cubeTag );
 
-            var beforeCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.planeTag ).GetMatches().Count;
+            var beforeCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.cubeTag ).GetMatches().Count;
             Object.Destroy( tempObj );
 
             // Need to wait a frame for destruction to complete
             yield return null;
 
-            var afterCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.planeTag ).GetMatches().Count;
+            var afterCount = Tagger.FilterGameObjects().WithTag( TagRefsForTests.cubeTag ).GetMatches().Count;
             Assert.That( afterCount, Is.EqualTo( beforeCount - 1 ),
                 "Destroyed objects should be removed from tag collections" );
         }
 
         [UnityTest]
         public IEnumerator ConcurrentTagModification_ThreadSafety() {
-            var tasks = new List<System.Threading.Tasks.Task>();
+            var tasks = new List<Task>();
 
             for ( var i = 0; i < 10; i++ ) {
                 var index = i;
-                tasks.Add( System.Threading.Tasks.Task.Run( () => {
+                tasks.Add( Task.Run( () => {
                     // Simulate concurrent tag operations
                     Cube.GetOrCreateTag( $"ConcurrentTag_{index}" );
                 } ) );
@@ -663,5 +703,22 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             Assert.That( Cube.GetComponent<Tagger>().GetTags.Count, Is.GreaterThanOrEqualTo( 2 ) );
             yield return null;
         }
+        
+        [UnityTest]
+        public IEnumerator TagSystem_AcrossSceneLoads_TaggerRegistryShouldBeEmpty() {
+
+    
+            // Load a different scene and back
+            SceneManager.LoadScene("AltScene");
+            yield return null;
+
+            Assert.That( TaggerRegistry.GetStaticTaggersDictionary().Count, Is.Zero, 
+                "TaggersDictionary should be empty after scene load." );
+            Assert.That( TaggerRegistry.GetStaticTaggedObjectsDictionary().Count, Is.Not.Zero,
+                "TaggedObjectsDictionary should be not be empty when switching from a scene that registered tags." );
+            Assert.That( TaggerRegistry.GetStaticNonTaggedGameObjects().Count, Is.Zero,
+                "NonTaggedGameObjects should be empty after scene load." );
+        }
+
     }
 }

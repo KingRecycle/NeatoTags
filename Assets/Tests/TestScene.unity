@@ -1056,7 +1056,6 @@ MonoBehaviour:
   testTags:
   - {fileID: 11400000, guid: e4d4f3b1e2339b442bf8b58c51c4e82d, type: 2}
   - {fileID: 11400000, guid: 669ed11665b95c64c9f985e2b48baffd, type: 2}
-  - {fileID: 11400000, guid: 7348c49f8ba378b409bd37e40024b99a, type: 2}
   testTagsStrings:
   - Cube
   - Sphere

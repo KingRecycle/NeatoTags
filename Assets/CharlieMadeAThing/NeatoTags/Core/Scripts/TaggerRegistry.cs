@@ -22,6 +22,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         static readonly Dictionary<GameObject, Tagger> s_taggers = new();
 
         // All tagged objects in the scene by tag (@runtime).
+        //NOTE: This is NOT cleared when the scene changes, but the gameobjects in it are.
         static readonly Dictionary<NeatoTag, HashSet<GameObject>> s_taggedObjects = new();
 
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
@@ -43,6 +44,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Initializes a new <see cref="Tagger" /> instance by registering it with the tag registry
         ///     and associating its tags with the relevant <see cref="GameObject" />.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to register itself.
+        ///     You do not need to call this method manually.
+        /// </remarks>
         /// <param name="gameObject">The <see cref="GameObject" /> to associate with the provided <see cref="Tagger" />.</param>
         /// <param name="tagger">The <see cref="Tagger" /> instance to be initialized and registered.</param>
         public static void InitializeNewTagger( GameObject gameObject, Tagger tagger ) {
@@ -71,8 +76,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <remarks>
         ///     This method will remove all data from the registry and log a message indicating
         ///     that the registry has been reset. This can be useful for scenarios where a clean
-        ///     slate for the registry is required, such as during initialization or when the
-        ///     application needs to reconfigure its tagging system.
+        ///     slate for the registry is required. When is that? I have no clue, so use it at your own risk.
         /// </remarks>
         public static void ResetRegistry() {
             s_taggers.Clear();
@@ -87,6 +91,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     the specified <see cref="GameObject" /> in the tag registry.
         ///     Effectively removing it from the system.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to unregister itself.
+        ///     You do not need to call this method manually.
+        /// </remarks>
         /// <param name="gameObject">
         ///     The <see cref="GameObject" /> from which the <see cref="Tagger" /> and its tags are to be
         ///     removed.
@@ -136,6 +144,11 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Registers a new tag in the tag registry. This ensures the tag is tracked
         ///     and ready to be associated with GameObjects at runtime.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to register its tags.
+        ///     You do not need to call this method manually.
+        ///     Registered tags do not unregister themselves on scene change by default.
+        /// </remarks>
         /// <param name="tagToRegister">The <see cref="NeatoTag" /> to register in the system.</param>
         public static void RegisterTag( NeatoTag tagToRegister ) {
             if ( !tagToRegister ) {
@@ -150,6 +163,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Unregisters a specified <see cref="NeatoTag" /> from the tag registry, removing all associations
         ///     it has with any <see cref="GameObject" />.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to unregister its tags.
+        ///     You do not need to call this method manually unless you want to remove a tag from the registry.
+        ///     By default, this is not called automatically.
+        ///     Doing so will remove the tag and the tag will not be considered to have ever existed on any gameobject.
+        /// </remarks>
         /// <param name="tagToUnregister">The <see cref="NeatoTag" /> to be unregistered from the registry.</param>
         public static void UnregisterTag( NeatoTag tagToUnregister ) {
             if ( !tagToUnregister ) {
@@ -157,12 +176,19 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
+            foreach ( var gameObject in s_taggedObjects[tagToUnregister] ) {
+                gameObject.RemoveTag( tagToUnregister );
+            }
             s_taggedObjects.Remove( tagToUnregister );
         }
 
         /// <summary>
         ///     Registers the specified <see cref="GameObject" /> to the specified <see cref="NeatoTag" /> in the tag registry.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to register its tags.
+        ///     You do not need to call this method manually.
+        /// </remarks>
         /// <param name="gameObject">The <see cref="GameObject" /> to register to the given <see cref="NeatoTag" />.</param>
         /// <param name="tag">The <see cref="NeatoTag" /> to associate with the given <see cref="GameObject" />.</param>
         public static void RegisterGameObjectToTag( GameObject gameObject, NeatoTag tag ) {
@@ -195,6 +221,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <summary>
         ///     Registers a <see cref="GameObject" /> that lacks any associated tags to the non-tagged objects registry.
         /// </summary>
+        /// <remarks>
+        ///     This is used by the <see cref="Tagger" /> component to register itself when it has no tags.
+        ///     You do not need to call this method manually.
+        /// </remarks>
         /// <param name="gameObject">The <see cref="GameObject" /> to register as non-tagged. Must not be null.</param>
         public static void RegisterNonTaggedGameObject( GameObject gameObject ) {
             if ( !gameObject ) {
