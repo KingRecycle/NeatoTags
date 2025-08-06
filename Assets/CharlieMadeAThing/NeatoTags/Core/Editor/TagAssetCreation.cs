@@ -10,7 +10,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static HashSet<NeatoTag> s_cachedTags;
         static Dictionary<string, NeatoTag> s_tagNameLookup;
         static bool s_tagCacheDirty = true;
-        const int MaxNameCounter = 1000; //Max attempts to add a number to the end of the tag name. Arbitrary amount.
+        const int MaxNameCounter = 1000; //Max attempts to add a number to the end of the tag name. An arbitrary amounts to preventing infinite loops. Feel free to change.
         const int MaxCachedTags = 1000; //Max number of tags to cache. Don't tell me you need more than 1000!?
 
         /// <summary>
@@ -164,9 +164,21 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             return AssetDatabase.LoadAssetAtPath<EditorDataHolder>( holderPath );
         }
 
+
         /// <summary>
-        ///     Creates a new tag with the specified name, assigns it a unique identifier if necessary,
-        ///     adds it to the asset database, updates the tag cache, and optionally focuses on the created tag in the Project
+        /// Creates a new NeatoTag asset with the default name "New Tag".
+        /// This will use the default folder location if set by the user, otherwise the currently selected folder.
+        /// </summary>
+        [MenuItem( "Assets/Create/Neato Tag", priority = 150 )] //Unity's Priority system for menu items is dumb, change this to whatever you like. 150 is about 1/3 of the way down.
+        static void CreateNeatoTagInSpecificFolder()
+        {
+            CreateNewTag( "New Tag" );
+        }
+
+
+        /// <summary>
+        ///     Creates a new tag with the specified name.
+        ///     Adds it to the asset database, updates the tag cache, and optionally focuses on the created tag in the Project
         ///     window.
         /// </summary>
         /// <param name="tagName">The name of the tag to be created. If empty or null, a default name "New Tag" will be used.</param>
@@ -180,20 +192,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
                 tagName = "New Tag";
             }
 
-            uint counter = 0;
-            var uniqueName = tagName;
-            while ( s_tagNameLookup != null && s_tagNameLookup.ContainsKey( uniqueName ) ) {
-                counter++;
-                uniqueName = $"{tagName} {counter}";
-                if ( counter <= MaxNameCounter ) continue;
-                Debug.LogError( "[TagAssetCreation]: Could not create tag. Hard limit reached. Try a different name." );
-                return null;
-            }
+            tagName = MakeSureNameIsUnique(tagName);
 
             var newTag = CreateInstance<NeatoTag>();
-            var assetPath = GetTagAssetPath( uniqueName );
+            var assetPath = GetTagAssetPath( tagName );
             if ( string.IsNullOrEmpty( assetPath ) ) {
-                Debug.LogError( "[TagAssetCreation]: Could not create tag. Invalid path." );
+                Debug.LogError( "[TagAssetCreation]: Could not create tag. Invalid path. Select a folder or set the default in the Neato Tag Manager." );
                 return null;
             }
 
@@ -202,7 +206,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
             if ( s_cachedTags != null && s_tagNameLookup != null ) {
                 s_cachedTags.Add( newTag );
-                s_tagNameLookup[uniqueName] = newTag;
+                s_tagNameLookup[tagName] = newTag;
             }
             else {
                 InvalidateTagCache();
@@ -214,6 +218,26 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             return newTag;
+        }
+        
+        static string MakeSureNameIsUnique(string baseName)
+        {
+            if (s_tagNameLookup == null || !s_tagNameLookup.ContainsKey(baseName))
+            {
+                return baseName;
+            }
+
+            for (int i = 1; i <= MaxNameCounter; i++)
+            {
+                var newName = $"{baseName} {i}";
+                if (!s_tagNameLookup.ContainsKey(newName))
+                {
+                    return newName;
+                }
+            }
+
+            Debug.LogError("[TagAssetCreation]: Could not create tag. Hard limit reached. Try a different name.");
+            return baseName; // Fallback, though this should ideally never be reached.
         }
 
         static string GetTagAssetPath( string tagName ) {

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
-    [CreateAssetMenu( fileName = "New NeatoTag", menuName = "Neato Tags/New Tag", order = 0 )]
+    //[CreateAssetMenu( fileName = "New NeatoTag", menuName = "Neato Tags/New Tag", order = 0 )]
     [Serializable]
     public class NeatoTag : ScriptableObject {
         [SerializeField] Color color = Color.gray;
