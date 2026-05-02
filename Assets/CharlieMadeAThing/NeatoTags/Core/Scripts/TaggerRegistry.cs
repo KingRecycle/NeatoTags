@@ -176,7 +176,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            foreach ( var gameObject in s_taggedObjects[tagToUnregister] ) {
+            if ( !s_taggedObjects.TryGetValue( tagToUnregister, out var taggedGameObjects ) ) return;
+
+            foreach ( var gameObject in taggedGameObjects.ToList() ) {
                 gameObject.RemoveTag( tagToUnregister );
             }
             s_taggedObjects.Remove( tagToUnregister );
