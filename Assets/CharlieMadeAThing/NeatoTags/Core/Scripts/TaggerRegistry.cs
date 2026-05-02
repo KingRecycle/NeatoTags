@@ -123,7 +123,9 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            s_taggers.Add( gameObject, tagger );
+            if ( !s_taggers.TryAdd( gameObject, tagger ) )
+                Debug.LogWarning(
+                    $"[TaggerRegistry]: GameObject '{gameObject.name}' already has a Tagger registered. Ignoring duplicate registration." );
         }
 
         /// <summary>

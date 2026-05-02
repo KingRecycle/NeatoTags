@@ -11,6 +11,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     ///     This class provides functionalities for adding, removing, and filtering tags.
     /// </summary>
     [Serializable]
+    [DisallowMultipleComponent]
     public class Tagger : MonoBehaviour {
         [SerializeField] List<NeatoTag> _tags = new();
         HashSet<string> _cachedTagNames = new();
