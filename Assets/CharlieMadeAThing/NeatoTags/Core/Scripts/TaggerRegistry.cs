@@ -201,7 +201,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            s_taggedObjects[tag].Add( gameObject );
+            if ( !s_taggedObjects.TryGetValue( tag, out var set ) ) {
+                set = new HashSet<GameObject>();
+                s_taggedObjects[tag] = set;
+            }
+
+            set.Add( gameObject );
             s_nonTaggedObjects.Remove( gameObject );
         }
 
@@ -216,7 +221,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            s_taggedObjects[tag].Remove( gameObject );
+            if ( s_taggedObjects.TryGetValue( tag, out var set ) ) set.Remove( gameObject );
             if ( !gameObject.IsTagged() ) {
                 s_nonTaggedObjects.Add( gameObject );
             }
