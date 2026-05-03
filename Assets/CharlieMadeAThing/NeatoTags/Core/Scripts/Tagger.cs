@@ -316,7 +316,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="tagName"></param>
         public void RemoveTag( string tagName ) {
-            var neatoTag = _tags.FirstOrDefault( t => t.name == tagName );
+            var neatoTag = _tags.FirstOrDefault( t => t != null && t.name == tagName );
             if ( !neatoTag ) {
                 Debug.LogWarning( $"You are trying to remove a tag with the name {tagName} that doesn't exist." );
                 return;
