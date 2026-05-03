@@ -392,6 +392,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         void OnValidate() {
             NeatoTagTaggerTracker.RegisterTagger( this );
             _tags.RemoveAll( neatoTag => !neatoTag );
+            var seen = new HashSet<NeatoTag>();
+            _tags.RemoveAll( t => !seen.Add( t ) );
         }
 #endif
     }

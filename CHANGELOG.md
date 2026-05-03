@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Tagger.OnValidate` now dedupes `_tags` after the existing null-removal pass, so an inspector edit that drops the same `NeatoTag` into the list twice (which bypasses the runtime `AddTag` guard) no longer leaves a phantom entry. `_tags.Count` matches the logical tag count, and `RemoveTag` removes the only entry instead of leaving a duplicate behind. ([#17](https://github.com/KingRecycle/NeatoTags/issues/17))
 - `Tagger.HasTag(string)` no longer returns stale results after a `NeatoTag` rename. The per-`Tagger` `HashSet<string>` cache was only invalidated on add/remove, so renaming a tag silently produced false positives for the old name and false negatives for the new one. Cache removed; `HasTag(string)` now iterates `_tags` directly. ([#16](https://github.com/KingRecycle/NeatoTags/issues/16))
 - `TaggerDrawer.OnDisable` now null-checks `Target` before unsubscribing from `OnWantRepaint`, preventing `NullReferenceException` in narrow editor teardown paths where the underlying target reference has been cleared. ([#15](https://github.com/KingRecycle/NeatoTags/issues/15))
 - `NeatoTagManager.CreateGUI` now null-checks the loaded `VisualTreeAsset` before calling `CloneTree`. A missing or renamed UXML asset now logs a clear error instead of throwing `NullReferenceException`. ([#14](https://github.com/KingRecycle/NeatoTags/issues/14))
