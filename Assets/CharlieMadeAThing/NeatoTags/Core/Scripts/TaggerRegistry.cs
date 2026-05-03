@@ -263,7 +263,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagName">The name of the tag to retrieve from the registry.</param>
         /// <returns>The <see cref="NeatoTag" /> instance if found; otherwise, null.</returns>
         public static NeatoTag GetRegisteredTag( string tagName ) {
-            return s_taggedObjects.Keys.FirstOrDefault( t => t.name == tagName );
+            return s_taggedObjects.Keys.FirstOrDefault( t => t && t.name == tagName );
         }
     }
 }
