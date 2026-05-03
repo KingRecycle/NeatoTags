@@ -91,3 +91,6 @@ crashlytics-build.properties
 
 # AI Guidelines file
 guidelines.*
+
+# Claude Code project memory
+CLAUDE.md
