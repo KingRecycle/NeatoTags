@@ -130,8 +130,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var neatTagsDirectory = GetNeatoTagsDirectory();
             var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "UXML",
                 SearchOption.AllDirectories );
-            var path = Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
-            if ( dirs.Length != 0 ) return path;
+            if ( dirs.Length != 0 ) return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
             Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags UXML directory." );
             return "";
         }
