@@ -78,7 +78,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="gameObject">Gameobject to check</param>
         /// <returns>True if the Gameobject has a Tagger component, false if not.</returns>
         public static bool HasTagger( GameObject gameObject ) {
-            return TaggerRegistry.GetStaticTaggersDictionary().ContainsKey( gameObject );
+            return gameObject && TaggerRegistry.GetStaticTaggersDictionary().ContainsKey( gameObject );
         }
 
         /// <summary>
@@ -88,7 +88,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="tagger">Gameobject's Tagger component</param>
         /// <returns>True if the Gameobject has a Tagger component, otherwise false.</returns>
         public static bool TryGetTagger( GameObject gameObject, out Tagger tagger ) {
-            return TaggerRegistry.GetStaticTaggersDictionary().TryGetValue( gameObject, out tagger );
+            tagger = null!;
+            return gameObject && TaggerRegistry.GetStaticTaggersDictionary().TryGetValue( gameObject, out tagger );
         }
 
         /// <summary>
