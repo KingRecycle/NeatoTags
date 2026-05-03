@@ -323,14 +323,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 return;
             }
 
-            _tags.Remove( neatoTag );
+            if ( !_tags.Remove( neatoTag ) ) return;
+
             _isCacheDirty = true;
-            if ( !TaggerRegistry.GetStaticTaggedObjectsDictionary()
+
+            if ( TaggerRegistry.GetStaticTaggedObjectsDictionary()
                     .TryGetValue( neatoTag, out var taggedGameObject ) ) {
-                return;
+                taggedGameObject.Remove( gameObject );
             }
 
-            taggedGameObject.Remove( gameObject );
             if ( _tags.Count == 0 ) {
                 TaggerRegistry.RegisterNonTaggedGameObject( gameObject );
             }
