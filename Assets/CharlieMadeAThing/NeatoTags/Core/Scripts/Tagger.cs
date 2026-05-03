@@ -14,8 +14,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
     [DisallowMultipleComponent]
     public class Tagger : MonoBehaviour {
         [SerializeField] List<NeatoTag> _tags = new();
-        HashSet<string> _cachedTagNames = new();
-        bool _isCacheDirty = true;
 
         public IReadOnlyList<NeatoTag> GetTags => _tags;
 
@@ -43,23 +41,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             OnWantRepaint = null;
 #endif
         }
-
-        #region Cache Methods
-
-        void UpdateCache() {
-            if ( !_isCacheDirty ) return;
-            _cachedTagNames.Clear();
-            foreach ( var nTag in _tags ) {
-                if ( nTag != null ) {
-                    _cachedTagNames.Add( nTag.name );
-                }
-            }
-
-
-            _isCacheDirty = false;
-        }
-
-        #endregion
 
         /// <summary>
         ///     Try to get a NeatoTag by name.
@@ -133,8 +114,10 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// <param name="neatoTag">The tag name to check for</param>
         /// <returns>True if Tagger has the tag, otherwise false.</returns>
         public bool HasTag( string neatoTag ) {
-            UpdateCache();
-            return _cachedTagNames.Contains( neatoTag );
+            foreach ( var nTag in _tags ) {
+                if ( nTag != null && nTag.name == neatoTag ) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -286,7 +269,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             _tags.Add( neatoTag );
             TaggerRegistry.RegisterTag( neatoTag );
             TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
-            _isCacheDirty = true;
         }
 
         /// <summary>
@@ -294,7 +276,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         /// </summary>
         /// <param name="neatoTagsToAdd">Tags to add.</param>
         public void AddTags( IEnumerable<NeatoTag> neatoTagsToAdd ) {
-            var changed = false;
             foreach ( var neatoTag in neatoTagsToAdd ) {
                 if ( !neatoTag || _tags.Contains( neatoTag ) ) {
                     Debug.LogWarning(
@@ -305,11 +286,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
                 _tags.Add( neatoTag );
                 TaggerRegistry.RegisterTag( neatoTag );
                 TaggerRegistry.RegisterGameObjectToTag( gameObject, neatoTag );
-                changed = true;
-            }
-
-            if ( changed ) {
-                _isCacheDirty = true;
             }
         }
 
@@ -324,8 +300,6 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             }
 
             if ( !_tags.Remove( neatoTag ) ) return;
-
-            _isCacheDirty = true;
 
             if ( TaggerRegistry.GetStaticTaggedObjectsDictionary()
                     .TryGetValue( neatoTag, out var taggedGameObject ) ) {
