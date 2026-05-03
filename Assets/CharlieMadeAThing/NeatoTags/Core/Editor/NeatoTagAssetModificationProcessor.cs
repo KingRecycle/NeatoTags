@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core.Editor {
     /// <summary>
@@ -17,10 +17,34 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         //This shouldn't be too slow since it's only called once even if there are multiple assets being modified.
         static void OnPostprocessAllAssets( string[] importedAssets, string[] deletedAssets, string[] movedAssets,
             string[] movedFromAssetPaths ) {
+            if ( !ContainsNeatoTagByType( importedAssets ) &&
+                 !ContainsNeatoTagByType( movedAssets ) &&
+                 !ContainsAssetExtension( deletedAssets ) )
+                return;
+
             UpdateTaggers();
             TagAssetCreation.InvalidateTagCache();
         }
 
+        private static bool ContainsNeatoTagByType( string[] paths ) {
+            foreach ( var p in paths ) {
+                if ( !p.EndsWith( ".asset", StringComparison.OrdinalIgnoreCase ) ) continue;
+                if ( AssetDatabase.GetMainAssetTypeAtPath( p ) == typeof( NeatoTag ) ) return true;
+            }
+
+            return false;
+        }
+
+        //deletedAssets can't be queried for type as the asset is gone. Fall back to the extension.
+        //This over-triggers slightly (any deleted .asset file refreshes the UI) but that's still vastly cheaper than refreshing on every texture import.
+        //And missing a deleted NeatoTag would leave stale UI which is worse.
+        private static bool ContainsAssetExtension( string[] paths ) {
+            foreach ( var p in paths )
+                if ( p.EndsWith( ".asset", StringComparison.OrdinalIgnoreCase ) )
+                    return true;
+            return false;
+        }
+        
         //Loop through all TaggerDrawers and NeatoTagDrawers and update them.
         //Without this custom inspector/windows won't update until the editor needs to redraw them,
         //and I find it not as cool unless they update automatically.
