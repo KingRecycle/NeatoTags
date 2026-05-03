@@ -405,7 +405,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             var tagPath = AssetDatabase.GetAssetPath( _selectedTag.targetObject );
-            AssetDatabase.RenameAsset( tagPath, newName );
+            var error = AssetDatabase.RenameAsset( tagPath, newName );
+            if ( !string.IsNullOrEmpty( error ) ) {
+                Debug.LogError( $"[NeatoTagManager]: Rename failed: {error}" );
+                return;
+            }
+            
             _selectedTag.targetObject.name = newName;
             EditorUtility.SetDirty( _selectedTag.targetObject );
 
