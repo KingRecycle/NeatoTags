@@ -79,7 +79,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         
         static void AddTag( GameObject gameObject, NeatoTag tag, bool addTaggerComponentIfNone ) {
             if ( !gameObject ) {
-                Debug.LogWarning($"Gameobject is null! Cannot add tag {tag.name} to a null GameObject.");
+                Debug.LogWarning($"Gameobject is null! Cannot add tag to a null GameObject.");
                 return;           
             }
             if ( !tag ) {
