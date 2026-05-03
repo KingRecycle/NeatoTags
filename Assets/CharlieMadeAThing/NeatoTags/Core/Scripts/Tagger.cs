@@ -92,7 +92,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Gets a Dictionary of all the gameobjects that have a Tagger component.
         /// </summary>
         /// <returns>A Dictionary where the keys are Gameobjects and Values are the respective Tagger component.</returns>
-        public static Dictionary<GameObject, Tagger> GetGameobjectsWithTagger() {
+        public static IReadOnlyDictionary<GameObject, Tagger> GetGameobjectsWithTagger() {
             return TaggerRegistry.GetStaticTaggersDictionary();
         }
 

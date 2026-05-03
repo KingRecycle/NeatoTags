@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **API**: `TaggerRegistry.GetStaticTaggersDictionary`, `GetStaticTaggedObjectsDictionary`, `GetStaticNonTaggedGameObjects`, and `Tagger.GetGameobjectsWithTagger` now return `IReadOnlyDictionary<...>` / `IReadOnlyCollection<...>` instead of the live mutable `Dictionary` / `HashSet`. Same instance under the hood (zero allocations), but external callers can no longer accidentally `Clear()`, `Add()`, or `Remove()` registry entries through these getters. Source-compatible for callers that use `var` or already store the result as `IEnumerable`/`IReadOnlyDictionary`; **breaking** for callers that store the result in a variable typed as the concrete `Dictionary<...>` / `HashSet<...>`. Internal field types are unchanged. ([#22](https://github.com/KingRecycle/NeatoTags/issues/22))
+
 ### Fixed
 
 - `Tagger.Awake` no longer wraps initialization in a `try/catch` that downgraded any exception to `LogWarning` and dropped the stack trace. The catch was originally a band-aid for the duplicate-key throw from `_taggers.Add` (now `RegisterTagger`'s `TryAdd`, fixed in #9) and the indexer-without-`TryGetValue` throws in `Register/UnregisterGameObjectFromTag` (#10, #41). Those throw paths are gone, so the catch is dead defensive code; removing it lets Unity's standard MonoBehaviour-callback exception handling surface any future regression as a loud Error with full stack trace instead of a swallowed warning that left the Tagger half-initialized. ([#29](https://github.com/KingRecycle/NeatoTags/issues/29))

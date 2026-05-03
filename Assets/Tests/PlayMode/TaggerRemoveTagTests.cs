@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
 using UnityEngine;
@@ -38,7 +41,14 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
             tagger.AddTag( _tag );
 
             //Wipe the registry entry while the Tagger still holds _tag in _tags.
-            TaggerRegistry.GetStaticTaggedObjectsDictionary().Remove( _tag );
+            //Reach the underlying mutable dictionary via reflection — the public getter
+            //returns IReadOnlyDictionary (#22), and engineering an invariant-violating
+            //state for this regression test is precisely the kind of thing that should
+            //live behind the private API rather than be reachable from user code.
+            var taggedObjectsField = typeof(TaggerRegistry).GetField( "s_taggedObjects",
+                BindingFlags.NonPublic | BindingFlags.Static );
+            var taggedObjects = (Dictionary<NeatoTag, HashSet<GameObject>>)taggedObjectsField!.GetValue( null );
+            taggedObjects.Remove( _tag );
 
             Assert.That( TaggerRegistry.GetStaticNonTaggedGameObjects().Contains( _go ), Is.False,
                 "Pre-condition: _go was tagged so it should not be in the non-tagged set yet." );

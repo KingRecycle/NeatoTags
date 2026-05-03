@@ -28,15 +28,15 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         // All gameobjects in the scene that have a Tagger component but no tags (@runtime).
         static readonly HashSet<GameObject> s_nonTaggedObjects = new();
 
-        public static Dictionary<GameObject, Tagger> GetStaticTaggersDictionary() {
+        public static IReadOnlyDictionary<GameObject, Tagger> GetStaticTaggersDictionary() {
             return s_taggers;
         }
 
-        public static Dictionary<NeatoTag, HashSet<GameObject>> GetStaticTaggedObjectsDictionary() {
+        public static IReadOnlyDictionary<NeatoTag, HashSet<GameObject>> GetStaticTaggedObjectsDictionary() {
             return s_taggedObjects;
         }
 
-        public static HashSet<GameObject> GetStaticNonTaggedGameObjects() {
+        public static IReadOnlyCollection<GameObject> GetStaticNonTaggedGameObjects() {
             return s_nonTaggedObjects;
         }
 
