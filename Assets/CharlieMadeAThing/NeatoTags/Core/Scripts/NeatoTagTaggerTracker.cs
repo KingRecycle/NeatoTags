@@ -17,21 +17,13 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         public static void RegisterTagger( Tagger tagger ) {
             CleanUpNulls();
-            if ( tagger == null ) {
-                Debug.LogWarning( "[NeatoTagTaggerTracker]: Attempting to register a null tagger!" );
-                return;
-            }
-
+            if ( tagger == null ) return;
             s_taggers.Add( tagger );
         }
 
         public static void UnregisterTagger( Tagger tagger ) {
             CleanUpNulls();
-            if ( tagger == null ) {
-                Debug.LogWarning( "[NeatoTagTaggerTracker]: Attempting to unregister a null tagger!" );
-                return;
-            }
-
+            if ( tagger == null ) return;
             s_taggers.Remove( tagger );
         }
 
