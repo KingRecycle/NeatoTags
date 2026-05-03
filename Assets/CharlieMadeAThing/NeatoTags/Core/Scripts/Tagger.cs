@@ -24,13 +24,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         void Awake() {
             //Cleanup and setup tagger. Nulls can be left behind, so we need to remove those.
-            try {
-                _tags.RemoveAll( nTag => !nTag );
-                TaggerRegistry.InitializeNewTagger( gameObject, this );
-            }
-            catch ( Exception e ) {
-                Debug.LogWarning( $"Failed to initialize Tagger: {e.Message}" );
-            }
+            _tags.RemoveAll( nTag => !nTag );
+            TaggerRegistry.InitializeNewTagger( gameObject, this );
         }
 
         void OnDestroy() {
