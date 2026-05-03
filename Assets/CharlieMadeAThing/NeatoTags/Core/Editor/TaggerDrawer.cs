@@ -110,11 +110,12 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         }
 
         void OnDisable() {
-            Target.OnWantRepaint -= DoRepaint;
-            if ( Target == null ) {
+            if ( Target != null ) {
+                Target.OnWantRepaint -= DoRepaint;
+            }
+            else {
                 NeatoTagTaggerTracker.UnregisterTagger( _tagger.targetObject as Tagger );
             }
-
             NeatoTagAssetModificationProcessor.UnregisterTaggerDrawer( this );
         }
 
