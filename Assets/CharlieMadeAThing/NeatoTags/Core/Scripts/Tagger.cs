@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CharlieMadeAThing.NeatoTags.Core.Editor;
+using UnityEditor;
 using UnityEngine;
 
 namespace CharlieMadeAThing.NeatoTags.Core {
@@ -391,7 +392,7 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         }
 
         void OnValidate() {
-            NeatoTagTaggerTracker.RegisterTagger( this );
+            if ( !PrefabUtility.IsPartOfPrefabAsset( this ) ) NeatoTagTaggerTracker.RegisterTagger( this );
             _tags.RemoveAll( neatoTag => !neatoTag );
             var seen = new HashSet<NeatoTag>();
             _tags.RemoveAll( t => !seen.Add( t ) );
