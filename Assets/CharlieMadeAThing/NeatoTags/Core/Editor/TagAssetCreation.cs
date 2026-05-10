@@ -91,6 +91,8 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         static string GetNeatoTagsEditorDirectory() {
             try {
                 var neatTagsDirectory = GetNeatoTagsDirectory();
+                if ( string.IsNullOrEmpty( neatTagsDirectory ) ) return "";
+                
                 var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "Editor",
                     SearchOption.AllDirectories );
                 if ( dirs.Length == 0 ) {
@@ -128,11 +130,16 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
         /// </returns>
         public static string GetUxmlDirectory() {
             var neatTagsDirectory = GetNeatoTagsDirectory();
-            var dirs = Directory.GetDirectories( $"{neatTagsDirectory}", "UXML",
+            if ( string.IsNullOrEmpty( neatTagsDirectory ) ) return "";
+
+            var dirs = Directory.GetDirectories( neatTagsDirectory, "UXML",
                 SearchOption.AllDirectories );
-            if ( dirs.Length != 0 ) return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
-            Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags UXML directory." );
-            return "";
+            if ( dirs.Length == 0 ) {
+                Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags UXML directory." );
+                return "";
+            }
+
+            return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, dirs[0] ) );
         }
 
         /// <summary>
