@@ -32,22 +32,19 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             if ( string.IsNullOrWhiteSpace( searchTerm ) ) {
                 return int.MaxValue; // No search term means the lowest priority
             }
-
-            var tagNameLower = tagName.ToLower();
-            var searchTermLower = searchTerm.ToLower();
-
+            
             // Exact match gets the highest priority (score 0)
-            if ( tagNameLower == searchTermLower ) {
+            if ( string.Equals( tagName, searchTerm, StringComparison.OrdinalIgnoreCase ) ) {
                 return 0;
             }
 
             // Starts with the search term gets the second-highest priority
-            if ( tagNameLower.StartsWith( searchTermLower ) ) {
+            if ( tagName.StartsWith( searchTerm, StringComparison.OrdinalIgnoreCase ) ) {
                 return 1;
             }
 
             // Find the first occurrence of the search term
-            var firstIndex = tagNameLower.IndexOf( searchTermLower, StringComparison.InvariantCultureIgnoreCase );
+            var firstIndex = tagName.IndexOf( searchTerm, StringComparison.OrdinalIgnoreCase );
             if ( firstIndex >= 0 ) {
                 // If the search term is close to the beginning of the tag name then it gets a lower score.
 
@@ -55,7 +52,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             }
 
             // Check for character-by-character matching (fuzzy matching)
-            var fuzzyScore = CalculateFuzzyMatchScore( tagNameLower, searchTermLower );
+            var fuzzyScore = CalculateFuzzyMatchScore( tagName, searchTerm );
             if ( fuzzyScore >= 0 ) {
                 return FuzzyMatchPriorityBase + fuzzyScore;
             }
@@ -79,7 +76,7 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             var score = 0;
 
             while ( tagIndex < tagName.Length && searchIndex < searchTerm.Length ) {
-                if ( char.ToLower( tagName[tagIndex] ) == char.ToLower( searchTerm[searchIndex] ) ) {
+                if ( char.ToLowerInvariant( tagName[tagIndex] ) == char.ToLowerInvariant( searchTerm[searchIndex] ) ) {
                     // Match found: Add index to score (earlier matches have lower scores)
                     score += tagIndex;
                     searchIndex++;
