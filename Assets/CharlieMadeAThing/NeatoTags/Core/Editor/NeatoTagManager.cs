@@ -218,10 +218,6 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
         void SetupSearchField() {
             // Clear any existing callbacks to avoid duplicates
-            _tagSearchField.UnregisterValueChangedCallback( evt => {
-                PopulateButtonsWithSearchAsync( evt.newValue );
-            } );
-
             _tagSearchField.UnregisterCallback<KeyDownEvent>( OnKeyDown );
             _tagSearchField.UnregisterCallback<KeyUpEvent>( OnKeyUp );
 
