@@ -61,31 +61,15 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
 
 
         static string GetNeatoTagsDirectory() {
-            try {
-                var dirs = Directory.GetDirectories( $"{Application.dataPath}", "NeatoTags",
-                    SearchOption.AllDirectories );
-                if ( dirs.Length == 0 ) {
-                    Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags directory." );
-                    return "";
-                }
-
-                var selectedDir = dirs[0];
-                // Verify the directory still exists before using it
-                if ( !Directory.Exists( selectedDir ) ) {
-                    Debug.LogWarning( "[TagAssetCreation]: NeatoTags directory was removed during operation." );
-                    return "";
-                }
-
-                return Path.Join( "Assets", Path.GetRelativePath( Application.dataPath, selectedDir ) );
-            }
-            catch ( DirectoryNotFoundException ex ) {
-                Debug.LogError( $"[TagAssetCreation]: Directory access failed: {ex.Message}" );
+            var guids = AssetDatabase.FindAssets( "Core.NeatoTags.CharlieMadeAThing t:asmdef" );
+            if ( guids.Length == 0 ) {
+                Debug.LogError( "[TagAssetCreation]: Could not find NeatoTags Core asmdef." );
                 return "";
             }
-            catch ( UnauthorizedAccessException ex ) {
-                Debug.LogError( $"[TagAssetCreation]: Access denied: {ex.Message}" );
-                return "";
-            }
+
+            var asmdefPath = AssetDatabase.GUIDToAssetPath( guids[0] );
+            // Walk up 3 levels: .../NeatoTags/Core/Scripts/<asmdef> → .../NeatoTags
+            return Path.GetDirectoryName( Path.GetDirectoryName( Path.GetDirectoryName( asmdefPath ) ) ) ?? "";
         }
 
         static string GetNeatoTagsEditorDirectory() {
