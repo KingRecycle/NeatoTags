@@ -18,8 +18,8 @@ namespace CharlieMadeAThing.NeatoTags.Core {
 
         public IReadOnlyList<NeatoTag> GetTags => _tags;
 
-        // Allows any character except < and >, but not empty or whitespace-only strings
-        public static readonly Regex TagNameRegex = new("^(?!\\s*$)[^<>]+$", RegexOptions.Compiled);
+        // Allows any non-control character except < > : " / \ | ? * and rejects empty / whitespace-only strings
+        public static readonly Regex TagNameRegex = new( @"^(?!\s*$)[^<>:""/\\|?*\x00-\x1F]+$", RegexOptions.Compiled );
 
 
         void Awake() {
