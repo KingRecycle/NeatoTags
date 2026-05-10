@@ -211,9 +211,25 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         #region Add and Remove Methods
 
         /// <summary>
-        ///     Gets an existing tag on the tagger with the given name or creates a new one if it doesn't exist.
-        ///     Tags created this way are not saved to disk.
+        ///     Gets an existing tag on the tagger with the given name, falls back to any
+        ///     NeatoTag of that name registered project-wide with
+        ///     <see cref="TaggerRegistry"/>, and only as a last resort creates a new
+        ///     in-memory NeatoTag (not saved to disk).
         /// </summary>
+        /// <remarks>
+        ///     <b>Limitation:</b> An asset NeatoTag is only discoverable by this method
+        ///     if it has been registered with <see cref="TaggerRegistry"/>, which
+        ///     happens when a Tagger holding the asset awakens or when something calls
+        ///     <see cref="Tagger.AddTag"/> with the asset reference. If your project
+        ///     has a customized NeatoTag asset (e.g. a "Boss" tag with a specific
+        ///     Color and Comment) that no Tagger has loaded yet — common when the
+        ///     tagged GameObjects are spawned at runtime — this method will create a
+        ///     duplicate runtime NeatoTag with default values instead of returning
+        ///     your asset. To avoid the duplicate: ensure the asset is referenced from
+        ///     a Tagger placed in a loaded scene, or call
+        ///     <see cref="TaggerRegistry.RegisterTag"/> directly during your game's
+        ///     bootstrap.
+        /// </remarks>
         /// <param name="tagName">Name of the tag to get or create.</param>
         /// <returns>Returns existing or new tag if successful, otherwise returns null.</returns>
         public NeatoTag GetOrCreate( string tagName ) {
@@ -225,6 +241,12 @@ namespace CharlieMadeAThing.NeatoTags.Core {
             var exist = TryGetTag( tagName, out var nTag );
             if ( exist ) {
                 return nTag;
+            }
+
+            // Does the tag exist elsewhere
+            if ( TryGetNeatoTag( tagName, out var registered ) ) {
+                AddTag( registered );
+                return registered;
             }
 
             // Create a new tag if it doesn't exist
