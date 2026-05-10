@@ -161,10 +161,11 @@ namespace CharlieMadeAThing.NeatoTags.Core.Editor {
             _tagSearchField.UnregisterCallback<KeyUpEvent>( OnKeyUp );
             EditorApplication.update -= ProcessTagBatch;
             EditorApplication.update -= ProcessSearchDebounce;
+            EditorSceneManager.sceneOpened -= OnSceneOpened;
             UnregisterDisplayCallbacks();
         }
 
-        //Register tag-specific callbacks when the tag is selected and displayed.
+        //Register tag-specific callbacks when the tag is selected and displayed
         void RegisterDisplayCallbacks() {
             _renameField.RegisterCallback<KeyDownEvent>( RenameFieldOnKeyDown, TrickleDown.TrickleDown );
             _renameButton.clicked += DoRename;
