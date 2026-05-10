@@ -1,11 +1,10 @@
 {
   "dependencies": {
     "com.unity.feature.2d": "2.0.1",
-    "com.unity.ide.rider": "3.0.36",
-    "com.unity.ide.vscode": "1.2.5",
+    "com.unity.ide.rider": "3.0.40",
     "com.unity.render-pipelines.universal": "12.1.15",
     "com.unity.test-framework": "1.1.33",
-    "com.unity.test-framework.performance": "3.0.3",
+    "com.unity.test-framework.performance": "3.4.2",
     "com.unity.textmeshpro": "3.0.9",
     "com.unity.ugui": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
