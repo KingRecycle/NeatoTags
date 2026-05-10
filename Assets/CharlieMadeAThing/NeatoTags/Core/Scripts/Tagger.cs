@@ -326,9 +326,13 @@ namespace CharlieMadeAThing.NeatoTags.Core {
         ///     Remove ALL tags from the tagger.
         /// </summary>
         public void RemoveAllTags() {
-            for ( var i = _tags.Count - 1; i >= 0; i-- ) {
-                RemoveTag( _tags[i] );
-            }
+            var taggedObjects = TaggerRegistry.GetStaticTaggedObjectsDictionary();
+            foreach ( var tag in _tags )
+                if ( tag && taggedObjects.TryGetValue( tag, out var set ) )
+                    set.Remove( gameObject );
+
+            _tags.Clear();
+            TaggerRegistry.RegisterNonTaggedGameObject( gameObject );
         }
 
         #endregion

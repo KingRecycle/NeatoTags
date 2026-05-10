@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CharlieMadeAThing.NeatoTags.Core;
 using NUnit.Framework;
@@ -304,6 +305,103 @@ namespace CharlieMadeAThing.NeatoTags.Tests.PlayMode {
 
 
             yield return null;
+        }
+    }
+
+    // Regression test for issue #25: Tagger.RemoveAllTags is O(n²).
+    // Each RemoveTag(NeatoTag) call does _tags.Remove(neatoTag), which is
+    // List<T>.Remove — O(n). Over n tags, that's O(n²) total.
+    //
+    // We measure RemoveAllTags at two pool sizes and assert the median-time
+    // ratio is closer to linear (~10×) than quadratic (~100×). 20× is the
+    // chosen threshold — 2× safety margin on either side of the boundary.
+    [TestFixture]
+    public class RemoveAllTagsScalingRegressionTests : NeatoTagTests {
+        const int SmallN = 100;
+        const int LargeN = 1000;
+        const int WarmupSamples = 3;
+        const int MeasurementSamples = 11;
+        const double LinearScalingThreshold = 20.0;
+
+        List<NeatoTag> _smallTagPool;
+        List<NeatoTag> _largeTagPool;
+        GameObject _target;
+        Tagger _targetTagger;
+
+        [UnitySetUp]
+        public new IEnumerator SetUp() {
+            yield return base.SetUp();
+            _smallTagPool = CreateRuntimeTagPool( SmallN, "Small" );
+            _largeTagPool = CreateRuntimeTagPool( LargeN, "Large" );
+            _target = new GameObject( "RemoveAllTagsScalingTarget" );
+            _targetTagger = _target.AddComponent<Tagger>();
+        }
+
+        [UnityTearDown]
+        public IEnumerator TearDown() {
+            if ( _target != null ) Object.Destroy( _target );
+            DestroyTagPool( _smallTagPool );
+            DestroyTagPool( _largeTagPool );
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator RemoveAllTags_ScalesLinearly_NotQuadratically() {
+            var medianSmallTicks = MeasureRemoveAllTags( _smallTagPool );
+            var medianLargeTicks = MeasureRemoveAllTags( _largeTagPool );
+
+            Assume.That( medianSmallTicks, Is.GreaterThan( 0L ),
+                $"Small-N (n={SmallN}) median was 0 ticks — Stopwatch resolution insufficient on this platform; ratio test cannot run." );
+
+            var ratio = (double)medianLargeTicks / medianSmallTicks;
+            const double sizeRatio = (double)LargeN / SmallN;
+
+            Assert.That( ratio, Is.LessThan( LinearScalingThreshold ),
+                $"RemoveAllTags scaling ratio (n={LargeN} / n={SmallN}) = {ratio:F1}×. " +
+                $"Expected ~{sizeRatio:F0}× for O(n) (threshold <{LinearScalingThreshold:F0}× allows 2× noise budget). " +
+                $"Observed ratio is consistent with O(n²) — see issue #25. " +
+                $"Medians: small={medianSmallTicks} ticks, large={medianLargeTicks} ticks." );
+
+            yield return null;
+        }
+
+        long MeasureRemoveAllTags( List<NeatoTag> tagPool ) {
+            var sw = new Stopwatch();
+
+            for ( var w = 0; w < WarmupSamples; w++ ) {
+                foreach ( var tag in tagPool ) _targetTagger.AddTag( tag );
+                _targetTagger.RemoveAllTags();
+            }
+
+            var samples = new List<long>( MeasurementSamples );
+            for ( var i = 0; i < MeasurementSamples; i++ ) {
+                foreach ( var tag in tagPool ) _targetTagger.AddTag( tag );
+                sw.Restart();
+                _targetTagger.RemoveAllTags();
+                sw.Stop();
+                samples.Add( sw.ElapsedTicks );
+            }
+
+            samples.Sort();
+            return samples[samples.Count / 2];
+        }
+
+        static List<NeatoTag> CreateRuntimeTagPool( int count, string label ) {
+            var pool = new List<NeatoTag>( count );
+            for ( var i = 0; i < count; i++ ) {
+                var tag = ScriptableObject.CreateInstance<NeatoTag>();
+                tag.name = $"PerfTag_{label}_{i}";
+                pool.Add( tag );
+            }
+            return pool;
+        }
+
+        static void DestroyTagPool( List<NeatoTag> pool ) {
+            if ( pool == null ) return;
+            foreach ( var tag in pool ) {
+                if ( tag != null ) Object.Destroy( tag );
+            }
+            pool.Clear();
         }
     }
 }
